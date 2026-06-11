@@ -1,9 +1,7 @@
 function DashboardPage() {
-  return (
-    <div className="container mt-5">
-      <h1>Dashboard Page</h1>
-    </div>
-  );
+    return (
+        <h1>Dashboard Page</h1>
+    );
 }
 
 export default DashboardPage;
