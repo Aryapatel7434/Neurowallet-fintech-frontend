@@ -1,3 +1,7 @@
+import "../../styles/dashboard.css";
+import "../../styles/loading.css";
+import { useState, useEffect } from "react";
+import { getDashboardStats } from "../../services/dashboardService";
 import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 
@@ -21,6 +25,69 @@ import UpcomingBills from "../../components/dashboard/UpcomingBills";
 import CategorySummary from "../../components/dashboard/CategorySummary";
 import "../../styles/dashboard.css";
 function DashboardPage() {
+    const [stats, setStats] = useState({
+         balance: 0,
+        income: 0,
+        expenses: 0,
+        savings: 0
+});
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState("");
+
+ const loadDashboard = async () => {
+  try {
+
+    const data = await getDashboardStats();
+
+    setStats(data);
+
+  } catch (error) {
+
+    console.error(error);
+
+     setError("Failed to load dashboard data");
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+useEffect(() => {
+  loadDashboard();
+}, []);
+
+if (loading) {
+  return (
+    <div style={{ padding: "50px" }}>
+      Loading Dashboard...
+    </div>
+  );
+}
+if (error) {
+  return (
+    <div style={{ padding: "50px" }}>
+
+      <h2>⚠️ Dashboard Error</h2>
+
+      <p>{error}</p>
+
+      <button
+        className="retry-btn"
+        onClick={() => {
+          setError("");
+          setLoading(true);
+          loadDashboard();
+        }}
+      >
+        Retry
+      </button>
+
+    </div>
+  );
+}
+
+
   return (
     <div className="dashboard-layout">
 

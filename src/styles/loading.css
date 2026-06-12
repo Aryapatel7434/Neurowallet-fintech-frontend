@@ -1,0 +1,20 @@
+.retry-btn {
+  background: #2563eb;
+  color: white;
+
+  border: none;
+
+  padding: 12px 20px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  margin-top: 15px;
+
+  font-weight: 600;
+}
+
+.retry-btn:hover {
+  opacity: 0.9;
+}
