@@ -1,0 +1,579 @@
+/* =========================
+   DASHBOARD LAYOUT
+========================= */
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f7fc;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 260px;
+  background: linear-gradient(
+    180deg,
+    #081229,
+    #0b1e46
+  );
+
+  color: white;
+  padding: 30px 20px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  width: 70px;
+  height: 70px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #4f8cff
+  );
+
+  border-radius: 18px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 28px;
+  font-weight: bold;
+
+  margin-bottom: 20px;
+
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.sidebar h2 {
+  margin-bottom: 40px;
+  font-size: 32px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  padding: 14px 12px;
+  margin-bottom: 12px;
+
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+  font-size: 16px;
+}
+
+.sidebar-menu li:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateX(5px);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.dashboard-content {
+  flex: 1;
+  padding: 30px;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.dashboard-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: white;
+
+  padding: 25px;
+  border-radius: 20px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.dashboard-navbar h2 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.dashboard-navbar p {
+  margin-top: 5px;
+  color: #64748b;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-box {
+  width: 260px;
+  padding: 12px 16px;
+
+  border: 1px solid #dbe3f0;
+  border-radius: 12px;
+
+  outline: none;
+}
+
+.search-box:focus {
+  border-color: #2563eb;
+}
+
+.notification {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.profile-circle {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  background: #2563eb;
+  color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: bold;
+}
+
+/* =========================
+   TOP CARDS
+========================= */
+
+.cards-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+.wallet-card {
+  background: white;
+
+  padding: 25px;
+  border-radius: 20px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+
+  transition: 0.3s;
+}
+
+.wallet-card:hover {
+  transform: translateY(-6px);
+}
+
+.wallet-card h4 {
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.wallet-card h2 {
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.growth {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* =========================
+   ANALYTICS SECTION
+========================= */
+
+.middle-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+.analytics-card,
+.insight-card {
+  background: white;
+
+  border-radius: 20px;
+  padding: 25px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.analytics-card h3,
+.insight-card h3 {
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.analytics-stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+.analytics-stats h4 {
+  color: #64748b;
+}
+
+.analytics-stats p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.insight-card p {
+  color: #64748b;
+  line-height: 1.8;
+}
+
+.insight-card h4 {
+  margin-top: 20px;
+  color: #16a34a;
+}
+
+/* =========================
+   TRANSACTION TABLE
+========================= */
+
+.transaction-card {
+  margin-top: 30px;
+
+  background: white;
+  border-radius: 20px;
+
+  padding: 25px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.transaction-card h3 {
+  margin-bottom: 20px;
+}
+
+.transaction-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-card th {
+  background: #f1f5f9;
+
+  text-align: left;
+
+  padding: 15px;
+  color: #475569;
+}
+
+.transaction-card td {
+  padding: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .middle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .sidebar {
+    display: none;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-navbar {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+}
+.bottom-grid {
+  margin-top: 30px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.quick-actions,
+.goal-card,
+.activity-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.action-grid button {
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.action-grid button:hover {
+  transform: translateY(-3px);
+}
+
+.goal {
+  margin-top: 20px;
+}
+
+.progress {
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #22c55e;
+}
+
+.activity-card ul {
+  padding-left: 20px;
+}
+
+.activity-card li {
+  margin-bottom: 12px;
+}
+
+/* =========================
+   CHARTS
+========================= */
+
+.chart-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+}
+
+.chart-grid-single {
+  margin-top: 25px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 {
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+@media (max-width: 1200px) {
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+.ai-advisor-card {
+  margin-top: 30px;
+
+  background: white;
+  border-radius: 20px;
+
+  padding: 30px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.advisor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 25px;
+}
+
+.advisor-badge {
+  background: #16a34a;
+  color: white;
+
+  padding: 6px 14px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.advisor-item {
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 15px;
+}
+
+.advisor-item h4 {
+  margin-bottom: 8px;
+}
+
+.positive {
+  background: #eff6ff;
+  border-left: 5px solid #2563eb;
+}
+
+.warning {
+  background: #fff7ed;
+  border-left: 5px solid #f97316;
+}
+
+.success {
+  background: #f0fdf4;
+  border-left: 5px solid #22c55e;
+}
+
+/* =========================
+   EXECUTIVE KPI SECTION
+========================= */
+
+.executive-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 25px;
+}
+
+.executive-card {
+  background: white;
+
+  border-radius: 20px;
+  padding: 25px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+
+  transition: 0.3s;
+}
+
+.executive-card:hover {
+  transform: translateY(-5px);
+}
+
+.executive-card span {
+  font-size: 28px;
+}
+
+.executive-card h4 {
+  margin-top: 15px;
+  color: #64748b;
+}
+
+.executive-card h2 {
+  margin-top: 10px;
+  color: #0f172a;
+}
+
+.executive-card p {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.positive {
+  color: #16a34a;
+}
+
+@media(max-width:1200px) {
+  .executive-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
+
+@media(max-width:768px) {
+  .executive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.finance-grid {
+  margin-top: 30px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 25px;
+}
+
+.wallet-accounts-card,
+.bills-card,
+.category-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.account-item,
+.bill-item,
+.category-row {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media(max-width:1200px){
+  .finance-grid{
+    grid-template-columns:1fr;
+  }
+}
