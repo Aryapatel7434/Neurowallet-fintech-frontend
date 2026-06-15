@@ -5,17 +5,17 @@ import { AuthContext } from "../../context/AuthContext";
 
 function Sidebar() {
 
+  const navigate = useNavigate();
+
   const { logout } =
     useContext(AuthContext);
-
-  const navigate =
-    useNavigate();
 
   const handleLogout = () => {
 
     logout();
 
     navigate("/");
+
   };
 
   return (
@@ -54,6 +54,7 @@ function Sidebar() {
       </ul>
 
     </div>
+
   );
 }
 

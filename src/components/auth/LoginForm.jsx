@@ -19,16 +19,19 @@ function LoginForm() {
 
         try {
 
-            const data = await loginUser(
-                email,
-                password
-            );
+           const data = await loginUser(
+             email,
+             password
+        );
 
-            console.log(data);
+        console.log(
+          "Login Response:",
+          data
+        );
 
-            login(data);
+        login(data);
 
-            navigate("/dashboard");
+        navigate("/dashboard");
 
         } catch (error) {
 

@@ -1,7 +1,10 @@
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
 import { useState, useEffect } from "react";
+
 import { getDashboardStats } from "../../services/dashboardService";
+import { getMyWallet } from "../../services/walletService";
+
 import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 
@@ -23,166 +26,231 @@ import AIAdvisorCard from "../../components/dashboard/AIAdvisorCard";
 import WalletAccounts from "../../components/dashboard/WalletAccounts";
 import UpcomingBills from "../../components/dashboard/UpcomingBills";
 import CategorySummary from "../../components/dashboard/CategorySummary";
-import "../../styles/dashboard.css";
+
 function DashboardPage() {
-    const [stats, setStats] = useState({
-         balance: 0,
-        income: 0,
-        expenses: 0,
-        savings: 0
+
+const [stats, setStats] = useState({
+balance: 0,
+income: 0,
+expenses: 0,
+savings: 0
 });
+
+const [wallet, setWallet] = useState(null);
+
 const [loading, setLoading] = useState(true);
+
 const [error, setError] = useState("");
 
- const loadDashboard = async () => {
-  try {
+const loadDashboard = async () => {
 
-    const data = await getDashboardStats();
 
-    setStats(data);
+try {
 
-  } catch (error) {
+  const data =
+    await getDashboardStats();
 
-    console.error(error);
+  setStats(data);
 
-     setError("Failed to load dashboard data");
+} catch (error) {
 
-  } finally {
+  console.error(error);
 
-    setLoading(false);
+  setError(
+    "Failed to load dashboard data"
+  );
 
-  }
+} finally {
+
+  setLoading(false);
+
+}
+
+
 };
+
+const loadWallet = async () => {
+
+
+try {
+
+  const data =
+    await getMyWallet();
+
+  console.log(
+    "Wallet Data:",
+    data
+  );
+
+  setWallet(data);
+
+} catch (error) {
+
+  console.error(
+    "Wallet Error:",
+    error
+  );
+}
+
+};
+
 useEffect(() => {
-  loadDashboard();
+
+
+loadDashboard();
+
+loadWallet();
+
+
 }, []);
 
 if (loading) {
-  return (
-    <div style={{ padding: "50px" }}>
-      Loading Dashboard...
-    </div>
-  );
+
+
+return (
+
+  <div style={{ padding: "50px" }}>
+    Loading Dashboard...
+  </div>
+
+);
+
+
 }
+
 if (error) {
-  return (
-    <div style={{ padding: "50px" }}>
 
-      <h2>⚠️ Dashboard Error</h2>
 
-      <p>{error}</p>
+return (
 
-      <button
-        className="retry-btn"
-        onClick={() => {
-          setError("");
-          setLoading(true);
-          loadDashboard();
-        }}
-      >
-        Retry
-      </button>
+  <div style={{ padding: "50px" }}>
 
-    </div>
-  );
+    <h2>
+      ⚠️ Dashboard Error
+    </h2>
+
+    <p>{error}</p>
+
+    <button
+      className="retry-btn"
+      onClick={() => {
+
+        setError("");
+
+        setLoading(true);
+
+        loadDashboard();
+
+        loadWallet();
+
+      }}
+    >
+      Retry
+    </button>
+
+  </div>
+
+);
+
+
 }
 
+return (
 
-  return (
-    <div className="dashboard-layout">
 
-      <Sidebar />
+<div className="dashboard-layout">
 
-      <div className="dashboard-content">
+  <Sidebar />
 
-      {/* Navbar */}
-<Navbar />
+  <div className="dashboard-content">
 
-{/* Executive KPI Section */}
-<div>Executive Stats Test</div>
+    <Navbar />
 
-<div className="cards-grid"></div>
-        {/* Wallet Cards */}
-        <div className="cards-grid">
+    <div>
+      Executive Stats Test
+    </div>
 
-          <WalletCard
-            title="Total Balance"
-            amount="₹1,25,000"
-            growth="12.5%"
-          />
+    <div className="cards-grid">
 
-          <WalletCard
-            title="Income"
-            amount="₹50,000"
-            growth="8%"
-          />
+      <WalletCard
+        title="Total Balance"
+        amount={
+          wallet
+            ? `₹${wallet.balance}`
+            : "Loading..."
+        }
+        growth="12.5%"
+      />
 
-          <WalletCard
-            title="Expenses"
-            amount="₹15,000"
-            growth="3%"
-          />
+       <WalletCard
+        title="Income"
+        amount={`₹${stats.income}`}
+        growth="8%"
+    />
 
-          <WalletCard
-            title="Savings"
-            amount="₹35,000"
-            growth="15%"
-          />
+      <WalletCard
+        title="Expenses"
+        amount={`₹${stats.expenses}`}
+        growth="3%"
+    />
 
-        </div>
+    <WalletCard
+      title="Savings"
+      amount={`₹${stats.savings}`}
+      growth="15%"
+    />
+    </div>
 
-        {/* Charts */}
-        <div className="chart-grid">
+    <div className="chart-grid">
 
-          <IncomeChart />
+      <IncomeChart />
 
-          <ExpenseChart />
-
-        </div>
-
-        <div className="chart-grid-single">
-
-          <SavingChart />
-
-        </div>
-
-        {/* AI Advisor */}
-        <AIAdvisorCard />
-
-        {/* Insight Card */}
-        <div className="middle-grid">
-
-          <InsightCard />
-
-        </div>
-
-        {/* Transactions */}
-        <TransactionTable />
-
-            <div className="finance-grid">
-
-            <WalletAccounts />
-
-             <UpcomingBills />
-
-            <CategorySummary />
-
-        </div>
-        {/* Bottom Widgets */}
-        <div className="bottom-grid">
-
-          <QuickActions />
-
-          <GoalTracker />
-
-          <ActivityFeed />
-
-        </div>
-
-      </div>
+      <ExpenseChart />
 
     </div>
-  );
+
+    <div className="chart-grid-single">
+
+      <SavingChart />
+
+    </div>
+
+    <AIAdvisorCard />
+
+    <div className="middle-grid">
+
+      <InsightCard />
+
+    </div>
+
+    <TransactionTable />
+
+    <div className="finance-grid">
+
+      <WalletAccounts />
+
+      <UpcomingBills />
+
+      <CategorySummary />
+
+    </div>
+
+    <div className="bottom-grid">
+
+      <QuickActions />
+
+      <GoalTracker />
+
+      <ActivityFeed />
+
+    </div>
+
+  </div>
+
+</div>
+
+
+);
 }
 
 export default DashboardPage;

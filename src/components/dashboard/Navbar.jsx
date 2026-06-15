@@ -1,10 +1,26 @@
+import { useContext } from "react";
+
+import { AuthContext } from "../../context/AuthContext";
+
 function Navbar() {
+
+  const { user } =
+    useContext(AuthContext);
+
   return (
+
     <div className="dashboard-navbar">
 
       <div>
-        <h2>Welcome Arya 👋</h2>
-        <p>Monitor your wallet and AI insights</p>
+
+        <h2>
+          Welcome {user?.name || "User"} 👋
+        </h2>
+
+        <p>
+          Monitor your wallet and AI insights
+        </p>
+
       </div>
 
       <div className="navbar-right">
@@ -20,12 +36,15 @@ function Navbar() {
         </span>
 
         <div className="profile-circle">
-          AP
+
+          {user?.initials || "U"}
+
         </div>
 
       </div>
 
     </div>
+
   );
 }
 

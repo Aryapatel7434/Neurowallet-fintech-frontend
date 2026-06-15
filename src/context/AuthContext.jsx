@@ -11,48 +11,60 @@ export const AuthProvider = ({
   children,
 }) => {
 
-  const [user, setUser] =
-    useState(null);
+ const [user, setUser] =
+  useState(() => {
 
-  useEffect(() => {
-
-    const accessToken =
+    const savedUser =
       localStorage.getItem(
-        "accessToken"
+        "user"
       );
 
-    const refreshToken =
-      localStorage.getItem(
-        "refreshToken"
-      );
+    return savedUser
+      ? JSON.parse(savedUser)
+      : null;
 
-    if (
-      accessToken &&
-      refreshToken
-    ) {
+  });
+ useEffect(() => {
 
-      setUser({
-        accessToken,
-        refreshToken
-      });
-    }
+  const savedUser =
+    localStorage.getItem(
+      "user"
+    );
 
-  }, []);
+  if (savedUser) {
+
+    setUser(
+      JSON.parse(savedUser)
+    );
+  }
+
+}, []);
 
   const login = (data) => {
 
-    localStorage.setItem(
-      "accessToken",
-      data.accessToken
-    );
+  localStorage.setItem(
+    "accessToken",
+    data.accessToken
+  );
 
-    localStorage.setItem(
-      "refreshToken",
-      data.refreshToken
-    );
+  localStorage.setItem(
+    "refreshToken",
+    data.refreshToken
+  );
 
-    setUser(data);
+  const userData = {
+
+    name: "Arya",
+    initials: "AP"
   };
+
+  localStorage.setItem(
+    "user",
+    JSON.stringify(userData)
+  );
+
+  setUser(userData);
+};
 
   const logout = () => {
 
@@ -62,6 +74,9 @@ export const AuthProvider = ({
 
     localStorage.removeItem(
       "refreshToken"
+    );
+     localStorage.removeItem(
+    "user"
     );
 
     setUser(null);
