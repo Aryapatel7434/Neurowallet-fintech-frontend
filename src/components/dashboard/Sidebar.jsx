@@ -1,5 +1,25 @@
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../../context/AuthContext";
+
 function Sidebar() {
+
+  const { logout } =
+    useContext(AuthContext);
+
+  const navigate =
+    useNavigate();
+
+  const handleLogout = () => {
+
+    logout();
+
+    navigate("/");
+  };
+
   return (
+
     <div className="sidebar">
 
       <div className="sidebar-logo">
@@ -11,12 +31,25 @@ function Sidebar() {
       <ul className="sidebar-menu">
 
         <li>🏠 Dashboard</li>
+
         <li>💰 Wallet</li>
+
         <li>💳 Transactions</li>
+
         <li>📊 Analytics</li>
+
         <li>🤖 AI Insights</li>
+
         <li>⚙ Settings</li>
-        <li>🚪 Logout</li>
+
+        <li
+          onClick={handleLogout}
+          style={{
+            cursor: "pointer"
+          }}
+        >
+          🚪 Logout
+        </li>
 
       </ul>
 

@@ -1,8 +1,11 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:8080/api/dashboard";
+import axiosInstance from "../api/axiosConfig";
 
 export const getDashboardStats = async () => {
-  const response = await axios.get(`${API_URL}/stats`);
+
+  const response =
+    await axiosInstance.get(
+      "/dashboard/stats"
+    );
+
   return response.data;
 };
