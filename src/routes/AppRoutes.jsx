@@ -10,6 +10,9 @@ from "../pages/auth/RegisterPage";
 import DashboardPage
 from "../pages/dashboard/DashboardPage";
 
+import WalletPage
+from "../pages/wallet/WalletPage";
+
 import ProtectedRoute
 from "../components/auth/ProtectedRoute";
 
@@ -35,9 +38,16 @@ function AppRoutes() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
 
+        <Route
+          path="/wallet"
+          element={
+            <ProtectedRoute>
+              <WalletPage />
             </ProtectedRoute>
           }
         />

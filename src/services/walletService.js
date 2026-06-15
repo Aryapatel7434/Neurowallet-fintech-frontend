@@ -38,3 +38,13 @@ export const withdrawMoney =
 
     return response.data;
 };
+export const getTransactions =
+  async () => {
+
+    const response =
+      await axiosInstance.get(
+        "/wallet/transactions"
+      );
+
+    return response.data;
+};

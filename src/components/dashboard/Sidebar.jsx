@@ -32,7 +32,16 @@ function Sidebar() {
 
         <li>🏠 Dashboard</li>
 
-        <li>💰 Wallet</li>
+       <li
+           onClick={() =>
+            navigate("/wallet")
+       }
+      style={{
+         cursor: "pointer"
+      }}
+    >
+     💰 Wallet
+    </li>
 
         <li>💳 Transactions</li>
 
