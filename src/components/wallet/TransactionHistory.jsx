@@ -80,18 +80,19 @@ function TransactionHistory() {
 
                 <td>
 
-                  <span
-                    className={
-                      tx.type ===
-                      "CREDIT"
-                        ? "credit-badge"
-                        : "debit-badge"
-                    }
-                  >
+                 <span
+           className={
+  tx.type === "CREDIT"
+    ? "credit-badge"
+    : tx.type === "DEBIT"
+    ? "debit-badge"
+    : "transfer-badge"
+}
+  >
 
-                    {tx.type}
+    {tx.type}
 
-                  </span>
+</span>
 
                 </td>
 

@@ -37,6 +37,21 @@ function WalletAnalytics({
           ),
         0
       );
+  const totalTransfer =
+  transactions
+    .filter(
+      tx =>
+        tx.type ===
+        "TRANSFER"
+    )
+    .reduce(
+      (sum, tx) =>
+        sum +
+        Number(
+          tx.amount
+        ),
+      0
+    );
 
   return (
 
@@ -66,18 +81,29 @@ function WalletAnalytics({
 
       </div>
 
-      <div className="analytics-card">
+     <div className="analytics-card">
 
-        <h3>
-          Transactions
-        </h3>
+  <h3>
+    Total Transfers
+  </h3>
 
-        <h2>
-          {transactions.length}
-        </h2>
+  <h2>
+    ₹{totalTransfer}
+  </h2>
 
-      </div>
+</div>
 
+<div className="analytics-card">
+
+  <h3>
+    Transactions
+  </h3>
+
+  <h2>
+    {transactions.length}
+  </h2>
+
+</div>
       <div className="analytics-card">
 
         <h3>
