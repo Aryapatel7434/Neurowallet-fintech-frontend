@@ -148,3 +148,52 @@ Recharts
 CSS3
 Component-Based Architecture
 
+
+
+
+
+# NeuroWallet AI Frontend
+
+Professional AI-Powered FinTech Platform Frontend built using React.
+
+## Features
+
+- JWT Authentication
+- Secure Login & Registration
+- Protected Routes
+- Wallet Dashboard
+- Add Money
+- Withdraw Money
+- Quick Transfer
+- Transaction History
+- Search Transactions
+- Filter Transactions
+- Pagination
+- Wallet Analytics
+- Transfer Activity
+- Toast Notifications
+- Responsive Design
+- Professional UI/UX
+
+## Tech Stack
+
+- React
+- React Router
+- Axios
+- Bootstrap
+- React Icons
+- React Toastify
+
+## Installation
+
+npm install
+
+npm start
+
+## Backend API
+
+Spring Boot REST APIs
+
+## Author
+
+Ary Patel
