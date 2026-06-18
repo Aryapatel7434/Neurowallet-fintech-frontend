@@ -1,6 +1,11 @@
 import { toast } from "react-toastify";
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 
 import { AuthContext } from "../../context/AuthContext";
 import { loginUser } from "../../services/authService";
@@ -14,31 +19,62 @@ function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [loading, setLoading] =
+        useState(false);
+
+    const [showPassword,
+        setShowPassword] =
+        useState(false);
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
+        if (!email || !password) {
+
+            toast.error(
+                "Please enter email and password"
+            );
+
+            return;
+        }
+
+        setLoading(true);
+
         try {
 
-           const data = await loginUser(
-             email,
-             password
-        );
+            const data =
+                await loginUser(
+                    email,
+                    password
+                );
 
-        console.log(
-          "Login Response:",
-          data
-        );
+            console.log(
+                "Login Response:",
+                data
+            );
 
-        login(data);
+            login(data);
 
-        navigate("/dashboard");
+            toast.success(
+                "Login Successful"
+            );
+
+            navigate(
+                "/dashboard"
+            );
 
         } catch (error) {
 
             console.error(error);
 
-           toast.error("Login Failed");
+            toast.error(
+                "Login Failed"
+            );
+
+        } finally {
+
+            setLoading(false);
 
         }
     };
@@ -53,15 +89,25 @@ function LoginForm() {
                     Email
                 </label>
 
-                <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
-                />
+                <div className="input-wrapper">
+
+                    <MdEmail
+                        className="input-icon"
+                    />
+
+                    <input
+                        type="email"
+                        className="form-control input-with-icon"
+                        placeholder="Enter Email"
+                        value={email}
+                        onChange={(e) =>
+                            setEmail(
+                                e.target.value
+                            )
+                        }
+                    />
+
+                </div>
 
             </div>
 
@@ -71,15 +117,47 @@ function LoginForm() {
                     Password
                 </label>
 
-                <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Enter Password"
-                    value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                />
+                <div className="password-wrapper">
+
+                    <FaLock
+                        className="input-icon"
+                    />
+
+                    <input
+                        type={
+                            showPassword
+                                ? "text"
+                                : "password"
+                        }
+                        className="form-control"
+                        placeholder="Enter Password"
+                        value={password}
+                        onChange={(e) =>
+                            setPassword(
+                                e.target.value
+                            )
+                        }
+                    />
+
+                    <button
+                        type="button"
+                        className="eye-btn"
+                        onClick={() =>
+                            setShowPassword(
+                                !showPassword
+                            )
+                        }
+                    >
+
+                        {
+                            showPassword
+                                ? <FaEyeSlash />
+                                : <FaEye />
+                        }
+
+                    </button>
+
+                </div>
 
             </div>
 
@@ -87,39 +165,52 @@ function LoginForm() {
 
                 <label className="remember-me">
 
-                    <input type="checkbox" />
+                    <input
+                        type="checkbox"
+                        className="remember-checkbox"
+                    />
 
-                    <span>Remember Me</span>
+                    <span>
+                        Remember Me
+                    </span>
 
                 </label>
 
-                <a
-                    href="/"
+                <Link
+                    to="/forgot-password"
                     className="forgot-link"
                 >
                     Forgot Password?
-                </a>
+                </Link>
 
             </div>
 
             <button
                 type="submit"
-                className="auth-btn"
+                className="login-btn"
+                disabled={loading}
             >
-                Login
+
+                {
+                    loading
+                        ? "Signing In..."
+                        : "Login"
+                }
+
             </button>
 
             <div className="auth-link">
 
                 New User?{" "}
 
-                <a href="/register">
+                <Link to="/register">
                     Create Account
-                </a>
+                </Link>
 
             </div>
 
         </form>
+
     );
 }
 
