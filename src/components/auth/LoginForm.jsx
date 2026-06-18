@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,7 +38,7 @@ function LoginForm() {
 
             console.error(error);
 
-            alert("Login Failed");
+           toast.error("Login Failed");
 
         }
     };

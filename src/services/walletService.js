@@ -48,3 +48,13 @@ export const getTransactions =
 
     return response.data;
 };
+export const getNotifications =
+  async () => {
+
+    const response =
+      await axiosInstance.get(
+        "/notifications"
+      );
+
+    return response.data;
+};

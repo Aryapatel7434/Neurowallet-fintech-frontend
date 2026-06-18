@@ -1,5 +1,11 @@
-import { BrowserRouter, Routes, Route }
-from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
 
 import LoginPage
 from "../pages/auth/LoginPage";
@@ -12,6 +18,9 @@ from "../pages/dashboard/DashboardPage";
 
 import WalletPage
 from "../pages/wallet/WalletPage";
+
+import NotificationsPage
+from "../pages/notifications/NotificationsPage";
 
 import ProtectedRoute
 from "../components/auth/ProtectedRoute";
@@ -52,10 +61,30 @@ function AppRoutes() {
           }
         />
 
+        <Route
+          path="/notifications"
+          element={
+            <NotificationsPage />
+          }
+        />
+
       </Routes>
 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick={true}
+        pauseOnHover={true}
+        draggable={true}
+        theme="dark"
+      />
+
     </BrowserRouter>
+
   );
+
 }
 
 export default AppRoutes;

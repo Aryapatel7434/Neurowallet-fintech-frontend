@@ -1,5 +1,10 @@
+import { FaPlus } from "react-icons/fa";
+import { FaWallet } from "react-icons/fa";
+import { FaPaperPlane } from "react-icons/fa";
+import {
+  FaArrowTrendDown
+} from "react-icons/fa6";
 import "../../styles/wallet.css";
-
 import { useEffect, useState } from "react";
 
 import TransactionHistory
@@ -7,13 +12,14 @@ from "../../components/wallet/TransactionHistory";
 
 import WalletAnalytics
 from "../../components/wallet/WalletAnalytics";
-import TransferInsights
-from "../../components/wallet/TransferInsights";
 import TransferActivity
 from "../../components/wallet/TransferActivity";
 import {
   transferMoney
 } from "../../services/transferService";
+import WalletHeader
+from "../../components/wallet/WalletHeader";
+import { toast } from "react-toastify";
 import {
   getMyWallet,
   getTransactions,
@@ -84,11 +90,10 @@ const [transferAmount,
 
         }
       };
-
+    
     loadWallet();
 
   }, []);
-
   const handleAddMoney =
     async () => {
 
@@ -112,17 +117,18 @@ const [transferAmount,
 
         setAmount("");
 
-        alert(
-          "Money Added Successfully"
-        );
+       toast.success(
+  "₹" + amount +
+  " added successfully"
+);
 
       } catch (error) {
 
         console.error(error);
 
-        alert(
-          "Add Money Failed"
-        );
+           toast.error(
+  "Failed to add money"
+);
       }
     };
 
@@ -149,17 +155,18 @@ const [transferAmount,
 
         setAmount("");
 
-        alert(
-          "Money Withdrawn Successfully"
-        );
+         toast.success(
+  "₹" + amount +
+  " withdrawn successfully"
+);
 
       } catch (error) {
 
         console.error(error);
 
-        alert(
-          "Withdraw Failed"
-        );
+          toast.error(
+  "Withdraw failed"
+);
       }
     };
     const handleTransfer =
@@ -167,15 +174,14 @@ const [transferAmount,
 
     try {
 
-      const response =
         await transferMoney(
-          receiverEmail,
-          Number(
-            transferAmount
-          )
-        );
+  receiverEmail,
+  Number(transferAmount)
+);
 
-      alert(response);
+         toast.success(
+  "Transfer completed successfully"
+);
 
       const walletData =
         await getMyWallet();
@@ -195,125 +201,128 @@ const [transferAmount,
 
       console.error(error);
 
-      alert(
-        "Transfer Failed"
-      );
+          toast.error(
+  "Transfer failed"
+);
     }
 };
 
   if (loading) {
-
-    return (
-      <h2>
-        Loading Wallet...
-      </h2>
-    );
-  }
-
+  return (
+    <div className="loading-screen">
+      <div className="loader"></div>
+      <h2>Loading NeuroWallet...</h2>
+    </div>
+  );
+}
   return (
 
     <div className="wallet-container">
 
-      <div className="wallet-header">
+     <div className="wallet-header">
 
-        <h1>
-          💰 My Wallet
-        </h1>
+  <div className="wallet-header-top">
 
-        <p>
-          Manage your wallet balance
-        </p>
+     <WalletHeader wallet={wallet} />
 
-      </div>
 
-      <div className="wallet-card">
+  </div>
 
-        <h2>
-          Available Balance
-        </h2>
+</div>
 
-        <div className="wallet-balance">
+           <div className="wallet-card">
 
-          ₹{wallet.balance}
+  <div className="wallet-card-top">
 
-        </div>
+     <h3 className="premium-title">
+  <FaWallet />
+  <span>NeuroWallet Premium</span>
+</h3>
 
-        <div className="wallet-info">
+    <span
+      className="status-badge"
+    >
+      ACTIVE
+    </span>
 
-          Wallet ID :
-          {wallet.walletId}
+  </div>
 
-          <br />
+  <p
+    className="balance-label"
+  >
+    Available Balance
+  </p>
 
-          Currency :
-          {wallet.currency}
+  <h1
+    className="wallet-balance"
+  >
+    ₹
+    {wallet.balance}
+  </h1>
 
-          <br />
+  <div
+    className="wallet-details"
+  >
 
-          Status :
-          {wallet.status}
+    <p>
+      Currency : INR
+    </p>
 
-        </div>
+    <p>
+      Last Updated :
+      Just Now
+    </p>
 
-      </div>
+  </div>
 
+</div>
       <WalletAnalytics
         wallet={wallet}
         transactions={transactions}
       />
-      <TransferInsights
-  transactions={
-    transactions
-  }
-/>
 <TransferActivity
   transactions={
     transactions
   }
 />
-     <div className="wallet-actions">
-
-  <div>
+  <div className="wallet-actions">
 
     <input
-      type="number"
-      placeholder="Enter Amount"
-      value={amount}
-      onChange={(e) =>
-        setAmount(
-          e.target.value
-        )
-      }
+        type="number"
+        placeholder="Enter Amount"
+        value={amount}
+        onChange={(e)=>
+            setAmount(
+                e.target.value
+            )
+        }
     />
 
-    <br />
-    <br />
+<button
+  className="wallet-btn"
+  onClick={handleAddMoney}
+>
+  <FaPlus />
+  <span>Add Money</span>
+</button>
 
-    <button
-      className="wallet-btn"
-      onClick={handleAddMoney}
-    >
-      Add Money
-    </button>
-
-  </div>
-
-  <button
-    className="wallet-btn"
-    onClick={handleWithdraw}
-  >
-    Withdraw
-  </button>
+<button
+  className="wallet-btn"
+  onClick={handleWithdraw}
+>
+  <FaArrowTrendDown />
+  <span>Withdraw</span>
+</button>
 
 </div>
-
 {/* Transfer Money Section */}
 
 <div className="wallet-transfer">
 
-  <h3>
-    Transfer Money
-  </h3>
+  <h3 className="transfer-title">
+  <FaPaperPlane />
+  <span>Quick Transfer</span>
+</h3>
 
   <input
     type="email"

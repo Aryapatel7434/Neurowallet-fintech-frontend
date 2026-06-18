@@ -4,3 +4,19 @@ body{
     background:#f5f7fa;
     font-family:Arial, Helvetica, sans-serif;
 }
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:#0f172a;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#8b5cf6;
+  border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:#a78bfa;
+}
