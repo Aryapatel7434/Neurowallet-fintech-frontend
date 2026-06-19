@@ -7,61 +7,29 @@ import {
   MdSwapHoriz
 } from "react-icons/md";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import {
-  getTransactions
-} from "../../services/walletService";
-
-function TransactionHistory() {
-
-  const [transactions, setTransactions] =
-    useState([]);
+function TransactionHistory({
+  transactions = []
+}) {
 
   const [search, setSearch] =
     useState("");
 
   const [filter, setFilter] =
     useState("ALL");
-const [currentPage,
-  setCurrentPage] =
-  useState(1);
 
-const recordsPerPage = 10;
-  useEffect(() => {
+  const [currentPage,
+    setCurrentPage] =
+    useState(1);
 
-    const loadTransactions =
-      async () => {
-
-        try {
-
-          const data =
-            await getTransactions();
-
-          console.log(
-            "Transactions:",
-            data
-          );
-
-          setTransactions(data);
-
-        } catch (error) {
-
-          console.error(error);
-
-        }
-
-      };
-
-    loadTransactions();
-
-  }, []);
+  const recordsPerPage = 10;
 
   const filteredTransactions =
     transactions.filter((tx) => {
 
       const matchesSearch =
-        tx.type
+        (tx.type || "")
           .toLowerCase()
           .includes(
             search.toLowerCase()
@@ -78,25 +46,29 @@ const recordsPerPage = 10;
       );
 
     });
-    const lastIndex =
-  currentPage *
-  recordsPerPage;
 
-const firstIndex =
-  lastIndex -
-  recordsPerPage;
+  const lastIndex =
+    currentPage *
+    recordsPerPage;
 
-const currentTransactions =
-  filteredTransactions.slice(
-    firstIndex,
-    lastIndex
-  );
+  const firstIndex =
+    lastIndex -
+    recordsPerPage;
 
-const totalPages =
-  Math.ceil(
-    filteredTransactions.length /
-    recordsPerPage
-  );
+  const currentTransactions =
+    filteredTransactions.slice(
+      firstIndex,
+      lastIndex
+    );
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredTransactions.length /
+        recordsPerPage
+      )
+    );
 
   return (
 
@@ -105,8 +77,6 @@ const totalPages =
       <h2>
         Recent Transactions
       </h2>
-
-      {/* Filters + Counter */}
 
       <div className="transaction-toolbar">
 
@@ -178,8 +148,6 @@ const totalPages =
 
       </div>
 
-      {/* Search */}
-
       <input
         type="text"
         placeholder="Search Credit, Debit, Transfer..."
@@ -191,8 +159,6 @@ const totalPages =
           )
         }
       />
-
-      {/* Table */}
 
       <table className="transaction-table">
 
@@ -214,16 +180,16 @@ const totalPages =
 
         <tbody>
 
-          {filteredTransactions.length === 0 ? (
+          {currentTransactions.length === 0 ? (
 
             <tr>
 
-               <td
-  colSpan="4"
-  className="empty-state"
->
-  🔍 No Transactions Found
-</td>
+              <td
+                colSpan="4"
+                className="empty-state"
+              >
+                No Transactions Found
+              </td>
 
             </tr>
 
@@ -231,13 +197,22 @@ const totalPages =
 
             currentTransactions.map((tx) => (
 
-              <tr key={tx.id}>
+              <tr
+                key={
+                  tx.id ||
+                  tx.transactionId
+                }
+              >
 
                 <td>
 
-                  {new Date(
+                  {
                     tx.createdAt
-                  ).toLocaleDateString()}
+                      ? new Date(
+                          tx.createdAt
+                        ).toLocaleDateString()
+                      : "-"
+                  }
 
                 </td>
 
@@ -285,7 +260,7 @@ const totalPages =
 
                   ₹
                   {Number(
-                    tx.amount
+                    tx.amount || 0
                   ).toLocaleString()}
 
                 </td>
@@ -309,40 +284,43 @@ const totalPages =
         </tbody>
 
       </table>
+
       <div className="pagination">
 
-  <button
-    disabled={
-      currentPage === 1
-    }
-    onClick={() =>
-      setCurrentPage(
-        currentPage - 1
-      )
-    }
-  >
-    Previous
-  </button>
+        <button
+          disabled={
+            currentPage === 1
+          }
+          onClick={() =>
+            setCurrentPage(
+              currentPage - 1
+            )
+          }
+        >
+          Previous
+        </button>
 
-  <span>
-    Page {currentPage}
-    of {totalPages}
-  </span>
+        <span>
+          Page {currentPage}
+          {" "}of{" "}
+          {totalPages}
+        </span>
 
-  <button
-    disabled={
-      currentPage === totalPages
-    }
-    onClick={() =>
-      setCurrentPage(
-        currentPage + 1
-      )
-    }
-  >
-    Next
-  </button>
+        <button
+          disabled={
+            currentPage ===
+            totalPages
+          }
+          onClick={() =>
+            setCurrentPage(
+              currentPage + 1
+            )
+          }
+        >
+          Next
+        </button>
 
-</div>
+      </div>
 
     </div>
 

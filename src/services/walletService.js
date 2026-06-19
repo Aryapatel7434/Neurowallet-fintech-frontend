@@ -1,21 +1,32 @@
-import axiosInstance from "../api/axiosConfig";
+import api from "../api/axiosConfig";
+
+/*
+=================================
+GET MY WALLET
+GET /wallet/me
+=================================
+*/
 
 export const getMyWallet = async () => {
 
   const response =
-    await axiosInstance.get(
-      "/wallet/me"
-    );
+    await api.get("/wallet/me");
 
   return response.data;
 };
 
+/*
+=================================
+ADD MONEY
+POST /wallet/add
+=================================
+*/
 export const addMoney = async (
   amount
 ) => {
 
   const response =
-    await axiosInstance.post(
+    await api.post(
       "/wallet/add-money",
       {
         amount
@@ -25,36 +36,68 @@ export const addMoney = async (
   return response.data;
 };
 
+/*
+=================================
+WITHDRAW MONEY
+POST /wallet/withdraw
+=================================
+*/
+
 export const withdrawMoney =
-  async (amount) => {
+async (amount) => {
 
-    const response =
-      await axiosInstance.post(
-        "/wallet/withdraw",
-        {
-          amount
-        }
-      );
+  const response =
+    await api.post(
+      "/wallet/withdraw",
+      {
+        amount
+      }
+    );
 
-    return response.data;
+  return response.data;
 };
-export const getTransactions =
-  async () => {
 
-    const response =
-      await axiosInstance.get(
-        "/wallet/transactions"
-      );
+/*
+=================================
+TRANSACTION HISTORY
+GET /transactions/history
+=================================
+*/
 
+export const getTransactions = async () => {
+
+  const response =
+     await api.get(
+  "/wallet/transactions"
+);
+  console.log(
+    "Transaction API Response:",
+    response.data
+  );
+
+  if (
+    Array.isArray(response.data)
+  ) {
     return response.data;
-};
-export const getNotifications =
-  async () => {
+  }
 
-    const response =
-      await axiosInstance.get(
-        "/notifications"
-      );
+  if (
+    response.data &&
+    Array.isArray(
+      response.data.content
+    )
+  ) {
+    return response.data.content;
+  }
 
-    return response.data;
+  if (
+    response.data &&
+    Array.isArray(
+      response.data.transactions
+    )
+  ) {
+    return response.data.transactions;
+  }
+
+  return [];
 };

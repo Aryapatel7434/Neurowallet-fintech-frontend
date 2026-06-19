@@ -1,6 +1,7 @@
-function ActivityFeed() {
+function ActivityTimeline() {
   return (
     <div className="activity-card">
+
       <h3>Recent Activity</h3>
 
       <ul>
@@ -9,8 +10,9 @@ function ActivityFeed() {
         <li>⚡ Mobile Recharge</li>
         <li>🛒 Amazon Shopping</li>
       </ul>
+
     </div>
   );
 }
 
-export default ActivityFeed;
+export default ActivityTimeline;

@@ -32,9 +32,12 @@ function WalletAnalytics({
   wallet = {}
 
 }) {
-
+  const safeTransactions =
+Array.isArray(transactions)
+  ? transactions
+  : [];
   const totalCredit =
-    transactions
+    safeTransactions
       .filter(tx => tx.type === "CREDIT")
       .reduce(
         (sum, tx) =>
@@ -42,42 +45,41 @@ function WalletAnalytics({
         0
       );
 
-  const totalDebit =
-    transactions
-      .filter(tx => tx.type === "DEBIT")
+    const totalDebit =
+  safeTransactions
+    .filter(tx => tx.type === "DEBIT")
       .reduce(
         (sum, tx) =>
           sum + Number(tx.amount),
         0
       );
 
-  const totalTransfer =
-    transactions
-      .filter(tx => tx.type === "TRANSFER")
+      const totalTransfer =
+  safeTransactions
+    .filter(tx => tx.type === "TRANSFER")
       .reduce(
         (sum, tx) =>
           sum + Number(tx.amount),
         0
       );
 
-  const highestCredit =
-    Math.max(
-      ...transactions
-        .filter(tx => tx.type === "CREDIT")
+        const highestCredit =
+  Math.max(
+    ...safeTransactions
         .map(tx => Number(tx.amount)),
       0
     );
 
-  const highestDebit =
-    Math.max(
-      ...transactions
+   const highestDebit =
+  Math.max(
+    ...safeTransactions
         .filter(tx => tx.type === "DEBIT")
         .map(tx => Number(tx.amount)),
       0
     );
-
-  const successRate = 100;
-
+console.log("Analytics Transactions:");
+console.log(transactions);
+console.log("Analytics Data:", transactions);
   return (
 
     <div className="analytics-grid">
@@ -135,15 +137,15 @@ function WalletAnalytics({
 
         <p className="analytics-growth">
           {
-            transactions.filter(
-              tx => tx.type === "TRANSFER"
-            ).length
+              safeTransactions.filter(
+  tx => tx.type === "TRANSFER"
+).length
           } Successful
         </p>
 
       </div>
 
-      {/* Transactions */}
+    {/* {transactions /} */}
 
       <div className="analytics-card">
 
@@ -153,7 +155,7 @@ function WalletAnalytics({
         </h3>
 
         <h2>
-          {transactions.length}
+             {safeTransactions.length}
         </h2>
 
         <p className="analytics-growth">
@@ -238,11 +240,195 @@ function WalletAnalytics({
 
       </div>
 
-      {/* Success Rate */}
-
     </div>
 
   );
 }
 
 export default WalletAnalytics;
+
+
+// import {
+//   FaArrowTrendUp,
+//   FaArrowTrendDown
+// } from "react-icons/fa6";
+
+// import { MdSwapHoriz } from "react-icons/md";
+// import { HiMiniChartBar } from "react-icons/hi2";
+// import { FaWallet } from "react-icons/fa";
+
+// function WalletAnalytics({
+//   transactions = [],
+//   wallet = {}
+// }) {
+
+//   const safeTransactions =
+//     Array.isArray(transactions)
+//       ? transactions
+//       : [];
+
+//   const totalCredit =
+//     safeTransactions
+//       .filter(
+//         tx =>
+//             tx.type?.toUpperCase() ===
+//  "CREDIT"
+//       )
+//       .reduce(
+//         (sum, tx) =>
+//           sum + Number(tx.amount),
+//         0
+//       );
+
+//   const totalDebit =
+//     safeTransactions
+//       .filter(
+//         tx =>
+//             tx.type?.toUpperCase() ===
+//  "CREDIT"
+//       )
+//       .reduce(
+//         (sum, tx) =>
+//           sum + Number(tx.amount),
+//         0
+//       );
+
+//   const totalTransfer =
+//     safeTransactions
+//       .filter(
+//         tx =>
+//            tx.type?.toUpperCase() === "TRANSFER"
+//       )
+//       .reduce(
+//         (sum, tx) =>
+//           sum + Number(tx.amount || 0),
+//         0
+//       );
+
+//   const highestCredit =
+//     Math.max(
+//       ...safeTransactions
+//         .filter(
+//           tx =>
+//             tx.transactionType === "CREDIT"
+//         )
+//         .map(
+//           tx =>
+//             Number(tx.amount || 0)
+//         ),
+//       0
+//     );
+
+//   const highestDebit =
+//     Math.max(
+//       ...safeTransactions
+//         .filter(
+//           tx =>
+//             tx.transactionType === "DEBIT"
+//         )
+//         .map(
+//           tx =>
+//             Number(tx.amount || 0)
+//         ),
+//       0
+//     );
+
+//   return (
+//     <div className="analytics-grid">
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaArrowTrendUp /> Total Credit
+//         </h3>
+//         <h2>₹{totalCredit}</h2>
+//         <p className="analytics-growth">
+//           +18.5% This Month
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaArrowTrendDown /> Total Debit
+//         </h3>
+//         <h2>₹{totalDebit}</h2>
+//         <p className="analytics-growth">
+//           +4.2% This Month
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <MdSwapHoriz /> Total Transfers
+//         </h3>
+//         <h2>₹{totalTransfer}</h2>
+
+//         <p className="analytics-growth">
+//           {
+//             safeTransactions.filter(
+//               tx =>
+//                 tx.transactionType ===
+//                 "TRANSFER"
+//             ).length
+//           } Successful
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <HiMiniChartBar /> Transactions
+//         </h3>
+//         <h2>
+//           {safeTransactions.length}
+//         </h2>
+//         <p className="analytics-growth">
+//           All Recorded
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaWallet /> Wallet Status
+//         </h3>
+//         <h2>
+//           {wallet?.status || "ACTIVE"}
+//         </h2>
+//         <p className="analytics-growth">
+//           Account Healthy
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaArrowTrendUp /> Highest Credit
+//         </h3>
+//         <h2>₹{highestCredit}</h2>
+//         <p className="analytics-growth">
+//           Best Deposit
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaArrowTrendDown /> Highest Debit
+//         </h3>
+//         <h2>₹{highestDebit}</h2>
+//         <p className="analytics-growth">
+//           Largest Expense
+//         </p>
+//       </div>
+
+//       <div className="analytics-card">
+//         <h3>
+//           <FaWallet /> Financial Health
+//         </h3>
+//         <h2>A+</h2>
+//         <p className="analytics-growth">
+//           Excellent
+//         </p>
+//       </div>
+
+//     </div>
+//   );
+// }
+
+// export default WalletAnalytics;

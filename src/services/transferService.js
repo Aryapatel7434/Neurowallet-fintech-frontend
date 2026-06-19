@@ -1,3 +1,21 @@
+// import api from "../api/axiosConfig";
+
+// export const transferMoney = async (
+//   receiverEmail,
+//   amount
+// ) => {
+
+//   const response =
+//     await api.post(
+//       "/transactions/send",
+//       {
+//         receiverEmail,
+//         amount
+//       }
+//     );
+
+//   return response.data;
+// };
 import axiosInstance from "../api/axiosConfig";
 
 export const transferMoney = async (

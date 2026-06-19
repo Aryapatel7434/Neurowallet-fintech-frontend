@@ -1,61 +1,29 @@
 function ExecutiveStats() {
   return (
-    <div className="executive-grid">
+    <div className="executive-stats">
 
-      <div className="executive-card">
-
-        <span>💎</span>
-
+      <div className="kpi-card">
         <h4>Net Worth</h4>
-
-        <h2>₹8,75,000</h2>
-
-        <p className="positive">
-          +18.2% This Year
-        </p>
-
+        <h2>₹2,62,111</h2>
+        <span>↑ 12%</span>
       </div>
 
-      <div className="executive-card">
-
-        <span>📈</span>
-
-        <h4>Investment Score</h4>
-
-        <h2>89 / 100</h2>
-
-        <p className="positive">
-          Excellent
-        </p>
-
-      </div>
-
-      <div className="executive-card">
-
-        <span>🛡️</span>
-
-        <h4>Credit Health</h4>
-
-        <h2>785</h2>
-
-        <p className="positive">
-          Strong Score
-        </p>
-
-      </div>
-
-      <div className="executive-card">
-
-        <span>⚡</span>
-
+      <div className="kpi-card">
         <h4>Cash Flow</h4>
+        <h2>₹27,000</h2>
+        <span>↑ 8%</span>
+      </div>
 
-        <h2>₹35,000</h2>
+      <div className="kpi-card">
+        <h4>Financial Health</h4>
+        <h2>89/100</h2>
+        <span>Excellent</span>
+      </div>
 
-        <p className="positive">
-          Positive
-        </p>
-
+      <div className="kpi-card">
+        <h4>AI Score</h4>
+        <h2>92%</h2>
+        <span>Optimized</span>
       </div>
 
     </div>

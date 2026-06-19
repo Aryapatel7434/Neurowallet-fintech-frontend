@@ -1,109 +1,85 @@
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
-import { useState, useEffect } from "react";
-
-import { getDashboardStats } from "../../services/dashboardService";
-import { getMyWallet } from "../../services/walletService";
-
+import { useEffect, useState } from "react";
+import {
+  getMyWallet
+} from "../../services/walletService";
+import {
+  getTransactionHistory
+} from "../../services/transactionService";
+import ExecutiveStats
+from "../../components/dashboard/ExecutiveStats";
 import Sidebar from "../../components/dashboard/Sidebar";
 import Navbar from "../../components/dashboard/Navbar";
 
-import ExecutiveStats from "../../components/dashboard/ExecutiveStats";
 
-import WalletCard from "../../components/dashboard/WalletCard";
-import InsightCard from "../../components/dashboard/InsightCard";
-import TransactionTable from "../../components/dashboard/TransactionTable";
+import WalletOverview from "../../components/dashboard/WalletOverview";
+
+import RecentTransactions from "../../components/dashboard/RecentTransactions";
 
 import QuickActions from "../../components/dashboard/QuickActions";
-import GoalTracker from "../../components/dashboard/GoalTracker";
-import ActivityFeed from "../../components/dashboard/ActivityFeed";
 
-import IncomeChart from "../../components/dashboard/charts/IncomeChart";
-import ExpenseChart from "../../components/dashboard/charts/ExpenseChart";
-import SavingChart from "../../components/dashboard/charts/SavingChart";
+import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
 
-import AIAdvisorCard from "../../components/dashboard/AIAdvisorCard";
-import WalletAccounts from "../../components/dashboard/WalletAccounts";
-import UpcomingBills from "../../components/dashboard/UpcomingBills";
-import CategorySummary from "../../components/dashboard/CategorySummary";
+import  IncomeChart from "../../components/dashboard/Analytics/IncomeChart";
+import ExpenseChart from "../../components/dashboard/Analytics/ExpenseChart";
+import SavingChart from "../../components/dashboard/Analytics/SavingChart";
+
+import AIFinancialAssistant from "../../components/dashboard/AIFinancialAssistant";
 
 function DashboardPage() {
-
-const [stats, setStats] = useState({
-balance: 0,
-income: 0,
-expenses: 0,
-savings: 0
-});
-
 const [wallet, setWallet] = useState(null);
+ const totalBalance =
+wallet?.balance || 0;
 
 const [loading, setLoading] = useState(true);
-
+const [transactions,
+setTransactions] =
+useState([]);
 const [error, setError] = useState("");
-
-const loadDashboard = async () => {
-
-
-try {
-
-  const data =
-    await getDashboardStats();
-
-  setStats(data);
-
-} catch (error) {
-
-  console.error(error);
-
-  setError(
-    "Failed to load dashboard data"
-  );
-
-} finally {
-
-  setLoading(false);
-
-}
-
-
-};
-
-const loadWallet = async () => {
-
-
-try {
-
-  const data =
-    await getMyWallet();
-
-  console.log(
-    "Wallet Data:",
-    data
-  );
-
-  setWallet(data);
-
-} catch (error) {
-
-  console.error(
-    "Wallet Error:",
-    error
-  );
-}
-
-};
 
 useEffect(() => {
 
-
-loadDashboard();
-
-loadWallet();
-
+fetchDashboardData();
 
 }, []);
+const fetchDashboardData =
+async () => {
 
+  try {
+
+    const walletData =
+      await getMyWallet();
+
+    const transactionData =
+      await getTransactionHistory();
+
+    console.log(
+      "Wallet:",
+      walletData
+    );
+
+    console.log(
+      "Transactions:",
+      transactionData
+    );
+
+    setWallet(walletData);
+
+    setTransactions(
+      transactionData
+    );
+
+  } catch(error) {
+
+    console.error(error);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 if (loading) {
 
 
@@ -133,17 +109,12 @@ return (
 
     <button
       className="retry-btn"
-      onClick={() => {
+        onClick={() => {
+    setError("");
+    setLoading(true);
 
-        setError("");
-
-        setLoading(true);
-
-        loadDashboard();
-
-        loadWallet();
-
-      }}
+    fetchDashboardData();
+}}
     >
       Retry
     </button>
@@ -165,40 +136,12 @@ return (
   <div className="dashboard-content">
 
     <Navbar />
-
-    <div>
-      Executive Stats Test
-    </div>
-
+    <ExecutiveStats />
     <div className="cards-grid">
 
-      <WalletCard
-        title="Total Balance"
-        amount={
-          wallet
-            ? `₹${wallet.balance}`
-            : "Loading..."
-        }
-        growth="12.5%"
+         <ExecutiveStats
+           wallet={wallet}
       />
-
-       <WalletCard
-        title="Income"
-        amount={`₹${stats.income}`}
-        growth="8%"
-    />
-
-      <WalletCard
-        title="Expenses"
-        amount={`₹${stats.expenses}`}
-        growth="3%"
-    />
-
-    <WalletCard
-      title="Savings"
-      amount={`₹${stats.savings}`}
-      growth="15%"
-    />
     </div>
 
     <div className="chart-grid">
@@ -215,36 +158,24 @@ return (
 
     </div>
 
-    <AIAdvisorCard />
+    <AIFinancialAssistant />
 
-    <div className="middle-grid">
-
-      <InsightCard />
-
-    </div>
-
-    <TransactionTable />
-
+     <RecentTransactions
+  transactions={transactions}
+/>
+    
     <div className="finance-grid">
 
-      <WalletAccounts />
-
-      <UpcomingBills />
-
-      <CategorySummary />
 
     </div>
+     <div className="bottom-grid">
 
-    <div className="bottom-grid">
+  <QuickActions />
 
-      <QuickActions />
+  <ActivityTimeline />
 
-      <GoalTracker />
-
-      <ActivityFeed />
-
-    </div>
-
+</div>
+   
   </div>
 
 </div>
@@ -252,5 +183,4 @@ return (
 
 );
 }
-
 export default DashboardPage;

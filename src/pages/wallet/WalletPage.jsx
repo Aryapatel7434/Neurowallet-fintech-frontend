@@ -1,6 +1,10 @@
+import {
+  transferMoney
+} from "../../services/transferService";
 import { FaPlus } from "react-icons/fa";
 import { FaWallet } from "react-icons/fa";
 import { FaPaperPlane } from "react-icons/fa";
+
 import {
   FaArrowTrendDown
 } from "react-icons/fa6";
@@ -9,14 +13,13 @@ import { useEffect, useState } from "react";
 
 import TransactionHistory
 from "../../components/wallet/TransactionHistory";
-
+import TransferInsights
+from "../../components/wallet/TransferInsights";
 import WalletAnalytics
 from "../../components/wallet/WalletAnalytics";
 import TransferActivity
 from "../../components/wallet/TransferActivity";
-import {
-  transferMoney
-} from "../../services/transferService";
+
 import WalletHeader
 from "../../components/wallet/WalletHeader";
 import { toast } from "react-toastify";
@@ -49,149 +52,191 @@ const [receiverEmail,
 const [transferAmount,
   setTransferAmount] =
   useState("");
-  useEffect(() => {
 
-    const loadWallet =
-      async () => {
 
-        try {
+  const refreshWalletData = async () => {
 
-          const walletData =
-            await getMyWallet();
+  const walletData =
+    await getMyWallet();
 
-          const txData =
-            await getTransactions();
+  const txData =
+    await getTransactions();
 
-          console.log(
-            "Wallet Data:",
-            walletData
-          );
+  setWallet(walletData);
 
-          console.log(
-            "Transactions:",
-            txData
-          );
-
-          setWallet(
-            walletData
-          );
-
-          setTransactions(
-            txData
-          );
-
-        } catch (error) {
-
-          console.error(error);
-
-        } finally {
-
-          setLoading(false);
-
-        }
-      };
-    
-    loadWallet();
-
-  }, []);
-  const handleAddMoney =
-    async () => {
-
-      try {
-
-        const updatedWallet =
-          await addMoney(
-            Number(amount)
-          );
-
-        const txData =
-          await getTransactions();
-
-        setWallet(
-          updatedWallet
-        );
-
-        setTransactions(
-          txData
-        );
-
-        setAmount("");
-
-       toast.success(
-  "₹" + amount +
-  " added successfully"
+  setTransactions(
+    Array.isArray(txData)
+      ? txData
+      : []
+  );
+};
+console.log(
+  "Wallet:",
+  wallet
 );
 
-      } catch (error) {
-
-        console.error(error);
-
-           toast.error(
-  "Failed to add money"
+console.log(
+  "Transactions:",
+  transactions
 );
-      }
-    };
-
-  const handleWithdraw =
-    async () => {
-
-      try {
-
-        const updatedWallet =
-          await withdrawMoney(
-            Number(amount)
-          );
-
-        const txData =
-          await getTransactions();
-
-        setWallet(
-          updatedWallet
-        );
-
-        setTransactions(
-          txData
-        );
-
-        setAmount("");
-
-         toast.success(
-  "₹" + amount +
-  " withdrawn successfully"
+console.log(
+  "FIRST TRANSACTION:",
+  transactions[0]
 );
+useEffect(() => {
 
-      } catch (error) {
+  const loadWallet = async () => {
 
-        console.error(error);
+    try {
 
-          toast.error(
-  "Withdraw failed"
-);
-      }
-    };
+      await refreshWalletData();
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  loadWallet();
+
+}, []);
+ const handleAddMoney =
+async () => {
+
+  if (!amount || Number(amount) <= 0) {
+
+    toast.error(
+      "Enter valid amount"
+    );
+
+    return;
+  }
+
+  try {
+
+    await addMoney(
+      Number(amount)
+    );
+
+    const walletData =
+      await getMyWallet();
+
+    const txData =
+      await getTransactions();
+
+    setWallet(walletData);
+
+    setTransactions(txData);
+
+    setAmount("");
+
+    toast.success(
+      `₹${amount} added successfully`
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Add Money Error:",
+      error.response?.data
+    );
+
+    console.error(
+      "Status:",
+      error.response?.status
+    );
+
+    toast.error(
+      "Failed to add money"
+    );
+
+  }
+
+};
+
+ const handleWithdraw =
+async () => {
+
+  if (!amount || Number(amount) <= 0) {
+
+    toast.error(
+      "Enter valid amount"
+    );
+
+    return;
+  }
+
+  try {
+
+    await withdrawMoney(
+      Number(amount)
+    );
+
+    const walletData =
+      await getMyWallet();
+
+    const txData =
+      await getTransactions();
+
+    setWallet(walletData);
+
+    setTransactions(txData);
+
+    setAmount("");
+
+    toast.success(
+      `₹${amount} withdrawn successfully`
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Withdraw Error:",
+      error.response?.data
+    );
+
+    console.error(
+      "Status:",
+      error.response?.status
+    );
+
+    toast.error(
+      "Withdraw failed"
+    );
+
+  }
+
+};
+
     const handleTransfer =
   async () => {
 
     try {
 
-        await transferMoney(
-  receiverEmail,
-  Number(transferAmount)
-);
+//         await transferMoney(
+//   receiverEmail,
+//   Number(transferAmount)
+// );
 
          toast.success(
   "Transfer completed successfully"
 );
 
-      const walletData =
-        await getMyWallet();
+        const walletData =
+  await getMyWallet();
 
-      const txData =
-        await getTransactions();
+const txData =
+  await getTransactions();
 
-      setWallet(walletData);
+setWallet(walletData);
 
-      setTransactions(txData);
+setTransactions(txData);
 
       setReceiverEmail("");
 
@@ -206,7 +251,6 @@ const [transferAmount,
 );
     }
 };
-
   if (loading) {
   return (
     <div className="loading-screen">
@@ -253,12 +297,9 @@ const [transferAmount,
     Available Balance
   </p>
 
-  <h1
-    className="wallet-balance"
-  >
-    ₹
-    {wallet.balance}
-  </h1>
+ <h1 className="wallet-balance">
+  ₹{wallet?.balance || 0}
+</h1>
 
   <div
     className="wallet-details"
@@ -276,10 +317,15 @@ const [transferAmount,
   </div>
 
 </div>
-      <WalletAnalytics
-        wallet={wallet}
-        transactions={transactions}
-      />
+{/* console.log("Analytics Transactions:", transactions); */}
+<WalletAnalytics
+  wallet={wallet}
+  transactions={transactions}
+/>
+{/* console.log(
+  "WalletPage Transactions:",
+  transactions
+); */}
 <TransferActivity
   transactions={
     transactions
@@ -360,8 +406,9 @@ const [transferAmount,
   </button>
 
 </div>
-
-<TransactionHistory />
+<TransactionHistory
+  transactions={transactions}
+/>
 
     </div>
 

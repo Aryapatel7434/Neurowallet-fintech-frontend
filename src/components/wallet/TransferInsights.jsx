@@ -3,14 +3,15 @@ function TransferInsights({
   transactions
 
 }) {
+  const safeTransactions =
+  Array.isArray(transactions)
+    ? transactions
+    : [];
 
-  const transfers =
-    transactions.filter(
-      tx =>
-        tx.type ===
-        "TRANSFER"
-    );
-
+const transfers =
+  safeTransactions.filter(
+    tx => tx.type === "TRANSFER"
+  );
   const transferCount =
     transfers.length;
 
@@ -45,7 +46,10 @@ function TransferInsights({
   transferCount > 0
     ? 100
     : 0;
-
+console.log(
+  "TransferInsights:",
+  transactions
+);
   return (
 
     <div
