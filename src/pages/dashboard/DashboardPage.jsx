@@ -1,32 +1,44 @@
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
+
 import { useEffect, useState } from "react";
-import {
-  getMyWallet
-} from "../../services/walletService";
-import {
-  getTransactionHistory
-} from "../../services/transactionService";
-import ExecutiveStats
-from "../../components/dashboard/ExecutiveStats";
-import Sidebar from "../../components/dashboard/Sidebar";
-import Navbar from "../../components/dashboard/Navbar";
 
+import { getMyWallet } from "../../services/walletService";
+import { getTransactionHistory } from "../../services/transactionService";
 
-import WalletOverview from "../../components/dashboard/WalletOverview";
+import Sidebar from "../../components/dashboard/layout/Sidebar";
+import Navbar from "../../components/dashboard/layout/Navbar";
 
-import RecentTransactions from "../../components/dashboard/RecentTransactions";
-
-import QuickActions from "../../components/dashboard/QuickActions";
-
-import ActivityTimeline from "../../components/dashboard/ActivityTimeline";
-
-import  IncomeChart from "../../components/dashboard/Analytics/IncomeChart";
+import IncomeChart from "../../components/dashboard/Analytics/IncomeChart";
 import ExpenseChart from "../../components/dashboard/Analytics/ExpenseChart";
-import SavingChart from "../../components/dashboard/Analytics/SavingChart";
 
-import AIFinancialAssistant from "../../components/dashboard/AIFinancialAssistant";
+import QuickActions from "../../components/dashboard/ai/QuickActions";
 
+import ActivityTimeline from "../../components/dashboard/activity/ActivityTimeline";
+import RecentTransactions from "../../components/dashboard/activity/RecentTransactions";
+
+import AIFinancialAssistant from "../../components/dashboard/ai/AIFinancialAssistant";
+import FinancialOverview from "../../components/dashboard/overview/FinancialOverview";
+import FinancialHealth
+from "../../components/dashboard/health/FinancialHealth";
+import TransactionTable
+from "../../components/dashboard/activity/TransactionTable";
+import AIInsights
+from "../../components/dashboard/insights/AIInsights";
+import SpendingInsights
+from "../../components/dashboard/Analytics/SpendingInsights";
+import BudgetHealth
+from "../../components/dashboard/ai/BudgetHealth";
+import MonthlyTrend
+from "../../components/dashboard/Analytics/MonthlyTrend";
+import SmartGoals
+from "../../components/dashboard/ai/SmartGoals";
+import AIAdvisor
+from "../../components/dashboard/ai/AIAdvisor";
+import GoalRecommendation
+from "../../components/dashboard/ai/GoalRecommendation";
+import FinancialScore
+from "../../components/dashboard/ai/FinancialScore";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -47,7 +59,7 @@ const fetchDashboardData =
 async () => {
 
   try {
-
+    
     const walletData =
       await getMyWallet();
 
@@ -66,9 +78,9 @@ async () => {
 
     setWallet(walletData);
 
-    setTransactions(
-      transactionData
-    );
+      setTransactions(
+  transactionData.content || []
+);
 
   } catch(error) {
 
@@ -122,65 +134,106 @@ return (
   </div>
 
 );
-
-
 }
-
-return (
-
-
-<div className="dashboard-layout">
-
+  return (
+          <div className="dashboard-layout">
   <Sidebar />
 
   <div className="dashboard-content">
 
     <Navbar />
-    <ExecutiveStats />
-    <div className="cards-grid">
 
-         <ExecutiveStats
-           wallet={wallet}
+    <FinancialOverview
+      wallet={wallet}
+      transactions={transactions}
+    />
+
+    <div className="command-grid">
+
+      <FinancialHealth
+        wallet={wallet}
+        transactions={transactions}
       />
-    </div>
 
-    <div className="chart-grid">
-
-      <IncomeChart />
-
-      <ExpenseChart />
+      <AIInsights
+        transactions={transactions}
+      />
 
     </div>
 
-    <div className="chart-grid-single">
+    {/* Charts Temporarily Disabled */}
 
-      <SavingChart />
+    {/*
+    <div className="analytics-row">
+
+      <IncomeChart
+        transactions={transactions}
+      />
+
+      <ExpenseChart
+        transactions={transactions}
+      />
 
     </div>
+    */}
 
-    <AIFinancialAssistant />
-
-     <RecentTransactions
+     <TransactionTable
   transactions={transactions}
 />
-    
-    <div className="finance-grid">
+<div className="analytics-row">
 
+  <IncomeChart
+    transactions={transactions}
+  />
 
-    </div>
-     <div className="bottom-grid">
+  <ExpenseChart
+    transactions={transactions}
+  />
+
+</div>
+
+<div className="analytics-row">
+
+  <SpendingInsights
+    transactions={transactions}
+  />
+
+  <MonthlyTrend
+    transactions={transactions}
+  />
+
+</div>
+
+    <ActivityTimeline />
+        <div className="ai-grid">
+
+  <AIFinancialAssistant
+    transactions={transactions}
+  />
+
+  <BudgetHealth
+    wallet={wallet}
+  />
+   <FinancialScore
+    wallet={wallet}
+  />
+  <SmartGoals
+    wallet={wallet}
+  />
+
+  <GoalRecommendation
+    wallet={wallet}
+  />
 
   <QuickActions />
 
-  <ActivityTimeline />
-
 </div>
-   
+
   </div>
-
 </div>
-
-
-);
+  );
 }
+
+ 
+ 
 export default DashboardPage;

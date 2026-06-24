@@ -1,0 +1,273 @@
+/* ==========================================
+   ANALYTICS CARDS
+========================================== */
+
+.analytics-card {
+
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+  linear-gradient(
+    135deg,
+    #08152f 0%,
+    #0d1d42 100%
+  );
+
+  border:
+  1px solid rgba(
+    255,
+    255,
+    255,
+    .06
+  );
+
+  border-radius: 28px;
+
+  padding: 30px;
+
+  min-height: 260px;
+
+  color: white;
+
+  box-shadow:
+  0 20px 50px rgba(
+    0,
+    0,
+    0,
+    .35
+  );
+
+  transition:
+  all .35s ease;
+}
+
+.analytics-card::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background:
+  linear-gradient(
+    90deg,
+    #3b82f6,
+    #06b6d4
+  );
+}
+
+.analytics-card:hover {
+
+  transform:
+  translateY(-8px);
+
+  border-color:
+  rgba(
+    59,
+    130,
+    246,
+    .35
+  );
+
+  box-shadow:
+  0 35px 80px rgba(
+    0,
+    0,
+    0,
+    .55
+  );
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.analytics-header {
+
+  display: flex;
+
+  justify-content:
+  space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.analytics-header h3 {
+
+  margin: 0;
+
+  color: white;
+
+  font-size: 1.4rem;
+
+  font-weight: 700;
+}
+
+/* ==========================================
+   BADGES
+========================================== */
+
+.analytics-badge {
+
+  padding:
+  8px 16px;
+
+  border-radius:
+  999px;
+
+  font-size:
+  .85rem;
+
+  font-weight:
+  700;
+}
+
+.income {
+
+  background:
+  rgba(
+    34,
+    197,
+    94,
+    .12
+  );
+
+  color:
+  #22c55e;
+}
+
+.expense {
+
+  background:
+  rgba(
+    239,
+    68,
+    68,
+    .12
+  );
+
+  color:
+  #ef4444;
+}
+
+.trend {
+
+  background:
+  rgba(
+    59,
+    130,
+    246,
+    .12
+  );
+
+  color:
+  #60a5fa;
+}
+
+/* ==========================================
+   VALUE
+========================================== */
+
+.analytics-value {
+
+  font-size: 3rem;
+
+  font-weight: 800;
+
+  margin-bottom: 12px;
+
+  color: white;
+}
+
+.analytics-subtitle {
+
+  color:
+  #94a3b8;
+
+  line-height: 1.8;
+
+  margin-bottom: 25px;
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.analytics-footer {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  color:
+  #cbd5e1;
+
+  margin-top: 25px;
+}
+
+/* ==========================================
+   METRICS
+========================================== */
+
+.metric {
+
+  display: flex;
+
+  justify-content:
+  space-between;
+
+  align-items: center;
+
+  padding: 16px 0;
+
+  border-bottom:
+  1px solid rgba(
+    255,
+    255,
+    255,
+    .06
+  );
+}
+
+.metric:last-child {
+
+  border-bottom: none;
+}
+
+.metric span {
+
+  color:
+  #94a3b8;
+}
+
+.metric strong {
+
+  color:
+  white;
+
+  font-weight: 700;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:768px){
+
+  .analytics-value {
+
+    font-size: 2.2rem;
+  }
+
+}

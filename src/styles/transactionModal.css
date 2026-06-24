@@ -1,0 +1,78 @@
+.modal-overlay {
+
+  position: fixed;
+  inset: 0;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.75
+  );
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+.transaction-modal {
+
+  width: 500px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #081428,
+      #111f40
+    );
+
+  border-radius: 20px;
+
+  padding: 30px;
+
+  border:
+    1px solid
+    rgba(
+      139,
+      92,
+      246,
+      0.3
+    );
+
+  color: white;
+}
+
+.modal-header {
+
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items: center;
+
+  margin-bottom: 25px;
+}
+
+.close-btn {
+
+  background: none;
+
+  border: none;
+
+  color: white;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+.modal-body p {
+
+  margin: 14px 0;
+
+  font-size: 16px;
+}

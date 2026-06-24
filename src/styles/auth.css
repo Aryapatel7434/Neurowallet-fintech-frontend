@@ -44,11 +44,8 @@
   blur(24px);
 
   box-shadow:
-  0 30px 80px
-  rgba(0,0,0,.55),
-
-  0 0 60px
-  rgba(124,58,237,.12);
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
 
   position: relative;
 
@@ -125,8 +122,9 @@
       #a855f7
     );
 
-  box-shadow:
-    0 12px 24px rgba(124, 58, 237, 0.35);
+      box-shadow:
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
 }
 
 .logo-circle-secondary {
@@ -275,11 +273,11 @@
 .form-control:focus {
   outline: none;
 
-  border-color: #8b5cf6;
+    border-color: rgba(59,130,246,.35);
 
-  box-shadow:
-    0 0 0 4px
-    rgba(139, 92, 246, 0.15);
+   box-shadow:
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
 }
 
 /* =========================
@@ -348,21 +346,16 @@
 
   transition: .3s;
 
-  box-shadow:
-  0 15px 40px
-  rgba(
-    124,
-    58,
-    237,
-    .35
-  );
+     box-shadow:
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
 }
 .login-btn:hover {
   transform: translateY(-3px);
 
-  box-shadow:
-    0 20px 40px
-    rgba(124,58,237,.45);
+    box-shadow:
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
 }
 
 .login-btn:active {

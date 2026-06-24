@@ -1,0 +1,176 @@
+.transaction-card {
+  background: linear-gradient(
+    135deg,
+    #071129,
+    #0d1f45
+  );
+
+  border-radius: 24px;
+
+  padding: 30px;
+
+  margin-top: 25px;
+
+  box-shadow:
+0 25px 50px rgba(0,0,0,.45),
+0 0 30px rgba(59,130,246,.15);
+
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 25px;
+
+  color: white;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-table th {
+  color: #8fa8d6;
+
+  text-align: left;
+
+  padding-bottom: 15px;
+}
+
+.transaction-table td {
+  color: white;
+
+  padding: 18px 0;
+
+border-top: 2px solid #3b82f6(
+      255,
+      255,
+      255,
+      0.08
+    );
+}
+
+.amount {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.status {
+  padding: 8px 14px;
+
+  border-radius: 20px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+}
+
+.success {
+  background:
+    rgba(34,197,94,0.15);
+
+  color: #22c55e;
+}
+.failed {
+
+  background:
+  rgba(
+    239,
+    68,
+    68,
+    0.15
+  );
+
+  color:
+  #ef4444;
+}
+.user-cell{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.user-avatar{
+  width:38px;
+  height:38px;
+
+  border-radius:50%;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background:linear-gradient(
+    135deg,
+    #3b82f6,
+    #60a5fa
+  );
+
+  color:white;
+  font-weight:700;
+}
+
+.user-avatar.secondary{
+  background:linear-gradient(
+    135deg,
+    #22c55e,
+    #10b981
+  );
+}
+
+.amount-credit{
+  color:#22c55e;
+  font-weight:700;
+}
+
+.amount-debit{
+  color:#ef4444;
+  font-weight:700;
+}
+
+.record-count{
+  background:
+  rgba(59,130,246,.12);
+
+  color:#60a5fa;
+
+  padding:10px 18px;
+
+  border-radius:999px;
+
+  font-weight:600;
+}
+
+.status{
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  min-width:110px;
+
+  padding:8px 16px;
+
+  border-radius:999px;
+
+  font-size:.85rem;
+
+  font-weight:700;
+}
+
+.success{
+  background:
+  rgba(34,197,94,.12);
+
+  color:#22c55e;
+}
+
+.failed{
+  background:
+  rgba(239,68,68,.12);
+
+  color:#ef4444;
+}

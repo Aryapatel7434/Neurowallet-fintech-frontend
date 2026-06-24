@@ -19,7 +19,8 @@ import WalletAnalytics
 from "../../components/wallet/WalletAnalytics";
 import TransferActivity
 from "../../components/wallet/TransferActivity";
-
+import TransactionModal
+from "../../components/wallet/TransactionModal";
 import WalletHeader
 from "../../components/wallet/WalletHeader";
 import { toast } from "react-toastify";
@@ -39,7 +40,10 @@ function WalletPage() {
   const [transactions,
     setTransactions] =
     useState([]);
-
+const [
+  selectedTransaction,
+  setSelectedTransaction
+] = useState(null);
   const [loading, setLoading] =
     useState(true);
 
@@ -213,43 +217,59 @@ async () => {
   }
 
 };
+const handleTransfer = async () => {
 
-    const handleTransfer =
-  async () => {
+  try {
 
-    try {
+    console.log("Receiver:", receiverEmail);
+    console.log("Amount:", transferAmount);
 
-//         await transferMoney(
-//   receiverEmail,
-//   Number(transferAmount)
-// );
+    const response =
+      await transferMoney(
+        receiverEmail,
+        Number(transferAmount)
+      );
 
-         toast.success(
-  "Transfer completed successfully"
-);
+    console.log(
+      "Transfer Success:",
+      response
+    );
 
-        const walletData =
-  await getMyWallet();
+    await refreshWalletData();
 
-const txData =
-  await getTransactions();
+    setReceiverEmail("");
+    setTransferAmount("");
 
-setWallet(walletData);
+    toast.success(
+      "Transfer completed successfully"
+    );
 
-setTransactions(txData);
+  } catch (error) {
 
-      setReceiverEmail("");
+    console.log(
+      "FULL ERROR:",
+      error
+    );
 
-      setTransferAmount("");
+    console.log(
+      "RESPONSE:",
+      error.response
+    );
 
-    } catch (error) {
+    console.log(
+      "DATA:",
+      error.response?.data
+    );
 
-      console.error(error);
+    console.log(
+      "STATUS:",
+      error.response?.status
+    );
 
-          toast.error(
-  "Transfer failed"
-);
-    }
+    toast.error(
+      "Transfer failed"
+    );
+  }
 };
   if (loading) {
   return (
@@ -408,6 +428,25 @@ setTransactions(txData);
 </div>
 <TransactionHistory
   transactions={transactions}
+  onSelectTransaction={
+    setSelectedTransaction
+  }
+/>
+
+<TransactionHistory
+  transactions={transactions}
+  onSelectTransaction={
+    setSelectedTransaction
+  }
+/>
+
+<TransactionModal
+  transaction={
+    selectedTransaction
+  }
+  onClose={() =>
+    setSelectedTransaction(null)
+  }
 />
 
     </div>

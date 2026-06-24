@@ -9,9 +9,10 @@ import {
 
 import { useState } from "react";
 
-function TransactionHistory({
-  transactions = []
-}) {
+ function TransactionHistory({
+  transactions = [],
+  onSelectTransaction
+}){
 
   const [search, setSearch] =
     useState("");
@@ -198,11 +199,17 @@ function TransactionHistory({
             currentTransactions.map((tx) => (
 
               <tr
-                key={
-                  tx.id ||
-                  tx.transactionId
-                }
-              >
+  key={
+    tx.id ||
+    tx.transactionId
+  }
+  onClick={() =>
+    onSelectTransaction(tx)
+  }
+  style={{
+    cursor: "pointer"
+  }}
+>
 
                 <td>
 
