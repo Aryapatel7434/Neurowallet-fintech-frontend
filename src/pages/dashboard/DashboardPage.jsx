@@ -1,3 +1,9 @@
+import {
+    FaChartLine,
+    FaRobot,
+    FaChartPie,
+    FaMoneyBillTrendUp
+} from "react-icons/fa6";
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
 
@@ -39,6 +45,17 @@ import GoalRecommendation
 from "../../components/dashboard/ai/GoalRecommendation";
 import FinancialScore
 from "../../components/dashboard/ai/FinancialScore";
+import IncomeTrendChart
+from "../../components/dashboard/Analytics/IncomeTrendChart";
+import ExpenseTrendChart from "../../components/dashboard/Analytics/ExpenseTrendChart";
+import CashFlowChart
+from "../../components/dashboard/Analytics/CashFlowChart";
+import SpendingCategoryChart
+from "../../components/dashboard/Analytics/SpendingCategoryChart";
+import DashboardSection
+from "../../components/dashboard/common/DashboardSection";
+import DashboardHero from "../../components/dashboard/layout/DashboardHero";
+
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -135,103 +152,218 @@ return (
 
 );
 }
-  return (
-          <div className="dashboard-layout">
-  <Sidebar />
+ return (
+  <div className="dashboard-layout">
 
-  <div className="dashboard-content">
+    <Sidebar />
 
-    <Navbar />
+    <div className="dashboard-content">
 
-    <FinancialOverview
-      wallet={wallet}
-      transactions={transactions}
-    />
+      {/* =========================
+          TOP NAVBAR
+      ========================== */}
 
-    <div className="command-grid">
+      <Navbar />
 
-      <FinancialHealth
+      <DashboardHero />
+
+      {/* =========================
+          FINANCIAL OVERVIEW
+      ========================== */}
+
+      <FinancialOverview
         wallet={wallet}
         transactions={transactions}
       />
 
-      <AIInsights
+      {/* =========================
+          COMMAND CENTER
+      ========================== */}
+
+      <div className="command-grid">
+
+        <FinancialHealth
+          wallet={wallet}
+          transactions={transactions}
+        />
+
+        <AIInsights
+          transactions={transactions}
+        />
+
+      </div>
+
+      {/* =========================
+          RECENT TRANSACTIONS
+      ========================== */}
+
+      <TransactionTable
         transactions={transactions}
       />
 
-    </div>
+      {/* =========================
+          ANALYTICS
+      ========================== */}
 
-    {/* Charts Temporarily Disabled */}
+   <DashboardSection
 
-    {/*
-    <div className="analytics-row">
+    title="Analytics"
 
-      <IncomeChart
-        transactions={transactions}
-      />
+    icon={<FaChartLine />}
 
-      <ExpenseChart
-        transactions={transactions}
-      />
+    badge="LIVE"
 
-    </div>
-    */}
+    showRefresh
 
-     <TransactionTable
-  transactions={transactions}
-/>
-<div className="analytics-row">
+>
 
-  <IncomeChart
-    transactions={transactions}
-  />
+  <div className="analytics-row">
 
-  <ExpenseChart
-    transactions={transactions}
-  />
+    <IncomeChart
+      transactions={transactions}
+    />
 
-</div>
-
-<div className="analytics-row">
-
-  <SpendingInsights
-    transactions={transactions}
-  />
-
-  <MonthlyTrend
-    transactions={transactions}
-  />
-
-</div>
-
-    <ActivityTimeline />
-        <div className="ai-grid">
-
-  <AIFinancialAssistant
-    transactions={transactions}
-  />
-
-  <BudgetHealth
-    wallet={wallet}
-  />
-   <FinancialScore
-    wallet={wallet}
-  />
-  <SmartGoals
-    wallet={wallet}
-  />
-
-  <GoalRecommendation
-    wallet={wallet}
-  />
-
-  <QuickActions />
-
-</div>
+    <ExpenseChart
+      transactions={transactions}
+    />
 
   </div>
-</div>
-  );
+
+</DashboardSection>
+
+      {/* =========================
+          PERFORMANCE CHARTS
+      ========================== */}
+
+ <DashboardSection
+
+    title="Performance"
+
+    icon={<FaMoneyBillTrendUp />}
+
+    badge="Realtime"
+
+    showRefresh
+
+>
+
+  <div className="analytics-row">
+
+    <IncomeTrendChart
+      transactions={transactions}
+    />
+
+    <ExpenseTrendChart
+      transactions={transactions}
+    />
+
+  </div>
+
+</DashboardSection>
+
+      {/* =========================
+          ADVANCED ANALYTICS
+      ========================== */}
+    <DashboardSection
+
+    title="Cash Flow & Spending"
+
+    icon={<FaChartPie />}
+
+    badge="Analytics"
+
+    showRefresh
+
+    showExport
+
+>
+  <div className="analytics-row">
+
+    <CashFlowChart
+      transactions={transactions}
+    />
+
+    <SpendingCategoryChart
+      transactions={transactions}
+    />
+
+  </div>
+
+</DashboardSection>
+     
+      {/* =========================
+          INSIGHTS
+      ========================== */}
+     <DashboardSection title="Insights">
+
+  <div className="analytics-row">
+
+    <SpendingInsights
+      transactions={transactions}
+    />
+
+    <MonthlyTrend
+      transactions={transactions}
+    />
+
+  </div>
+
+</DashboardSection>
+
+      {/* =========================
+          ACTIVITY
+      ========================== */}
+
+      <ActivityTimeline />
+
+      {/* =========================
+          AI ASSISTANT
+      ========================== */}
+ <DashboardSection
+
+    title="AI Assistant"
+
+    icon={<FaRobot />}
+
+    badge="AI"
+
+    showRefresh
+
+>
+
+  <div className="ai-grid">
+
+    <AIFinancialAssistant
+      transactions={transactions}
+    />
+
+    <BudgetHealth
+      wallet={wallet}
+    />
+
+    <FinancialScore
+      wallet={wallet}
+    />
+
+    <SmartGoals
+      wallet={wallet}
+    />
+
+    <GoalRecommendation
+      wallet={wallet}
+    />
+
+    <QuickActions />
+
+  </div>
+
+</DashboardSection>
+      
+
+    </div>
+
+  </div>
+);
 }
 
  

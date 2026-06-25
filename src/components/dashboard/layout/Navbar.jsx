@@ -1,56 +1,127 @@
 import { useContext } from "react";
+
+import {
+  FaBell,
+  FaChevronDown,
+  FaMagnifyingGlass,
+  FaCircle
+} from "react-icons/fa6";
+
 import { AuthContext } from "../../../context/AuthContext";
 
 function Navbar() {
+
   const { user } = useContext(AuthContext);
 
-  const currentHour = new Date().getHours();
-
-  let greeting = "Good Evening";
-
-  if (currentHour < 12) {
-    greeting = "Good Morning";
-  } else if (currentHour < 18) {
-    greeting = "Good Afternoon";
-  }
-
   return (
-    <div className="dashboard-navbar">
+
+    <header className="dashboard-navbar">
+
+      {/* =========================
+            LEFT
+      ========================== */}
 
       <div className="navbar-left">
-        <span className="navbar-badge">
-          NeuroWallet AI
-        </span>
 
-        <h2>
-          {greeting},{" "}
-          {user?.name || "Arya"} 👋
-        </h2>
+        <div className="search-wrapper">
 
-        <p>
-          Welcome back to your financial command center.
-        </p>
+          <FaMagnifyingGlass
+            className="search-icon"
+          />
+
+          <input
+            type="text"
+            placeholder="Search..."
+            className="search-box"
+          />
+
+        </div>
+
       </div>
+
+      {/* =========================
+            RIGHT
+      ========================== */}
 
       <div className="navbar-right">
 
-        <div className="ai-status">
-          <span className="status-dot"></span>
-          AI Active
+        {/* Dashboard Filter */}
+
+        <select
+          className="dashboard-filter"
+        >
+
+          <option>Today</option>
+
+          <option>This Week</option>
+
+          <option>This Month</option>
+
+          <option>This Year</option>
+
+        </select>
+
+        {/* Backend Status */}
+
+        <div className="backend-status">
+
+          <FaCircle
+            className="backend-dot"
+          />
+
+          <span>
+
+            Connected
+
+          </span>
+
         </div>
 
-        <button className="notification-btn">
-          🔔
+        {/* Notification */}
+
+        <button
+          className="notification-btn"
+        >
+
+          <FaBell />
+
+          <span
+            className="notification-count"
+          >
+
+            3
+
+          </span>
+
         </button>
 
-        <div className="profile-circle">
-          {user?.initials || "AP"}
+        {/* Profile */}
+
+        <div className="profile-card">
+
+          <div className="profile-avatar">
+
+            {user?.initials || "AP"}
+
+          </div>
+           <div className="profile-info">
+    <span className="profile-name">
+        {user?.name || "Arya"}
+    </span>
+</div>
+          
+          <FaChevronDown
+            className="profile-arrow"
+          />
+
         </div>
 
       </div>
 
-    </div>
+    </header>
+
   );
+
 }
 
 export default Navbar;

@@ -66,14 +66,24 @@
 
   line-height: 1.7;
 }
+.hero-user{
 
-.hero-right {
-  display: flex;
-  flex-direction: column;
+    font-size:48px;
 
-  gap: 18px;
+    font-weight:800;
 
-  min-width: 260px;
+    margin-top:4px;
+}
+
+.hero-right{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:flex-start;
+
+    min-width:180px;
 }
 
 .hero-status {
@@ -134,9 +144,17 @@
     align-items: flex-start;
   }
 
-  .hero-right {
-    width: 100%;
-  }
+   .hero-right{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:flex-start;
+
+    min-width:180px;
+}
+
 
   .hero-content h1 {
     font-size: 2.2rem;

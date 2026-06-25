@@ -271,3 +271,28 @@
   }
 
 }
+.chart-empty{
+
+    height:320px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    color:#94a3b8;
+
+    gap:12px;
+}
+
+.chart-empty h3{
+
+    color:white;
+
+    font-size:24px;
+}
