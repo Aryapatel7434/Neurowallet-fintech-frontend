@@ -1,136 +1,226 @@
-/* ==========================================
-   ANALYTICS CARDS
-========================================== */
+/*==================================================
+            ANALYTICS CARD
+==================================================*/
 
-.analytics-card {
+.analytics-card{
 
-  position: relative;
+    position:relative;
 
-  overflow: hidden;
+    overflow:hidden;
 
-  background:
-  linear-gradient(
-    135deg,
-    #08152f 0%,
-    #0d1d42 100%
-  );
+    background:linear-gradient(
+        145deg,
+        #132344,
+        #0f1d3c
+    );
 
-  border:
-  1px solid rgba(
-    255,
-    255,
-    255,
-    .06
-  );
+    border:1px solid rgba(255,255,255,.06);
 
-  border-radius: 28px;
+    border-radius:28px;
 
-  padding: 30px;
+    padding:30px;
 
-  min-height: 260px;
+    min-height:300px;
 
-  color: white;
+    display:flex;
 
-  box-shadow:
-  0 20px 50px rgba(
-    0,
-    0,
-    0,
-    .35
-  );
+    flex-direction:column;
 
-  transition:
-  all .35s ease;
+    justify-content:space-between;
+
+    transition:.35s;
+
+    box-shadow:
+        0 18px 40px rgba(0,0,0,.35);
+
 }
 
-.analytics-card::before {
+.analytics-card:hover{
 
-  content: "";
+    transform:translateY(-6px);
 
-  position: absolute;
+    border-color:#3b82f6;
 
-  top: 0;
-  left: 0;
+    box-shadow:
+    0 24px 45px rgba(0,0,0,.45);
 
-  width: 100%;
-  height: 4px;
+}
+.analytics-card-header{
 
-  background:
-  linear-gradient(
-    90deg,
-    #3b82f6,
-    #06b6d4
-  );
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:20px;
+
+}
+.analytics-card-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
 }
 
-.analytics-card:hover {
+.analytics-card-title h3{
 
-  transform:
-  translateY(-8px);
+    color:white;
 
-  border-color:
-  rgba(
-    59,
-    130,
-    246,
-    .35
-  );
+    font-size:26px;
 
-  box-shadow:
-  0 35px 80px rgba(
-    0,
-    0,
-    0,
-    .55
-  );
+    font-weight:700;
+
+    margin:0;
+
 }
 
+.analytics-card-title p{
+
+    margin-top:6px;
+
+    color:#8ea3c7;
+
+    font-size:14px;
+
+}
+.analytics-card-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:28px;
+
+    color:white;
+
+    flex-shrink:0;
+
+}
+
+.income-icon{
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #60a5fa
+    );
+
+    box-shadow:
+    0 15px 30px rgba(37,99,235,.30);
+
+}
+.growth-badge{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+.income-growth{
+
+    color:#22c55e;
+
+    background:rgba(34,197,94,.12);
+
+}
+.analytics-main-value{
+
+    font-size:46px;
+
+    font-weight:800;
+
+    color:white;
+
+    letter-spacing:-2px;
+
+     margin-top:0;
+
+    margin-bottom:6px;
+
+}
+
+.analytics-main-subtitle{
+
+    color:#8ea3c7;
+
+    font-size:16px;
+
+}
+.income-chart-placeholder{
+
+    display:none;
+
+}
+.analytics-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+.analytics-footer-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#61a5ff;
+
+    font-weight:600;
+
+}
+
+
+.analytics-updated{
+
+    color:#8ea3c7;
+
+    font-size:13px;
+
+}
+.mini-chart{
+
+    width:100%;
+
+    height:70px;
+
+    margin:24px 0;
+
+}
 /* ==========================================
    HEADER
 ========================================== */
 
-.analytics-header {
-
-  display: flex;
-
-  justify-content:
-  space-between;
-
-  align-items: center;
-
-  margin-bottom: 24px;
-}
-
-.analytics-header h3 {
-
-  margin: 0;
-
-  color: white;
-
-  font-size: 1.4rem;
-
-  font-weight: 700;
-}
-
 /* ==========================================
    BADGES
 ========================================== */
-
-.analytics-badge {
-
-  padding:
-  8px 16px;
-
-  border-radius:
-  999px;
-
-  font-size:
-  .85rem;
-
-  font-weight:
-  700;
-}
-
 .income {
 
   background:
@@ -177,44 +267,9 @@
    VALUE
 ========================================== */
 
-.analytics-value {
-
-  font-size: 3rem;
-
-  font-weight: 800;
-
-  margin-bottom: 12px;
-
-  color: white;
-}
-
-.analytics-subtitle {
-
-  color:
-  #94a3b8;
-
-  line-height: 1.8;
-
-  margin-bottom: 25px;
-}
-
 /* ==========================================
    FOOTER
 ========================================== */
-
-.analytics-footer {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  color:
-  #cbd5e1;
-
-  margin-top: 25px;
-}
 
 /* ==========================================
    METRICS
@@ -295,4 +350,269 @@
     color:white;
 
     font-size:24px;
+}
+
+
+/*==========================================
+            EXPENSE CARD
+==========================================*/
+
+.expense-icon{
+
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #a855f7
+    );
+
+    box-shadow:
+    0 15px 30px rgba(124,58,237,.30);
+
+}
+
+.expense-growth{
+
+    color:#ef4444;
+
+    background:rgba(239,68,68,.12);
+
+}
+
+.expense-chart-placeholder{
+
+    display:none;
+
+}
+
+.expense-line{
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #7c3aed,
+        #ef4444,
+        transparent
+    );
+
+}
+
+
+/*==================================================
+        PREMIUM ANALYTICS HEADER
+==================================================*/
+
+.analytics-premium-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.analytics-premium-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.analytics-premium-icon{
+
+    width:72px;
+
+    height:72px;
+
+    border-radius:22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:30px;
+
+    color:#60a5fa;
+
+    background:linear-gradient(
+        135deg,
+        rgba(59,130,246,.18),
+        rgba(37,99,235,.35)
+    );
+
+    border:1px solid rgba(96,165,250,.18);
+
+    box-shadow:
+        0 18px 35px rgba(37,99,235,.20);
+
+}
+
+.analytics-premium-title{
+
+    margin:0;
+
+    color:#ffffff;
+
+    font-size:48px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+
+}
+
+.analytics-premium-subtitle{
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:17px;
+
+    font-weight:500;
+
+}
+
+.analytics-premium-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.analytics-live-badge{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 22px;
+
+    border-radius:999px;
+
+    background:rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+    font-weight:700;
+
+    font-size:14px;
+
+    letter-spacing:.6px;
+
+}
+
+.analytics-live-badge svg{
+
+    font-size:8px;
+
+    animation:livePulse 1.5s infinite;
+
+}
+
+.analytics-refresh-btn{
+
+    width:54px;
+
+    height:54px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#1b2746;
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.35s;
+
+}
+
+.analytics-refresh-btn:hover{
+
+    background:#2563eb;
+
+    transform:rotate(180deg);
+
+    box-shadow:
+        0 12px 24px rgba(37,99,235,.35);
+
+}
+
+@keyframes livePulse{
+
+    0%{
+
+        opacity:.4;
+
+        transform:scale(.9);
+
+    }
+
+    50%{
+
+        opacity:1;
+
+        transform:scale(1.25);
+
+    }
+
+    100%{
+
+        opacity:.4;
+
+        transform:scale(.9);
+
+    }
+
+}
+
+/*==========================
+      Responsive
+===========================*/
+
+@media(max-width:768px){
+
+    .analytics-premium-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:20px;
+
+    }
+
+    .analytics-premium-title{
+
+        font-size:34px;
+
+    }
+
+    .analytics-premium-icon{
+
+        width:60px;
+
+        height:60px;
+
+        font-size:26px;
+
+    }
+
 }

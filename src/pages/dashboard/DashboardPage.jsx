@@ -55,7 +55,7 @@ from "../../components/dashboard/Analytics/SpendingCategoryChart";
 import DashboardSection
 from "../../components/dashboard/common/DashboardSection";
 import DashboardHero from "../../components/dashboard/layout/DashboardHero";
-
+import AnalyticsHeader from "../../components/dashboard/Analytics/AnalyticsHeader";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -204,32 +204,24 @@ return (
       {/* =========================
           ANALYTICS
       ========================== */}
+<div className="dashboard-section">
 
-   <DashboardSection
+    <AnalyticsHeader />
 
-    title="Analytics"
+    <div className="analytics-row">
 
-    icon={<FaChartLine />}
+        <IncomeChart
+            transactions={transactions}
+        />
 
-    badge="LIVE"
+        <ExpenseChart
+            transactions={transactions}
+        />
 
-    showRefresh
+    </div>
 
->
-
-  <div className="analytics-row">
-
-    <IncomeChart
-      transactions={transactions}
-    />
-
-    <ExpenseChart
-      transactions={transactions}
-    />
-
-  </div>
-
-</DashboardSection>
+</div>
+  
 
       {/* =========================
           PERFORMANCE CHARTS
