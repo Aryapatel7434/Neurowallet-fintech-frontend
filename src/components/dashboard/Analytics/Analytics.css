@@ -616,3 +616,276 @@
     }
 
 }
+
+
+
+/*==================================================
+            PREMIUM TREND CHART
+==================================================*/
+
+.trend-card-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:26px;
+
+}
+
+.trend-title-group{
+
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+}
+
+.trend-icon{
+
+    width:68px;
+    height:68px;
+
+    border-radius:20px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:30px;
+
+    color:#fff;
+
+    flex-shrink:0;
+
+}
+
+.income-trend-icon{
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #60a5fa
+    );
+
+    box-shadow:
+        0 20px 35px rgba(37,99,235,.35);
+
+}
+
+.expense-trend-icon{
+
+    background:linear-gradient(
+        135deg,
+        #9333ea,
+        #c084fc
+    );
+
+    box-shadow:
+        0 20px 35px rgba(147,51,234,.35);
+
+}
+
+.trend-title{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:34px;
+
+    font-weight:800;
+
+}
+
+.trend-subtitle{
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:15px;
+
+}
+
+.trend-growth-badge{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:12px 18px;
+
+    border-radius:999px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+}
+
+.income-growth{
+
+    color:#22c55e;
+
+    background:rgba(34,197,94,.14);
+
+}
+
+.expense-growth{
+
+    color:#ef4444;
+
+    background:rgba(239,68,68,.14);
+
+}
+
+/*============================================*/
+
+.trend-kpi{
+
+    margin-bottom:20px;
+
+}
+
+.trend-kpi h1{
+
+    margin:0;
+
+    color:#fff;
+
+    font-size:52px;
+
+    font-weight:800;
+
+    letter-spacing:-2px;
+
+}
+
+.trend-kpi span{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:15px;
+
+}
+
+/*============================================*/
+
+.trend-stats{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:18px;
+
+    margin-top:22px;
+
+}
+
+.trend-stat{
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    border-radius:18px;
+
+    padding:18px;
+
+}
+
+.trend-stat span{
+
+    display:block;
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+    margin-bottom:8px;
+
+}
+
+.trend-stat strong{
+
+    color:#fff;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+/*============================================*/
+
+.trend-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:24px;
+
+}
+
+.trend-footer-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#60a5fa;
+
+    font-weight:600;
+
+}
+
+/*============================================*/
+
+.chart-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+}
+
+.chart-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:100%;
+    height:4px;
+
+    background:linear-gradient(
+        90deg,
+        #3b82f6,
+        #06b6d4
+    );
+
+}
+
+.chart-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+        0 25px 45px rgba(0,0,0,.35);
+
+}
