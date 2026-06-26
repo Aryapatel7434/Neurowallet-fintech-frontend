@@ -433,13 +433,6 @@ const handleTransfer = async () => {
   }
 />
 
-<TransactionHistory
-  transactions={transactions}
-  onSelectTransaction={
-    setSelectedTransaction
-  }
-/>
-
 <TransactionModal
   transaction={
     selectedTransaction
