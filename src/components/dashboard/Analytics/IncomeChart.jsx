@@ -13,11 +13,24 @@ import {
 function IncomeChart({
   transactions = [],
 }) {
+const user = JSON.parse(
+  localStorage.getItem("user")
+);
+console.log("USER EMAIL:", user?.email);
 
-  const incomeTransactions =
-    transactions.filter(
-      (t) => t.type === "CREDIT"
+transactions.forEach(tx => {
+    console.log(
+        tx.receiverEmail,
+        "===",
+        user?.email,
+        "=",
+        tx.receiverEmail === user?.email
     );
+});
+
+const incomeTransactions = transactions.filter(
+    tx => tx.receiverEmail === user?.email
+);
 
   const totalIncome =
     incomeTransactions.reduce(
@@ -26,15 +39,46 @@ function IncomeChart({
     );
 
   const growth = 18.4;
-const chartData = [
-  { value: 1200 },
-  { value: 1800 },
-  { value: 1400 },
-  { value: 2400 },
-  { value: 1900 },
-  { value: 3200 },
-  { value: totalIncome || 0 }
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
 ];
+
+const monthlyIncome = {};
+
+incomeTransactions.forEach((tx) => {
+
+  const month =
+    monthNames[
+      new Date(tx.timestamp).getMonth()
+    ];
+
+  monthlyIncome[month] =
+    (monthlyIncome[month] || 0) +
+    Number(tx.amount);
+
+});
+
+const chartData =
+  monthNames.map((month) => ({
+    month,
+    value: monthlyIncome[month] || 0
+  }));
+
+console.log("Income Transactions:", incomeTransactions);
+console.log("Income Chart:", chartData);
+
+
   return (
 
     <div className="analytics-card income-card">
@@ -102,7 +146,7 @@ const chartData = [
         height={70}
     >
 
-        <AreaChart data={chartData}>
+       <AreaChart data={chartData}>
 
             <defs>
 

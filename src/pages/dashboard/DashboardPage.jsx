@@ -58,6 +58,8 @@ import DashboardHero from "../../components/dashboard/layout/DashboardHero";
 import AnalyticsHeader from "../../components/dashboard/Analytics/AnalyticsHeader";
 import PerformanceHeader
 from "../../components/dashboard/Analytics/PerformanceHeader";
+import CashFlowHeader
+from "../../components/dashboard/Analytics/CashFlowHeader";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -90,17 +92,25 @@ async () => {
       walletData
     );
 
-    console.log(
-      "Transactions:",
-      transactionData
-    );
+   console.log("FULL API RESPONSE");
+console.log(transactionData);
+
+console.log("CONTENT");
+console.log(transactionData.content);
+
+console.log("FIRST");
+console.log(transactionData.content?.[0]);
 
     setWallet(walletData);
 
       setTransactions(
   transactionData.content || []
 );
+console.log("Dashboard Transactions:");
+console.log(transactionData.content);
 
+console.log("First Transaction:");
+console.log(transactionData.content?.[0]);
   } catch(error) {
 
     console.error(error);
@@ -250,32 +260,23 @@ return (
       {/* =========================
           ADVANCED ANALYTICS
       ========================== */}
-    <DashboardSection
+  <div className="dashboard-section">
 
-    title="Cash Flow & Spending"
+    <CashFlowHeader />
 
-    icon={<FaChartPie />}
+    <div className="analytics-row">
 
-    badge="Analytics"
+        <CashFlowChart
+            transactions={transactions}
+        />
 
-    showRefresh
+        <SpendingCategoryChart
+            transactions={transactions}
+        />
 
-    showExport
+    </div>
 
->
-  <div className="analytics-row">
-
-    <CashFlowChart
-      transactions={transactions}
-    />
-
-    <SpendingCategoryChart
-      transactions={transactions}
-    />
-
-  </div>
-
-</DashboardSection>
+</div>
      
       {/* =========================
           INSIGHTS

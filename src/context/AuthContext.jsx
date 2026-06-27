@@ -40,7 +40,7 @@ export const AuthProvider = ({
 
 }, []);
 
-  const login = (data) => {
+const login = (data) => {
 
   localStorage.setItem(
     "accessToken",
@@ -52,10 +52,19 @@ export const AuthProvider = ({
     data.refreshToken
   );
 
-  const userData = {
+  localStorage.setItem(
+    "email",
+    data.email
+  );
 
-    name: "Arya",
-    initials: "AP"
+  const userData = {
+    name: data.name,
+    email: data.email,
+    initials: data.name
+      .split(" ")
+      .map(word => word[0])
+      .join("")
+      .toUpperCase()
   };
 
   localStorage.setItem(
@@ -65,7 +74,6 @@ export const AuthProvider = ({
 
   setUser(userData);
 };
-
   const logout = () => {
 
     localStorage.removeItem(

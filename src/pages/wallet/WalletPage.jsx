@@ -57,6 +57,9 @@ const [transferAmount,
   setTransferAmount] =
   useState("");
 
+  const [category,
+  setCategory] =
+  useState("OTHER");
 
   const refreshWalletData = async () => {
 
@@ -226,9 +229,10 @@ const handleTransfer = async () => {
 
     const response =
       await transferMoney(
-        receiverEmail,
-        Number(transferAmount)
-      );
+  receiverEmail,
+  Number(transferAmount),
+  category
+);
 
     console.log(
       "Transfer Success:",
@@ -239,6 +243,7 @@ const handleTransfer = async () => {
 
     setReceiverEmail("");
     setTransferAmount("");
+    setCategory("OTHER");
 
     toast.success(
       "Transfer completed successfully"
@@ -417,7 +422,61 @@ const handleTransfer = async () => {
 
   <br />
   <br />
+  <select
+  value={category}
+  onChange={(e) =>
+    setCategory(e.target.value)
+  }
+>
 
+  <option value="FOOD">
+    🍔 Food
+  </option>
+
+  <option value="SHOPPING">
+    🛒 Shopping
+  </option>
+
+  <option value="BILLS">
+    🧾 Bills
+  </option>
+
+  <option value="TRAVEL">
+    ✈️ Travel
+  </option>
+
+  <option value="HEALTH">
+    💊 Health
+  </option>
+
+  <option value="ENTERTAINMENT">
+    🎬 Entertainment
+  </option>
+
+  <option value="EDUCATION">
+    🎓 Education
+  </option>
+
+  <option value="INVESTMENT">
+    📈 Investment
+  </option>
+
+  <option value="SALARY">
+    💼 Salary
+  </option>
+
+  <option value="TRANSFER">
+    💸 Transfer
+  </option>
+
+  <option value="OTHER">
+    📦 Other
+  </option>
+
+</select>
+
+<br />
+<br />
   <button
     className="wallet-btn"
     onClick={handleTransfer}

@@ -889,3 +889,306 @@
         0 25px 45px rgba(0,0,0,.35);
 
 }
+
+/*==========================================
+        CASH FLOW CARD
+==========================================*/
+
+.cashflow-icon{
+
+    background:linear-gradient(
+        135deg,
+        #06b6d4,
+        #2563eb
+    );
+
+    box-shadow:
+        0 18px 35px rgba(37,99,235,.30);
+
+}
+
+.trend-growth{
+
+    background:rgba(59,130,246,.12);
+
+    color:#60a5fa;
+
+}
+
+.premium-chart{
+
+    margin:28px 0;
+
+    height:240px;
+
+}
+
+.recharts-cartesian-grid line{
+
+    opacity:.15;
+
+}
+
+.recharts-tooltip-wrapper{
+
+    border-radius:16px;
+
+}
+
+/*==========================================
+        SPENDING CATEGORY
+==========================================*/
+
+.spending-icon{
+
+    background:linear-gradient(
+        135deg,
+        #f59e0b,
+        #f97316
+    );
+
+    box-shadow:
+        0 18px 35px rgba(245,158,11,.30);
+
+}
+
+.spending-badge{
+
+    background:rgba(245,158,11,.12);
+
+    color:#f59e0b;
+
+}
+
+.category-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.category-item:last-child{
+
+    border:none;
+
+}
+
+.category-name{
+
+    color:white;
+
+    font-weight:600;
+
+}
+
+.category-value{
+
+    color:#94a3b8;
+
+}
+
+/*==================================================
+      SPENDING CATEGORY LIST
+==================================================*/
+
+.category-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-top:18px;
+
+}
+
+.category-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.03);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    transition:.3s;
+
+}
+
+.category-item:hover{
+
+    background:rgba(59,130,246,.08);
+
+    border-color:rgba(59,130,246,.25);
+
+    transform:translateX(4px);
+
+}
+
+.category-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:#dbe7ff;
+
+    font-weight:600;
+
+}
+
+.category-dot{
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+
+}
+
+.category-item strong{
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+/*==================================================
+          SPENDING CARD
+==================================================*/
+
+.spending-icon{
+
+    background:linear-gradient(
+        135deg,
+        #f59e0b,
+        #fb923c
+    );
+
+    box-shadow:
+    0 15px 35px rgba(245,158,11,.28);
+
+}
+
+.spending-badge{
+
+    color:#f59e0b;
+
+    background:rgba(245,158,11,.12);
+
+}
+
+/*==================================================
+            EMPTY STATE
+==================================================*/
+
+.chart-empty{
+
+    height:260px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:15px;
+
+    color:#94a3b8;
+
+}
+
+.chart-empty svg{
+
+    font-size:46px;
+
+    opacity:.8;
+
+}
+
+/*==================================================
+            RESPONSIVE
+==================================================*/
+
+@media(max-width:768px){
+
+    .category-item{
+
+        padding:12px 14px;
+
+    }
+
+}
+
+/*=========================================
+        PREMIUM CHART GLOW
+=========================================*/
+
+.premium-chart-glow{
+
+    position:relative;
+
+}
+
+.premium-chart-glow::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+
+    height:220px;
+
+    left:50%;
+
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    background:
+
+    radial-gradient(
+
+    rgba(59,130,246,.22),
+
+    transparent 70%
+
+    );
+
+    filter:blur(40px);
+
+    z-index:0;
+
+}
+
+.premium-chart-glow>*{
+
+    position:relative;
+
+    z-index:1;
+
+}

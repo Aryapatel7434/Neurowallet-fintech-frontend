@@ -20,17 +20,18 @@ import axiosInstance from "../api/axiosConfig";
 
 export const transferMoney = async (
   receiverEmail,
-  amount
+  amount,
+  category
 ) => {
 
-  const response =
-    await axiosInstance.post(
-      "/wallet/transfer",
-      {
-        receiverEmail,
-        amount
-      }
-    );
+  const response = await axiosInstance.post(
+    "/wallet/transfer", // Change to "/transactions/send" if that's your actual endpoint
+    {
+      receiverEmail,
+      amount,
+      category
+    }
+  );
 
   return response.data;
 };

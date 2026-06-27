@@ -53,7 +53,7 @@ function LoginForm() {
                 "Login Response:",
                 data
             );
-
+            console.log("EMAIL:", data.email);
             login(data);
 
             toast.success(
