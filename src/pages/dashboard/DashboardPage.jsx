@@ -205,7 +205,13 @@ return (
 
       <Navbar />
 
-      <DashboardHero />
+    <DashboardHero
+
+    wallet={wallet}
+
+    dashboardInsights={dashboardInsights}
+
+/>
 
       {/* =========================
           FINANCIAL OVERVIEW

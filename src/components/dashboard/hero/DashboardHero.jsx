@@ -1,7 +1,41 @@
 import "./DashboardHero.css";
 import { FaWallet } from "react-icons/fa6";
 
-function DashboardHero() {
+function DashboardHero({
+    wallet,
+    dashboardInsights
+}) {
+  const user =
+    JSON.parse(
+        localStorage.getItem("user")
+    );
+
+const balance =
+    wallet?.balance || 0;
+
+const totalIncome =
+    dashboardInsights?.totalIncome || 0;
+
+const totalExpense =
+    dashboardInsights?.totalExpense || 0;
+
+const netCashFlow =
+    dashboardInsights?.netCashFlow || 0;
+
+
+    const hour = new Date().getHours();
+
+let greeting = "Good Evening";
+
+if (hour < 12) {
+
+    greeting = "Good Morning";
+
+} else if (hour < 18) {
+
+    greeting = "Good Afternoon";
+
+}
   return (
     <section className="hero-section">
 
@@ -12,15 +46,29 @@ function DashboardHero() {
             NeuroWallet AI
           </span>
 
-          {/* <h1>
-            Welcome Back Arya 👋
-          </h1>
+         <h1>
 
-          <p>
-            Monitor your wallet, transactions,
-            spending patterns and AI insights
-            from a single dashboard.
-          </p> */}
+    {greeting},
+
+    {" "}
+
+    {user?.name || "User"}
+
+    👋
+
+</h1>
+
+<p>
+
+    Welcome back to NeuroWallet AI.
+
+    Monitor your wallet, transactions,
+
+    analytics and financial insights
+
+    from one secure dashboard.
+
+</p>
         </div>
 
         <div className="hero-right">
@@ -36,7 +84,11 @@ function DashboardHero() {
             <div>
               <span>Total Balance</span>
 
-              <h2>₹25,450</h2>
+              <h2>
+
+₹{Number(balance).toLocaleString("en-IN")}
+
+</h2>
             </div>
 
           </div>
