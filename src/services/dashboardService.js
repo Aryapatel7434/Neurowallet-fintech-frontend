@@ -1,11 +1,21 @@
-import axiosInstance from "../api/axiosConfig";
+import axios from "axios";
 
-export const getDashboardStats = async () => {
+const API =
+  "http://localhost:8080/api/dashboard";
 
-  const response =
-    await axiosInstance.get(
-      "/dashboard/stats"
-    );
+export const getDashboardInsights = async () => {
+
+ const token = localStorage.getItem("accessToken");
+
+  const response = await axios.get(
+    `${API}/insights`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   return response.data;
+
 };

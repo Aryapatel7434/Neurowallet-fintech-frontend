@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
+  Label,
 } from "recharts";
 
 import {
@@ -67,12 +68,12 @@ const expenseTransactions = transactions.filter(
 
   // ================= CHART DATA =================
 
-  const chartData = Object.keys(
-    categories
-  ).map((key) => ({
-    name: key,
-    value: categories[key],
-  }));
+ const chartData = Object.entries(categories)
+  .map(([name, value]) => ({
+    name,
+    value,
+  }))
+  .sort((a, b) => b.value - a.value);
 
   console.log("CHART DATA:");
   console.log(chartData);
@@ -168,17 +169,18 @@ const expenseTransactions = transactions.filter(
 
             <PieChart>
 
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={105}
-                paddingAngle={4}
-                cornerRadius={8}
-              >
+            <Pie
+    data={chartData}
+    dataKey="value"
+    nameKey="name"
+    cx="50%"
+    cy="50%"
+    innerRadius={70}
+    outerRadius={105}
+    paddingAngle={4}
+    cornerRadius={8}
+    animationDuration={1000}
+>
 
                 {chartData.map(
                   (entry, index) => (
@@ -195,26 +197,54 @@ const expenseTransactions = transactions.filter(
 
                   )
                 )}
+<Label
+  position="center"
+  content={() => (
+    <text
+      x="50%"
+      y="50%"
+      textAnchor="middle"
+      dominantBaseline="middle"
+    >
+      <tspan
+        x="50%"
+        dy="-6"
+        fill="#ffffff"
+        fontSize="22"
+        fontWeight="700"
+      >
+        ₹{totalExpense.toLocaleString()}
+      </tspan>
 
-              </Pie>
+      <tspan
+        x="50%"
+        dy="24"
+        fill="#94a3b8"
+        fontSize="13"
+      >
+        Spent
+      </tspan>
+    </text>
+  )}
+/>
 
-              <Tooltip
-                formatter={(value) => [
-                  `₹${Number(value).toLocaleString()}`,
-                  "Amount",
-                ]}
-                contentStyle={{
-                  background: "#14233d",
-                  border: "none",
-                  borderRadius: "16px",
-                  color: "#fff",
-                }}
-              />
+   </Pie>
 
-              <Legend
-                verticalAlign="bottom"
-                iconType="circle"
-              />
+             <Tooltip
+    formatter={(value, name) => [
+        `₹${Number(value).toLocaleString("en-IN")}`,
+        name,
+    ]}
+    separator=" : "
+    cursor={{ fill: "rgba(255,255,255,0.05)" }}
+    contentStyle={{
+        background: "#111827",
+        border: "1px solid #374151",
+        borderRadius: "12px",
+        color: "#fff",
+        boxShadow: "0 8px 30px rgba(0,0,0,.35)"
+    }}
+/>
 
             </PieChart>
 

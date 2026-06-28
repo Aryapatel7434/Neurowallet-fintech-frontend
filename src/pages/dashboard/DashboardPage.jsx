@@ -1,3 +1,8 @@
+import { useEffect, useState } from "react";
+
+import { getMyWallet } from "../../services/walletService";
+import { getTransactionHistory } from "../../services/transactionService";
+import { getDashboardInsights } from "../../services/dashboardService";
 import {
     FaChartLine,
     FaRobot,
@@ -6,11 +11,6 @@ import {
 } from "react-icons/fa6";
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
-
-import { useEffect, useState } from "react";
-
-import { getMyWallet } from "../../services/walletService";
-import { getTransactionHistory } from "../../services/transactionService";
 
 import Sidebar from "../../components/dashboard/layout/Sidebar";
 import Navbar from "../../components/dashboard/layout/Navbar";
@@ -70,10 +70,14 @@ const [transactions,
 setTransactions] =
 useState([]);
 const [error, setError] = useState("");
+const [dashboardInsights, setDashboardInsights] = useState(null);
 
+const [loadingInsights, setLoadingInsights] = useState(true);
 useEffect(() => {
 
-fetchDashboardData();
+    fetchDashboardData();
+
+    fetchDashboardInsights();
 
 }, []);
 const fetchDashboardData =
@@ -120,6 +124,30 @@ console.log(transactionData.content?.[0]);
     setLoading(false);
 
   }
+};
+const fetchDashboardInsights = async () => {
+
+    try {
+
+        const data = await getDashboardInsights();
+
+        console.log("========== Dashboard API ==========");
+        console.log(data);
+        console.log("==================================");
+
+        setDashboardInsights(data);
+
+    } catch (error) {
+
+        console.log("Dashboard API Error");
+        console.log(error);
+
+    } finally {
+
+        setLoadingInsights(false);
+
+    }
+
 };
 if (loading) {
 
@@ -199,9 +227,11 @@ return (
           transactions={transactions}
         />
 
-        <AIInsights
-          transactions={transactions}
-        />
+       <AIInsights
+    transactions={transactions}
+    dashboardInsights={dashboardInsights}
+    loading={loadingInsights}
+/>
 
       </div>
 
