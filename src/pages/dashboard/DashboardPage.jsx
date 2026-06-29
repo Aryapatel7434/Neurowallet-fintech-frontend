@@ -58,6 +58,8 @@ import DashboardHero from "../../components/dashboard/layout/DashboardHero";
 import AnalyticsHeader from "../../components/dashboard/Analytics/AnalyticsHeader";
 import PerformanceHeader
 from "../../components/dashboard/Analytics/PerformanceHeader";
+import InsightsHeader
+from "../../components/dashboard/Analytics/InsightsHeader";
 import CashFlowHeader
 from "../../components/dashboard/Analytics/CashFlowHeader";
 function DashboardPage() {
@@ -317,21 +319,43 @@ return (
       {/* =========================
           INSIGHTS
       ========================== */}
-     <DashboardSection title="Insights">
+   {/* <DashboardSection>
 
-  <div className="analytics-row">
+    <InsightsHeader />
 
-    <SpendingInsights
-      transactions={transactions}
-    />
+    <div className="analytics-row">
 
-    <MonthlyTrend
-      transactions={transactions}
-    />
+        <SpendingInsights
+            transactions={transactions}
+        />
 
-  </div>
+        <MonthlyTrend
+            transactions={transactions}
+            dashboardInsights={dashboardInsights}
+        />
 
-</DashboardSection>
+    </div>
+
+</DashboardSection> */}
+
+<div className="dashboard-section">
+
+    <InsightsHeader />
+
+    <div className="analytics-row">
+
+        <SpendingInsights
+            transactions={transactions}
+        />
+
+        <MonthlyTrend
+            transactions={transactions}
+            dashboardInsights={dashboardInsights}
+        />
+
+    </div>
+
+</div>
 
       {/* =========================
           ACTIVITY
