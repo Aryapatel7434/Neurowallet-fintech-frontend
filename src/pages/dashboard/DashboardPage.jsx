@@ -337,7 +337,9 @@ return (
           ACTIVITY
       ========================== */}
 
-      <ActivityTimeline />
+      <ActivityTimeline
+    transactions={transactions}
+/>
 
       {/* =========================
           AI ASSISTANT
