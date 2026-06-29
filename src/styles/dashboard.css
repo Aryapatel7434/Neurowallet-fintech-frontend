@@ -1475,21 +1475,6 @@ color:white;
 
 }
 /* AI */
-.ai-header h3{
-    font-size:2rem;
-    font-weight:700;
-    margin:0;
-}
-
-
-.ai-header{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    margin-bottom:24px;
-}
-
-
 .ai-status{
 
 background:#16a34a;
@@ -2330,16 +2315,15 @@ background:rgba(59,130,246,.06);
    AI FINTECH SECTION
 ========================================== */
 
-.ai-grid {
+.ai-grid{
 
-  display:grid;
+    display:grid;
 
-  grid-template-columns:
-  repeat(2,1fr);
+    grid-template-columns:repeat(2,1fr);
 
-  gap:24px;
+    gap:24px;
 
-  margin-top:30px;
+    margin-top:5px;
 }
 
 /* ==========================================
@@ -2347,7 +2331,6 @@ background:rgba(59,130,246,.06);
 ========================================== */
 
 .ai-advisor-card,
-.budget-card,
 .goal-card,
 .ai-card,
 .quick-card {
@@ -2385,7 +2368,6 @@ background:rgba(59,130,246,.06);
 }
 
 .ai-advisor-card:hover,
-.budget-card:hover,
 .goal-card:hover,
 .ai-card:hover,
 .quick-card:hover {
@@ -2397,7 +2379,7 @@ background:rgba(59,130,246,.06);
 }
 
 .ai-advisor-card::before,
-.budget-card::before,
+
 .goal-card::before,
 .ai-card::before,
 .quick-card::before {
@@ -2471,7 +2453,7 @@ background:rgba(59,130,246,.06);
 ========================================== */
 
 .ai-advisor-card h2,
-.budget-card h2,
+
 .goal-card h2,
 .ai-card h2,
 .quick-card h2 {
@@ -2489,45 +2471,8 @@ background:rgba(59,130,246,.06);
    AI ADVISOR
 ========================================== */
 
-.advisor-header {
 
-  display:flex;
 
-  justify-content:space-between;
-
-  align-items:center;
-
-  margin-bottom:24px;
-}
-
-.advisor-badge {
-
-  background:
-  rgba(
-    34,
-    197,
-    94,
-    .15
-  );
-
-  color:#22c55e;
-
-  padding:
-  8px 16px;
-
-  border-radius:999px;
-
-  font-weight:700;
-}
-
-.advisor-item {
-
-  padding:20px;
-
-  border-radius:18px;
-
-  margin-bottom:18px;
-}
 
 .positive {
 
@@ -2571,25 +2516,11 @@ background:rgba(59,130,246,.06);
   4px solid #3b82f6;
 }
 
-.advisor-item h4 {
-
-  color:white;
-
-  margin-bottom:10px;
-}
-
-.advisor-item p {
-
-  color:#94a3b8;
-
-  line-height:1.8;
-}
-
 /* ==========================================
    BUDGET HEALTH
 ========================================== */
 
-.budget-progress,
+
 .goal-progress {
 
   height:14px;
@@ -2607,16 +2538,6 @@ background:rgba(59,130,246,.06);
   overflow:hidden;
 
   margin:24px 0;
-}
-
-.budget-fill {
-
-  background: linear-gradient(
-    90deg,
-    #2563eb,
-    #60a5fa
-  );
-
 }
 
 .goal-fill {
@@ -2747,11 +2668,6 @@ background:rgba(59,130,246,.06);
 }
 @media(max-width:1200px){
 
-  .ai-grid{
-
-    grid-template-columns:1fr;
-  }
-
 }
 
 @media(max-width:768px){
@@ -2760,23 +2676,7 @@ background:rgba(59,130,246,.06);
 
     grid-template-columns:1fr;
   }
-
 }
-.advisor-header h3,
-.advisor-item h4 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.budget-card h2 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-
-
-
 /* ==========================================
    DASHBOARD SECTION
 ========================================== */

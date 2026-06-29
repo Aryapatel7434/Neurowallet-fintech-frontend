@@ -62,6 +62,8 @@ import InsightsHeader
 from "../../components/dashboard/Analytics/InsightsHeader";
 import CashFlowHeader
 from "../../components/dashboard/Analytics/CashFlowHeader";
+import AIAssistantHeader
+from "../../components/dashboard/ai/AIAssistantHeader";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -368,46 +370,41 @@ return (
       {/* =========================
           AI ASSISTANT
       ========================== */}
- <DashboardSection
+{/* =========================
+    AI ASSISTANT
+========================= */}
 
-    title="AI Assistant"
+<div className="dashboard-section ai-section">
 
-    icon={<FaRobot />}
+    <AIAssistantHeader />
 
-    badge="AI"
+    <div className="ai-grid">
 
-    showRefresh
+        <AIFinancialAssistant
+            transactions={transactions}
+        />
 
->
+        <BudgetHealth
+            wallet={wallet}
+        />
 
-  <div className="ai-grid">
+        <FinancialScore
+            wallet={wallet}
+        />
 
-    <AIFinancialAssistant
-      transactions={transactions}
-    />
+        <SmartGoals
+            wallet={wallet}
+        />
 
-    <BudgetHealth
-      wallet={wallet}
-    />
+        <GoalRecommendation
+            wallet={wallet}
+        />
 
-    <FinancialScore
-      wallet={wallet}
-    />
+        <QuickActions />
 
-    <SmartGoals
-      wallet={wallet}
-    />
+    </div>
 
-    <GoalRecommendation
-      wallet={wallet}
-    />
-
-    <QuickActions />
-
-  </div>
-
-</DashboardSection>
-      
+</div>
 
     </div>
 
