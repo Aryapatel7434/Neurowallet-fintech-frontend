@@ -1,10 +1,21 @@
- import { useState } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
+import {
+    FaUser,
+    FaLock,
+    FaEye,
+    FaEyeSlash
+} from "react-icons/fa";
 
+import { MdEmail } from "react-icons/md";
+
+import { registerUser } from "../../services/userService";
 
 function RegisterForm() {
 
-
+    const navigate = useNavigate();
 
     const [name, setName] = useState("");
 
@@ -12,37 +23,72 @@ function RegisterForm() {
 
     const [password, setPassword] = useState("");
 
+    const [loading, setLoading] = useState(false);
 
+    const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
 
+        if (!name || !email || !password) {
 
+            toast.error("Please fill all fields");
 
-        console.log({
+            return;
+        }
 
-            name,
+        if (password.length < 6) {
 
-            email,
+            toast.error("Password must be at least 6 characters");
 
-            password
+            return;
+        }
 
-        });
+        setLoading(true);
+
+        try {
+
+            await registerUser({
+
+                name,
+
+                email,
+
+                password
+
+            });
+
+            toast.success("Account created successfully!");
+
+            navigate("/");
+
+        } catch (error) {
+
+            console.error(error);
+
+            const message =
+                error.response?.data?.message ||
+                error.response?.data ||
+                "Registration failed";
+
+            toast.error(message);
+
+        } finally {
+
+            setLoading(false);
+
+        }
 
     };
-
-
 
     return (
 
         <form onSubmit={handleSubmit}>
 
-
+            {/* Name */}
 
             <div className="form-group">
-
-
 
                 <label className="form-label">
 
@@ -50,31 +96,27 @@ function RegisterForm() {
 
                 </label>
 
+                <div className="input-wrapper">
 
+                    <FaUser className="input-icon" />
 
-                <input
+                    <input
+                        type="text"
+                        className="form-control input-with-icon"
+                        placeholder="Enter Full Name"
+                        value={name}
+                        onChange={(e) =>
+                            setName(e.target.value)
+                        }
+                    />
 
-                    type="text"
-
-                    className="form-control"
-
-                    placeholder="Enter Full Name"
-
-                    value={name}
-
-                    onChange={(e) => setName(e.target.value)}
-
-                />
-
-
+                </div>
 
             </div>
 
-
+            {/* Email */}
 
             <div className="form-group">
-
-
 
                 <label className="form-label">
 
@@ -82,31 +124,27 @@ function RegisterForm() {
 
                 </label>
 
+                <div className="input-wrapper">
 
+                    <MdEmail className="input-icon" />
 
-                <input
+                    <input
+                        type="email"
+                        className="form-control input-with-icon"
+                        placeholder="Enter Email"
+                        value={email}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
+                    />
 
-                    type="email"
-
-                    className="form-control"
-
-                    placeholder="Enter Email"
-
-                    value={email}
-
-                    onChange={(e) => setEmail(e.target.value)}
-
-                />
-
-
+                </div>
 
             </div>
 
-
+            {/* Password */}
 
             <div className="form-group">
-
-
 
                 <label className="form-label">
 
@@ -114,68 +152,78 @@ function RegisterForm() {
 
                 </label>
 
+                <div className="password-wrapper">
 
+                    <FaLock className="input-icon" />
 
-                <input
+                    <input
+                        type={
+                            showPassword
+                                ? "text"
+                                : "password"
+                        }
+                        className="form-control"
+                        placeholder="Create Password"
+                        value={password}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
+                    />
 
-                    type="password"
+                    <button
+                        type="button"
+                        className="eye-btn"
+                        onClick={() =>
+                            setShowPassword(!showPassword)
+                        }
+                    >
 
-                    className="form-control"
+                        {
+                            showPassword
+                                ? <FaEyeSlash />
+                                : <FaEye />
+                        }
 
-                    placeholder="Create Password"
+                    </button>
 
-                    value={password}
-
-                    onChange={(e) => setPassword(e.target.value)}
-
-                />
-
-
+                </div>
 
             </div>
 
-
+            {/* Submit */}
 
             <button
-
                 type="submit"
-
                 className="auth-btn"
-
+                disabled={loading}
             >
 
-                Create Account
+                {
+                    loading
+                        ? "Creating Account..."
+                        : "Create Account"
+                }
 
             </button>
 
-
+            {/* Login Link */}
 
             <div className="auth-link">
 
-
-
                 Already have an account?{" "}
 
-
-
-                <a href="/">
+                <Link to="/">
 
                     Login
 
-                </a>
-
-
+                </Link>
 
             </div>
-
-
 
         </form>
 
     );
 
 }
-
-
 
 export default RegisterForm;

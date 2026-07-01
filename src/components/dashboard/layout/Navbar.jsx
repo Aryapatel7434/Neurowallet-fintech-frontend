@@ -101,12 +101,12 @@ function Navbar() {
 
           <div className="profile-avatar">
 
-            {user?.initials || "AP"}
+            {user?.initials || "U"}
 
           </div>
            <div className="profile-info">
     <span className="profile-name">
-        {user?.name || "Arya"}
+        {user?.name || "User"}
     </span>
 </div>
           

@@ -64,6 +64,8 @@ import CashFlowHeader
 from "../../components/dashboard/Analytics/CashFlowHeader";
 import AIAssistantHeader
 from "../../components/dashboard/ai/AIAssistantHeader";
+import DashboardSkeleton
+from "../../components/dashboard/common/DashboardSkeleton";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -155,15 +157,23 @@ const fetchDashboardInsights = async () => {
 };
 if (loading) {
 
+    return (
 
-return (
+        <div className="dashboard-layout">
 
-  <div style={{ padding: "50px" }}>
-    Loading Dashboard...
-  </div>
+            <Sidebar />
 
-);
+            <div className="dashboard-content">
 
+                <Navbar />
+
+                <DashboardSkeleton />
+
+            </div>
+
+        </div>
+
+    );
 
 }
 

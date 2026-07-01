@@ -1,0 +1,251 @@
+/* ==========================================================
+   Dashboard Skeleton
+========================================================== */
+
+.dashboard-skeleton{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:32px;
+
+}
+
+/* ==========================================================
+   Skeleton Base
+========================================================== */
+
+.skeleton{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:#162340;
+
+    border-radius:24px;
+}
+
+.skeleton::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-150%;
+
+    width:150%;
+
+    height:100%;
+
+    background:linear-gradient(
+
+        90deg,
+
+        transparent,
+
+        rgba(255,255,255,.08),
+
+        transparent
+
+    );
+
+    animation:skeleton-loading 1.4s infinite;
+
+}
+
+/* ==========================================================
+   Hero
+========================================================== */
+
+.hero-skeleton{
+
+    height:220px;
+
+}
+
+/* ==========================================================
+   Grid
+========================================================== */
+
+.skeleton-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:24px;
+
+}
+
+/* ==========================================================
+   Cards
+========================================================== */
+
+.card{
+
+    height:180px;
+
+}
+
+.large-card{
+
+    height:320px;
+
+}
+
+/* ==========================================================
+   Table
+========================================================== */
+
+.table-skeleton{
+
+    height:420px;
+
+}
+
+/* ==========================================================
+   Animation
+========================================================== */
+
+@keyframes skeleton-loading{
+
+    0%{
+
+        left:-150%;
+
+    }
+
+    100%{
+
+        left:150%;
+
+    }
+
+}
+
+/* ==========================================================
+   Responsive
+========================================================== */
+
+@media(max-width:768px){
+
+    .skeleton-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+/* ==========================================
+   Financial Overview
+========================================== */
+
+.skeleton-overview{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:24px;
+
+}
+
+.overview-card{
+
+    height:180px;
+
+}
+
+/* ==========================================
+   Two Column Layout
+========================================== */
+
+.skeleton-two-column{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:24px;
+
+}
+
+.command-card{
+
+    height:340px;
+
+}
+
+.analytics-card-skeleton{
+
+    height:360px;
+
+}
+
+/* ==========================================
+   Table
+========================================== */
+
+.table-card{
+
+    height:430px;
+
+}
+
+/* ==========================================
+   AI Grid
+========================================== */
+
+.skeleton-ai-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:24px;
+
+}
+
+.ai-card{
+
+    height:320px;
+
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:1200px){
+
+    .skeleton-overview{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .skeleton-ai-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .skeleton-overview,
+
+    .skeleton-two-column,
+
+    .skeleton-ai-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
