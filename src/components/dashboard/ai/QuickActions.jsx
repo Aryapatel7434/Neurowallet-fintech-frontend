@@ -1,71 +1,154 @@
-import {
-  FaWallet,
-  FaPaperPlane,
-  FaChartLine,
-  FaBullseye
-} from "react-icons/fa";
+import "./QuickActions.css";
 
-import { FaBolt } from "react-icons/fa";
+import {
+    FaWallet,
+    FaMoneyBillTransfer,
+    FaChartPie,
+    FaBullseye,
+    FaArrowRight
+} from "react-icons/fa6";
+
+import { useNavigate } from "react-router-dom";
 
 function QuickActions() {
 
-  const actions = [
+    const navigate = useNavigate();
 
-    {
-      icon: <FaWallet />,
-      title: "Add Money"
-    },
+    const actions = [
 
-    {
-      icon: <FaPaperPlane />,
-      title: "Transfer"
-    },
+        {
+            icon: <FaWallet />,
+            title: "Add Money",
+            description: "Top up your wallet instantly",
+            color: "blue",
+            route: "/wallet/deposit"
+        },
 
-    {
-      icon: <FaChartLine />,
-      title: "Analytics"
-    },
+        {
+            icon: <FaMoneyBillTransfer />,
+            title: "Transfer",
+            description: "Send money securely",
+            color: "green",
+            route: "/transfer"
+        },
 
-    {
-      icon: <FaBullseye />,
-      title: "Goals"
-    }
+        {
+            icon: <FaChartPie />,
+            title: "Analytics",
+            description: "View financial reports",
+            color: "purple",
+            route: "/analytics"
+        },
 
-  ];
+        {
+            icon: <FaBullseye />,
+            title: "Goals",
+            description: "Track savings goals",
+            color: "orange",
+            route: "/goals"
+        }
 
-  return (
+    ];
 
-    <div className="quick-card">
+    const handleNavigation = (route) => {
 
-      <h2>
-        <FaBolt />
-        Quick Actions
-      </h2>
+        // Replace with actual pages when implemented
 
-      <div className="quick-grid">
+        if (
+            route === "/wallet/deposit" ||
+            route === "/transfer" ||
+            route === "/analytics" ||
+            route === "/goals"
+        ) {
 
-        {actions.map((action, index) => (
+            navigate("/dashboard");
 
-          <div
-            key={index}
-            className="action-box"
-          >
+            // Later:
+            // navigate(route);
 
-            {action.icon}
+        }
 
-            <span>
-              {action.title}
-            </span>
+    };
 
-          </div>
+    return (
 
-        ))}
+        <div className="quick-card">
 
-      </div>
+            {/* ================= Header ================= */}
 
-    </div>
+            <div className="quick-header">
 
-  );
+                <h2>
+
+                    Quick Actions
+
+                </h2>
+
+                <span>
+
+                    {actions.length} Actions
+
+                </span>
+
+            </div>
+
+            {/* ================= Action Grid ================= */}
+
+            <div className="quick-grid">
+
+                {
+
+                    actions.map((action, index) => (
+
+                        <button
+
+                            key={index}
+
+                            className={`quick-item ${action.color}`}
+
+                            onClick={() =>
+                                handleNavigation(action.route)
+                            }
+
+                        >
+
+                            <div className="quick-icon">
+
+                                {action.icon}
+
+                            </div>
+
+                            <div className="quick-content">
+
+                                <h4>
+
+                                    {action.title}
+
+                                </h4>
+
+                                <p>
+
+                                    {action.description}
+
+                                </p>
+
+                            </div>
+
+                            <FaArrowRight
+                                className="quick-arrow"
+                            />
+
+                        </button>
+
+                    ))
+
+                }
+
+            </div>
+
+        </div>
+
+    );
 
 }
 

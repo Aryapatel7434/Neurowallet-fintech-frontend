@@ -1,52 +1,181 @@
-import { FaShieldAlt } from "react-icons/fa";
+import "./FinancialScore.css";
+
+import {
+    FaShieldHeart,
+    FaArrowTrendUp,
+    FaCircleCheck
+} from "react-icons/fa6";
+
 function FinancialScore({ wallet }) {
 
-  const balance = wallet?.balance || 0;
+    const balance = wallet?.balance || 0;
 
-  let score = 50;
+   const score =
+    balance >= 100000
+        ? 98
+        : balance >= 50000
+        ? 90
+        : balance >= 25000
+        ? 82
+        : balance >= 10000
+        ? 70
+        : balance >= 5000
+        ? 58
+        : 40;
 
-  if (balance > 1000)
-    score += 10;
+  const status =
+    score >= 95
+        ? "Elite"
+        : score >= 90
+        ? "Excellent"
+        : score >= 75
+        ? "Good"
+        : score >= 60
+        ? "Average"
+        : "Needs Improvement";
 
-  if (balance > 5000)
-    score += 10;
+    return (
 
-  if (balance > 10000)
-    score += 10;
+        <div className="score-card">
 
-  if (balance > 25000)
-    score += 10;
+            {/* Header */}
 
-  if (balance > 50000)
-    score += 10;
+            <div className="score-header">
 
-  let status = "Needs Improvement";
+                <h2>
 
-  if (score >= 90)
-    status = "Excellent";
+                    <FaShieldHeart />
 
-  else if (score >= 75)
-    status = "Good";
+                    Financial Score
 
-  else if (score >= 60)
-    status = "Healthy";
+                </h2>
 
-  return (
+                <span className="score-live">
 
-    <div className="ai-card">
+                    LIVE
 
-     <h2>
-  <FaShieldAlt />
-  Financial Score
-</h2>
+                </span>
 
-      <h1>{score}/100</h1>
+            </div>
 
-      <p>{status}</p>
+            {/* Main Score */}
 
-    </div>
+            <div className="score-main">
 
-  );
+                <h1>
+
+                    {score}
+
+                </h1>
+
+                <span>
+
+                    /100
+
+                </span>
+
+            </div>
+
+            <p className="score-status">
+
+                {status}
+
+            </p>
+            <div className="score-badge">
+
+    Credit Rating
+
+    <strong>
+
+        {score >= 95
+            ? "  A++"
+            : score >= 85
+            ? "  A+"
+            : score >= 70
+            ? "  A"
+            : score >= 55
+            ? "  B++"
+            : "  B+"}
+
+    </strong>
+
+</div>
+
+            {/* Progress */}
+
+            <div className="score-progress">
+
+                <div
+                    className="score-fill"
+                    style={{
+                        width: `${score}%`
+                    }}
+                />
+
+            </div>
+
+            {/* Metrics */}
+
+            <div className="score-metrics">
+
+                <div>
+
+                    <span>Wallet</span>
+
+                    <strong>
+
+                        ₹{balance.toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Rating</span>
+
+                    <strong>
+
+                        A+
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Risk</span>
+
+                    <strong>
+
+                        Low
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            {/* Recommendation */}
+
+            <div className="score-tip">
+
+                <FaCircleCheck />
+
+                <p>
+
+                   {score >= 90
+    ? "Excellent financial discipline. Continue your current saving strategy to maintain a top credit profile."
+    : score >= 75
+    ? "Healthy financial behavior. Increasing your monthly savings can further improve your score."
+    : "Focus on reducing unnecessary expenses and increasing savings to improve your financial health."}
+                </p>
+
+            </div>
+
+        </div>
+
+    );
 
 }
 

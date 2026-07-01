@@ -1,0 +1,314 @@
+/* ==========================================================
+   Smart Goals - Premium Card
+========================================================== */
+
+.goal-card{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    padding:30px;
+
+    background:linear-gradient(
+        180deg,
+        #162340 0%,
+        #10192d 100%
+    );
+
+    border:1px solid rgba(93,138,255,.22);
+
+    border-top:4px solid #6d5efc;
+
+    border-radius:26px;
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.40),
+        inset 0 1px rgba(255,255,255,.05);
+
+    transition:.35s;
+
+    overflow:hidden;
+}
+
+.goal-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(79,140,255,.08),
+            transparent 60%
+        );
+
+    pointer-events:none;
+}
+
+.goal-card:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#4f8cff;
+
+    box-shadow:
+        0 28px 60px rgba(0,0,0,.45),
+        0 0 25px rgba(79,140,255,.18);
+}
+
+/* ==========================================================
+   Header
+========================================================== */
+
+.goal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.goal-header h2{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:0;
+
+    color:#ffffff;
+
+    font-size:30px;
+
+    font-weight:700;
+}
+
+.goal-live{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+.goal-live::before{
+
+    content:"";
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    box-shadow:0 0 10px #22c55e;
+}
+
+/* ==========================================================
+   Progress
+========================================================== */
+
+.goal-progress-section{
+
+    text-align:center;
+}
+
+.goal-progress-section h1{
+
+    margin:0;
+
+    font-size:68px;
+
+    color:#ffffff;
+
+    font-weight:800;
+}
+
+.goal-progress-section p{
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:16px;
+}
+
+.goal-progress{
+
+    width:100%;
+
+    height:12px;
+
+    background:#202d47;
+
+    border-radius:999px;
+
+    overflow:hidden;
+}
+
+.goal-fill{
+
+    height:100%;
+
+    border-radius:999px;
+
+    background:linear-gradient(
+        90deg,
+        #22c55e,
+        #3b82f6
+    );
+
+    transition:width .8s ease;
+}
+
+/* ==========================================================
+   Metrics
+========================================================== */
+
+.goal-metrics{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:18px;
+}
+
+.goal-metrics div{
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    text-align:center;
+
+    transition:.3s;
+}
+
+.goal-metrics div:hover{
+
+    background:rgba(79,140,255,.08);
+
+    border-color:rgba(79,140,255,.30);
+}
+
+.goal-metrics span{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    color:#94a3b8;
+
+    font-size:13px;
+}
+
+.goal-metrics strong{
+
+    color:#ffffff;
+
+    font-size:18px;
+
+    font-weight:700;
+}
+
+/* ==========================================================
+   Recommendation
+========================================================== */
+
+.goal-tip{
+
+    display:flex;
+
+    gap:18px;
+
+    align-items:flex-start;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    background:rgba(34,197,94,.10);
+
+    border-left:5px solid #22c55e;
+}
+
+.goal-tip svg{
+
+    color:#22c55e;
+
+    font-size:28px;
+
+    flex-shrink:0;
+}
+
+.goal-tip h4{
+
+    margin:0 0 8px;
+
+    color:#22c55e;
+
+    font-size:18px;
+}
+
+.goal-tip p{
+
+    margin:0;
+
+    color:#d6deea;
+
+    line-height:1.8;
+
+    font-size:15px;
+}
+
+/* ==========================================================
+   Footer
+========================================================== */
+
+.goal-footer{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding-top:18px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    color:#94a3b8;
+
+    font-size:14px;
+}

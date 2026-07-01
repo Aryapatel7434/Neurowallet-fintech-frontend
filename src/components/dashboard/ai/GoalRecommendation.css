@@ -1,0 +1,291 @@
+/* ==========================================================
+   Goal Recommendation - Premium Card
+========================================================== */
+
+.recommend-card{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    padding:30px;
+
+    background:linear-gradient(
+        180deg,
+        #162340 0%,
+        #10192d 100%
+    );
+
+    border:1px solid rgba(93,138,255,.22);
+
+    border-top:4px solid #6d5efc;
+
+    border-radius:26px;
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.40),
+        inset 0 1px rgba(255,255,255,.05);
+
+    transition:.35s;
+
+    overflow:hidden;
+}
+
+.recommend-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(79,140,255,.08),
+            transparent 60%
+        );
+
+    pointer-events:none;
+}
+
+.recommend-card:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#4f8cff;
+
+    box-shadow:
+        0 28px 60px rgba(0,0,0,.45),
+        0 0 25px rgba(79,140,255,.18);
+}
+
+/* ==========================================================
+   Header
+========================================================== */
+
+.recommend-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.recommend-header h2{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:0;
+
+    color:#ffffff;
+
+    font-size:30px;
+
+    font-weight:700;
+}
+
+.recommend-live{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:rgba(34,197,94,.12);
+
+    color:#22c55e;
+
+    font-size:13px;
+
+    font-weight:700;
+}
+
+.recommend-live::before{
+
+    content:"";
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    box-shadow:0 0 10px #22c55e;
+}
+
+/* ==========================================================
+   Confidence
+========================================================== */
+
+.recommend-confidence{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.06);
+
+    border-radius:18px;
+
+    padding:22px;
+}
+
+.recommend-confidence span{
+
+    color:#94a3b8;
+
+    font-size:14px;
+}
+
+.recommend-confidence h1{
+
+    margin-top:8px;
+
+    color:#ffffff;
+
+    font-size:58px;
+
+    font-weight:800;
+}
+
+.recommend-priority{
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:#123b2a;
+
+    color:#22c55e;
+
+    font-weight:700;
+}
+
+/* ==========================================================
+   Recommendation
+========================================================== */
+
+.recommend-box{
+
+    display:flex;
+
+    gap:18px;
+
+    align-items:flex-start;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    background:rgba(59,130,246,.10);
+
+    border-left:5px solid #3b82f6;
+}
+
+.recommend-box svg{
+
+    color:#3b82f6;
+
+    font-size:28px;
+
+    flex-shrink:0;
+}
+
+.recommend-box h4{
+
+    margin:0 0 8px;
+
+    color:#60a5fa;
+
+    font-size:18px;
+}
+
+.recommend-box p{
+
+    margin:0;
+
+    color:#d6deea;
+
+    line-height:1.8;
+
+    font-size:15px;
+}
+
+/* ==========================================================
+   Impact
+========================================================== */
+
+.recommend-impact{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    background:rgba(34,197,94,.10);
+}
+
+.recommend-impact span{
+
+    color:#94a3b8;
+}
+
+.recommend-impact strong{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#22c55e;
+
+    font-size:18px;
+}
+
+/* ==========================================================
+   Footer
+========================================================== */
+
+.recommend-footer{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding-top:18px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    color:#94a3b8;
+
+    font-size:14px;
+}

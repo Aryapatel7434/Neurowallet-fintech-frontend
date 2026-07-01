@@ -1,53 +1,169 @@
-import { FaBullseye } from "react-icons/fa6";
+import "./SmartGoals.css";
+
+import {
+    FaBullseye,
+    FaFlagCheckered,
+    FaCircleCheck
+} from "react-icons/fa6";
+
 function SmartGoals({ wallet }) {
 
-  const current =
-    wallet?.balance || 0;
+    const balance = wallet?.balance || 0;
 
-  const target = 50000;
+    const goalAmount = 100000;
 
-  const percentage =
-    Math.min(
-      (current / target) * 100,
-      100
+    const progress = Math.min(
+        Math.round((balance / goalAmount) * 100),
+        100
     );
 
-  return (
+    const remaining = goalAmount - balance;
 
-    <div className="goal-card">
+    return (
 
-        <h2>
-  <FaBullseye />
-  Smart Goal
-</h2>
+        <div className="goal-card">
 
-      <h1>
-        ₹{current}
-      </h1>
+            {/* ================= HEADER ================= */}
 
-      <p>
-        Goal ₹50,000
-      </p>
+            <div className="goal-header">
 
-      <div className="goal-progress">
+                <h2>
 
-        <div
-          className="goal-fill"
-          style={{
-            width:
-              `${percentage}%`
-          }}
-        />
+                    <FaBullseye />
 
-      </div>
+                    Smart Goal
 
-      <h3>
-        {percentage.toFixed(1)}%
-      </h3>
+                </h2>
 
-    </div>
+                <span className="goal-live">
 
-  );
+                    LIVE
+
+                </span>
+
+            </div>
+
+            {/* ================= PROGRESS ================= */}
+
+            <div className="goal-progress-section">
+
+                <h1>
+
+                    {progress}%
+
+                </h1>
+
+                <p>
+
+                    Goal Completed
+
+                </p>
+
+            </div>
+
+            <div className="goal-progress">
+
+                <div
+
+                    className="goal-fill"
+
+                    style={{
+
+                        width: `${progress}%`
+
+                    }}
+
+                />
+
+            </div>
+
+            {/* ================= METRICS ================= */}
+
+            <div className="goal-metrics">
+
+                <div>
+
+                    <span>Current</span>
+
+                    <strong>
+
+                        ₹{balance.toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Target</span>
+
+                    <strong>
+
+                        ₹{goalAmount.toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Remaining</span>
+
+                    <strong>
+
+                        ₹{remaining.toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            {/* ================= RECOMMENDATION ================= */}
+
+            <div className="goal-tip">
+
+                <FaCircleCheck />
+
+                <div>
+
+                    <h4>
+
+                        Goal Recommendation
+
+                    </h4>
+
+                    <p>
+
+                        {progress >= 80
+                            ? "You're close to achieving your savings goal. Keep maintaining your current financial discipline."
+                            : progress >= 50
+                            ? "Excellent progress. Continue saving consistently to reach your target."
+                            : "Increase your monthly savings to accelerate goal completion."}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            {/* ================= FOOTER ================= */}
+
+            <div className="goal-footer">
+
+                <FaFlagCheckered />
+
+                <span>
+
+                    Target: ₹1,00,000
+
+                </span>
+
+            </div>
+
+        </div>
+
+    );
 
 }
 
