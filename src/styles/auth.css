@@ -536,3 +536,50 @@
   accent-color:
   #8b5cf6;
 } 
+
+/* ===========================================
+   Reset Token Card
+=========================================== */
+
+.reset-token-box{
+
+    margin-top:24px;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    background:rgba(22,35,61,.95);
+
+    border:1px solid rgba(139,92,246,.45);
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.reset-token-box h4{
+
+    margin-bottom:12px;
+
+    color:#8b5cf6;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+.reset-token-box p{
+
+    margin:0;
+
+    color:#f8fafc;
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    word-break:break-all;
+
+    font-family:monospace;
+
+}

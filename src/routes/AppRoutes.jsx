@@ -2,9 +2,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
-  BrowserRouter,
-  Routes,
-  Route
+    BrowserRouter,
+    Routes,
+    Route
 } from "react-router-dom";
 
 import LoginPage
@@ -12,6 +12,12 @@ from "../pages/auth/LoginPage";
 
 import RegisterPage
 from "../pages/auth/RegisterPage";
+
+import ForgotPasswordPage
+from "../pages/auth/ForgotPasswordPage";
+
+import ResetPasswordPage
+from "../pages/auth/ResetPasswordPage";
 
 import DashboardPage
 from "../pages/dashboard/DashboardPage";
@@ -27,63 +33,83 @@ from "../components/auth/ProtectedRoute";
 
 function AppRoutes() {
 
-  return (
+    return (
 
-    <BrowserRouter>
+        <BrowserRouter>
 
-      <Routes>
+            <Routes>
 
-        <Route
-          path="/"
-          element={<LoginPage />}
-        />
+                {/* ===========================
+                    Authentication
+                ============================ */}
 
-        <Route
-          path="/register"
-          element={<RegisterPage />}
-        />
+                <Route
+                    path="/"
+                    element={<LoginPage />}
+                />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
+                <Route
+                    path="/register"
+                    element={<RegisterPage />}
+                />
 
-        <Route
-          path="/wallet"
-          element={
-            <ProtectedRoute>
-              <WalletPage />
-            </ProtectedRoute>
-          }
-        />
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPasswordPage />}
+                />
 
-        <Route
-          path="/notifications"
-          element={
-            <NotificationsPage />
-          }
-        />
+                <Route
+                    path="/reset-password"
+                    element={<ResetPasswordPage />}
+                />
 
-      </Routes>
+                {/* ===========================
+                    Dashboard
+                ============================ */}
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick={true}
-        pauseOnHover={true}
-        draggable={true}
-        theme="dark"
-      />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <DashboardPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-    </BrowserRouter>
+                <Route
+                    path="/wallet"
+                    element={
+                        <ProtectedRoute>
+                            <WalletPage />
+                        </ProtectedRoute>
+                    }
+                />
 
-  );
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute>
+                            <NotificationsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+            </Routes>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="dark"
+            />
+
+        </BrowserRouter>
+
+    );
 
 }
 
