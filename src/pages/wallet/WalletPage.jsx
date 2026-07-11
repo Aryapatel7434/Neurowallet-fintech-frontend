@@ -61,21 +61,40 @@ const [transferAmount,
   setCategory] =
   useState("OTHER");
 
-  const refreshWalletData = async () => {
+ const refreshWalletData = async () => {
 
-  const walletData =
-    await getMyWallet();
+    try {
 
-  const txData =
-    await getTransactions();
+        const [walletData, transactionData] =
+            await Promise.all([
 
-  setWallet(walletData);
+                getMyWallet(),
 
-  setTransactions(
-    Array.isArray(txData)
-      ? txData
-      : []
-  );
+                getTransactions()
+
+            ]);
+
+        setWallet(walletData);
+
+        setTransactions(
+            Array.isArray(transactionData)
+                ? transactionData
+                : []
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Refresh Wallet Error:",
+            error
+        );
+
+        toast.error(
+            "Unable to refresh wallet."
+        );
+
+    }
+
 };
 console.log(
   "Wallet:",
@@ -127,19 +146,13 @@ async () => {
 
   try {
 
-    await addMoney(
-      Number(amount)
-    );
+  await addMoney(Number(amount));
 
-    const walletData =
-      await getMyWallet();
-
-    const txData =
-      await getTransactions();
-
-    setWallet(walletData);
-
-    setTransactions(txData);
+await refreshWalletData();
+sessionStorage.setItem(
+    "dashboardRefresh",
+    "true"
+);
 
     setAmount("");
 
@@ -181,19 +194,13 @@ async () => {
 
   try {
 
-    await withdrawMoney(
-      Number(amount)
-    );
+   await withdrawMoney(Number(amount));
 
-    const walletData =
-      await getMyWallet();
-
-    const txData =
-      await getTransactions();
-
-    setWallet(walletData);
-
-    setTransactions(txData);
+await refreshWalletData();
+sessionStorage.setItem(
+    "dashboardRefresh",
+    "true"
+);
 
     setAmount("");
 
@@ -240,6 +247,11 @@ const handleTransfer = async () => {
     );
 
     await refreshWalletData();
+
+    sessionStorage.setItem(
+    "dashboardRefresh",
+    "true"
+);
 
     setReceiverEmail("");
     setTransferAmount("");

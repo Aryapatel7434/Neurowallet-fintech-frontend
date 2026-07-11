@@ -1,21 +1,18 @@
-import axios from "axios";
-
-const API =
-  "http://localhost:8080/api/dashboard";
+import api from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
+/*
+=================================
+DASHBOARD INSIGHTS
+GET /dashboard/insights
+=================================
+*/
 
 export const getDashboardInsights = async () => {
 
- const token = localStorage.getItem("accessToken");
+    const response = await api.get(
+       API_ENDPOINTS.DASHBOARD_INSIGHTS
+    );
 
-  const response = await axios.get(
-    `${API}/insights`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  return response.data;
+    return response.data;
 
 };

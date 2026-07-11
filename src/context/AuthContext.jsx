@@ -1,106 +1,97 @@
 import {
   createContext,
+  useMemo,
   useState,
-  useEffect
 } from "react";
 
-export const AuthContext =
-  createContext();
+import { STORAGE_KEYS } from "../constants/storageKeys";
+import { getInitials } from "../utils/userUtils";
 
-export const AuthProvider = ({
-  children,
-}) => {
+export const AuthContext = createContext();
 
- const [user, setUser] =
-  useState(() => {
+export const AuthProvider = ({ children }) => {
 
-    const savedUser =
-      localStorage.getItem(
-        "user"
-      );
+  const [user, setUser] = useState(() => {
+
+    const savedUser = localStorage.getItem(
+      STORAGE_KEYS.USER
+    );
 
     return savedUser
       ? JSON.parse(savedUser)
       : null;
 
   });
- useEffect(() => {
 
-  const savedUser =
-    localStorage.getItem(
-      "user"
+  const login = (data) => {
+
+    localStorage.setItem(
+      STORAGE_KEYS.ACCESS_TOKEN,
+      data.accessToken
     );
 
-  if (savedUser) {
-
-    setUser(
-      JSON.parse(savedUser)
+    localStorage.setItem(
+      STORAGE_KEYS.REFRESH_TOKEN,
+      data.refreshToken
     );
-  }
 
-}, []);
+    localStorage.setItem(
+      STORAGE_KEYS.EMAIL,
+      data.email
+    );
 
-const login = (data) => {
+    const userData = {
 
-  localStorage.setItem(
-    "accessToken",
-    data.accessToken
-  );
+      name: data.name,
 
-  localStorage.setItem(
-    "refreshToken",
-    data.refreshToken
-  );
+      email: data.email,
 
-  localStorage.setItem(
-    "email",
-    data.email
-  );
+      initials: getInitials(data.name),
 
-  const userData = {
-    name: data.name,
-    email: data.email,
-    initials: data.name
-      .split(" ")
-      .map(word => word[0])
-      .join("")
-      .toUpperCase()
+    };
+
+    localStorage.setItem(
+      STORAGE_KEYS.USER,
+      JSON.stringify(userData)
+    );
+
+    setUser(userData);
+
   };
 
-  localStorage.setItem(
-    "user",
-    JSON.stringify(userData)
-  );
-
-  setUser(userData);
-};
   const logout = () => {
 
-    localStorage.removeItem(
-      "accessToken"
-    );
-
-    localStorage.removeItem(
-      "refreshToken"
-    );
-     localStorage.removeItem(
-    "user"
-    );
+    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.EMAIL);
+    localStorage.removeItem(STORAGE_KEYS.USER);
 
     setUser(null);
+
   };
+
+  const isAuthenticated = !!user;
+
+  const value = useMemo(() => ({
+
+    user,
+
+    login,
+
+    logout,
+
+    isAuthenticated,
+
+  }), [user]);
 
   return (
 
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
+
       {children}
+
     </AuthContext.Provider>
 
   );
+
 };

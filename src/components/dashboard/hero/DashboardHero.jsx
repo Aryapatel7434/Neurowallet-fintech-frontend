@@ -5,10 +5,11 @@ function DashboardHero({
     wallet,
     dashboardInsights
 }) {
-  const user =
-    JSON.parse(
-        localStorage.getItem("user")
-    );
+ const {
+user
+}
+=
+useContext(AuthContext);
 
 const balance =
     wallet?.balance || 0;

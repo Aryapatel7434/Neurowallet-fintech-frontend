@@ -1,5 +1,5 @@
 import api from "../api/axiosConfig";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 /*
 =================================
 GET MY WALLET
@@ -10,7 +10,7 @@ GET /wallet/me
 export const getMyWallet = async () => {
 
   const response =
-    await api.get("/wallet/me");
+    await api.get(API_ENDPOINTS.GET_WALLET)
 
   return response.data;
 };
@@ -26,8 +26,7 @@ export const addMoney = async (
 ) => {
 
   const response =
-    await api.post(
-      "/wallet/add-money",
+    await api.post(API_ENDPOINTS.ADD_MONEY,
       {
         amount
       }
@@ -47,8 +46,7 @@ export const withdrawMoney =
 async (amount) => {
 
   const response =
-    await api.post(
-      "/wallet/withdraw",
+    await api.post(API_ENDPOINTS.WITHDRAW,
       {
         amount
       }
@@ -70,11 +68,6 @@ export const getTransactions = async () => {
      await api.get(
   "/wallet/transactions"
 );
-  console.log(
-    "Transaction API Response:",
-    response.data
-  );
-
   if (
     Array.isArray(response.data)
   ) {
@@ -99,5 +92,7 @@ export const getTransactions = async () => {
     return response.data.transactions;
   }
 
-  return [];
+    throw new Error(
+"Unexpected API response."
+);
 };

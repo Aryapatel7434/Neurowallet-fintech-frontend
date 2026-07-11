@@ -78,82 +78,63 @@ useState([]);
 const [error, setError] = useState("");
 const [dashboardInsights, setDashboardInsights] = useState(null);
 
-const [loadingInsights, setLoadingInsights] = useState(true);
 useEffect(() => {
 
-    fetchDashboardData();
+    const loadDashboard = async () => {
 
-    fetchDashboardInsights();
+        await fetchDashboardData();
+
+        sessionStorage.removeItem(
+            "dashboardRefresh"
+        );
+
+    };
+
+    loadDashboard();
 
 }, []);
 const fetchDashboardData =
 async () => {
 
-  try {
-    
-    const walletData =
-      await getMyWallet();
+ try {
 
-    const transactionData =
-      await getTransactionHistory();
+    console.log("Fetching Wallet...");
+    const walletData = await getMyWallet();
+    console.log(walletData);
 
-    console.log(
-      "Wallet:",
-      walletData
-    );
+    console.log("Fetching Transactions...");
+    const transactionData = await getTransactionHistory();
+    console.log(transactionData);
 
-   console.log("FULL API RESPONSE");
-console.log(transactionData);
-
-console.log("CONTENT");
-console.log(transactionData.content);
-
-console.log("FIRST");
-console.log(transactionData.content?.[0]);
+    console.log("Fetching Dashboard...");
+    const insightsData = await getDashboardInsights();
+    console.log(insightsData);
 
     setWallet(walletData);
+    setTransactions(transactionData.content || []);
+    setDashboardInsights(insightsData);
 
-      setTransactions(
-  transactionData.content || []
-);
-console.log("Dashboard Transactions:");
-console.log(transactionData.content);
+}
+catch (error) {
 
-console.log("First Transaction:");
-console.log(transactionData.content?.[0]);
-  } catch(error) {
-
+    console.error("API ERROR");
     console.error(error);
 
-  } finally {
+    console.error(error.response);
+
+    console.error(error.response?.data);
+
+    setError(
+        error.response?.data?.message ||
+        "Unable to load dashboard."
+    );
+
+}
+finally {
 
     setLoading(false);
 
-  }
-};
-const fetchDashboardInsights = async () => {
-
-    try {
-
-        const data = await getDashboardInsights();
-
-        console.log("========== Dashboard API ==========");
-        console.log(data);
-        console.log("==================================");
-
-        setDashboardInsights(data);
-
-    } catch (error) {
-
-        console.log("Dashboard API Error");
-        console.log(error);
-
-    } finally {
-
-        setLoadingInsights(false);
-
-    }
-
+}
 };
 if (loading) {
 
@@ -250,7 +231,7 @@ return (
        <AIInsights
     transactions={transactions}
     dashboardInsights={dashboardInsights}
-    loading={loadingInsights}
+  loading={loading}
 />
 
       </div>
@@ -410,7 +391,9 @@ return (
             wallet={wallet}
         />
 
-        <QuickActions />
+      <QuickActions
+    onRefresh={fetchDashboardData}
+/>
 
     </div>
 

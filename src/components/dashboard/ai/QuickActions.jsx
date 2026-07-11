@@ -10,7 +10,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-function QuickActions() {
+function QuickActions({ onRefresh }) {
 
     const navigate = useNavigate();
 

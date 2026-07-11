@@ -1,19 +1,29 @@
 import axiosInstance from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 /* ==========================
    LOGIN
 ========================== */
 
+/**
+ * Login User
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<Object>}
+ */
+
 export const loginUser = async (email, password) => {
+
+    const loginRequest = {
+        email,
+        password,
+    };
 
     const response = await axiosInstance.post(
 
-        "/auth/login",
+        API_ENDPOINTS.LOGIN,
 
-        {
-            email,
-            password
-        }
+        loginRequest
 
     );
 
@@ -25,15 +35,23 @@ export const loginUser = async (email, password) => {
    FORGOT PASSWORD
 ========================== */
 
+/**
+ * Send Password Reset Link
+ * @param {string} email
+ * @returns {Promise<Object>}
+ */
+
 export const forgotPassword = async (email) => {
+
+    const forgotPasswordRequest = {
+        email,
+    };
 
     const response = await axiosInstance.post(
 
-        "/auth/forgot-password",
+        API_ENDPOINTS.FORGOT_PASSWORD,
 
-        {
-            email
-        }
+        forgotPasswordRequest
 
     );
 
@@ -45,6 +63,13 @@ export const forgotPassword = async (email) => {
    RESET PASSWORD
 ========================== */
 
+/**
+ * Reset Password
+ * @param {string} token
+ * @param {string} newPassword
+ * @returns {Promise<Object>}
+ */
+
 export const resetPassword = async (
 
     token,
@@ -52,14 +77,19 @@ export const resetPassword = async (
 
 ) => {
 
+    const resetPasswordRequest = {
+
+        token,
+
+        newPassword,
+
+    };
+
     const response = await axiosInstance.post(
 
-        "/auth/reset-password",
+        API_ENDPOINTS.RESET_PASSWORD,
 
-        {
-            token,
-            newPassword
-        }
+        resetPasswordRequest
 
     );
 
