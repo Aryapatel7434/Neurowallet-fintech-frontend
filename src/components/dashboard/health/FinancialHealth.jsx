@@ -1,90 +1,273 @@
-import {
-  FaArrowTrendUp,
-  FaShieldHeart
-} from "react-icons/fa6";
-
+import { FaShieldHeart } from "react-icons/fa6";
 function FinancialHealth({
-  wallet,
-  transactions = [],
+    wallet,
+    transactions = [],
 }) {
 
-  const score =
-    wallet?.balance > 1000 ? 87 : 62;
+    const balance = wallet?.balance || 0;
 
-  const progress = score;
+    const totalTransactions = transactions.length;
 
-  return (
+    /* ===========================
+       Financial Health Score
+    =========================== */
+
+    let score = 50;
+
+    // Wallet Balance Score
+    if (balance >= 100000) {
+        score += 25;
+    } else if (balance >= 50000) {
+        score += 15;
+    } else if (balance >= 10000) {
+        score += 10;
+    }
+
+    // Transaction Activity Score
+    if (totalTransactions >= 50) {
+        score += 15;
+    } else if (totalTransactions >= 20) {
+        score += 10;
+    }
+
+    score = Math.min(score, 100);
+
+    const progress = score;
+
+    /* ===========================
+       Trend
+    =========================== */
+
+    const trend =
+        score >= 90
+            ? "+12%"
+            : score >= 75
+            ? "+8%"
+            : score >= 60
+            ? "+4%"
+            : "-3%";
+
+    /* ===========================
+       Expense Status
+    =========================== */
+
+    const expenseStatus =
+        score >= 80
+            ? "Excellent"
+            : score >= 65
+            ? "Stable"
+            : "Needs Attention";
+
+    /* ===========================
+       Health Status
+    =========================== */
+
+    const healthStatus =
+        score >= 80
+            ? "Excellent"
+            : score >= 70
+            ? "Good"
+            : score >= 50
+            ? "Average"
+            : "Needs Improvement";
+
+    return (
 
         <div className="health-card">
 
-    <div className="health-header">
+            {/* Header */}
 
-        <div>
+            <div className="health-header">
 
-            <h3>Financial Health</h3>
+                <div>
 
-            <p>Overall account wellness</p>
+                   <h3 className="health-title">
 
-        </div>
+    <FaShieldHeart className="health-title-icon" />
 
-        <div className="health-percent">
+    Financial Health Score
 
-            87%
+</h3>
 
-        </div>
+                    <p>
+                        Real-time financial health based on your wallet and transaction history.
+                    </p>
 
-    </div>
+                </div>
 
-    <div className="progress-wrapper">
+                <div className="health-percent">
 
-        <div className="progress-bar">
+                    {progress}%
 
-            <div className="progress-fill"></div>
+                </div>
 
-        </div>
+            </div>
 
-    </div>
+            {/* Progress */}
+
+            <div className="progress-wrapper">
+
+                <div className="progress-bar">
+
+                    <div
+                        className="progress-fill"
+                        style={{
+                            width: `${progress}%`,
+                        }}
+                    ></div>
+
+                </div>
+
+            </div>
+
+            {/* Score */}
 
     <div className="score-section">
 
-        <h1>87</h1>
+    <div className="score-circle">
 
-        <span>Excellent Score</span>
+        <span className="health-score-label">
+            HEALTH SCORE
+        </span>
+
+        <h1 className="health-score">
+
+            {score}
+
+        </h1>
+
+        <span
+            className={`health-status ${
+                score >= 80
+                    ? "excellent"
+                    : score >= 70
+                    ? "good"
+                    : score >= 50
+                    ? "average"
+                    : "poor"
+            }`}
+        >
+
+            {
+                score >= 80
+                    ? "Excellent"
+                    : score >= 70
+                    ? "Good"
+                    : score >= 50
+                    ? "Average"
+                    : "Poor"
+            }
+
+        </span>
 
     </div>
 
-    <div className="health-metrics">
+    <p className="health-message">
 
-        <div>
+        {
+            score >= 80
+                ? "Outstanding financial stability."
+                : score >= 70
+                ? "Healthy financial discipline."
+                : score >= 50
+                ? "Continue improving your savings."
+                : "Reduce expenses and increase savings."
+        }
 
-            <label>Trend</label>
+    </p>
 
-            <strong>+5%</strong>
+</div>
 
-        </div>
+            {/* Metrics */}
 
-        <div>
+            <div className="health-metrics">
 
-            <label>Expenses</label>
+    <div className="metric-box">
 
-            <strong>Stable</strong>
+        <label>Trend</label>
 
-        </div>
+        <strong>{trend}</strong>
 
-        <div>
+    </div>
 
-            <label>Target</label>
+    <div className="metric-box">
 
-            <strong>90</strong>
+        <label>Expense Health</label>
 
-        </div>
+        <strong>{expenseStatus}</strong>
+
+    </div>
+
+    <div className="metric-box">
+
+        <label>Next Target</label>
+
+        <strong>{Math.min(score + 10,100)}</strong>
 
     </div>
 
 </div>
 
-  );
+<div className="health-summary">
 
+    <h4>
+
+        🤖 AI Health Summary
+
+    </h4>
+
+    <ul>
+
+        <li>
+
+            Wallet Balance:
+            <strong>
+
+                ₹{balance.toLocaleString("en-IN")}
+
+            </strong>
+
+        </li>
+
+        <li>
+
+            Transactions:
+            <strong>
+
+                {totalTransactions}
+
+            </strong>
+
+        </li>
+
+        <li>
+
+            Status:
+            <strong>
+
+                {expenseStatus}
+
+            </strong>
+
+        </li>
+
+    </ul>
+
+</div>
+<div className="health-footer">
+
+    <FaShieldHeart />
+
+    <span>
+
+        Updated using live backend analytics
+
+    </span>
+
+</div>
+        </div>
+
+    );
 }
 
 export default FinancialHealth;

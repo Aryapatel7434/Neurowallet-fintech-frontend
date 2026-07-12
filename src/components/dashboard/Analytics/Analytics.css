@@ -1299,15 +1299,52 @@ opacity:.7;
 }
 .analytics-summary{
 
-    margin-top:20px;
+display:flex;
 
-    padding:22px;
+justify-content:space-between;
 
-    border-radius:18px;
+margin-top:18px;
 
-    background:rgba(59,130,246,.08);
+padding:14px 18px;
 
-    border-left:4px solid #3b82f6;
+border-radius:16px;
+
+background:rgba(255,255,255,.04);
+
+}
+.analytics-summary span{
+
+display:block;
+
+font-size:.8rem;
+
+color:#94a3b8;
+
+margin-bottom:6px;
+
+}
+.analytics-summary strong{
+
+font-size:1.15rem;
+
+font-weight:700;
+
+color:white;
+
+}
+.analytics-empty-chart{
+
+height:70px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+color:#94a3b8;
+
+font-size:.9rem;
 
 }
 .analytics-title{

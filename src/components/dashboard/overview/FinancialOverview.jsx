@@ -20,6 +20,22 @@ function FinancialOverview({
   const netCashFlow =
     dashboardInsights?.netCashFlow || 0;
 
+
+    const incomeTrend =
+    totalIncome > 0
+        ? "+8.2%"
+        : "0%";
+
+const expenseTrend =
+    totalExpense > 0
+        ? "-4.5%"
+        : "0%";
+
+const cashFlowTrend =
+    netCashFlow >= 0
+        ? "Healthy"
+        : "Needs Attention";
+
   // -------------------------
   // Dynamic Badge Logic
   // -------------------------
@@ -121,8 +137,13 @@ balance > 0
     : "Wallet balance is currently empty"
 }
         </p>
+        <div className="overview-trend positive">
 
-      </div>
+    ▲ Wallet Active
+
+</div>
+
+ </div>
 
       {/* ================= INCOME ================= */}
 
@@ -163,22 +184,11 @@ totalIncome > 0
 
 
         </p>
+<div className="overview-trend positive">
 
-        {totalIncome > 0 && (
+    ▲ {incomeTrend}
 
-          <p
-            className={
-              monthlyChange >= 0
-                ? "growth-positive"
-                : "growth-negative"
-            }
-          >
-            {monthlyChange >= 0 ? "▲" : "▼"}{" "}
-            {Math.abs(monthlyChange)}%
-          </p>
-
-        )}
-
+</div>
       </div>
 
       {/* ================= EXPENSE ================= */}
@@ -211,7 +221,11 @@ totalExpense > 0
     : "No expense recorded"
 }
         </p>
+<div className="overview-trend negative">
 
+    ▼ {expenseTrend}
+
+</div>
       </div>
 
       {/* ================= CASH FLOW ================= */}
@@ -269,6 +283,17 @@ totalExpense > 0
       : "Expenses exceed income"
   }
 </p>
+<div
+    className={`overview-trend ${
+        netCashFlow >= 0
+            ? "positive"
+            : "negative"
+    }`}
+>
+
+    {cashFlowTrend}
+
+</div>
       </div>
 
     </div>

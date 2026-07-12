@@ -37,8 +37,11 @@ const incomeTransactions = transactions.filter(
       (sum, t) => sum + (t.amount || 0),
       0
     );
-
-  const growth = 18.4;
+const incomeStatus =
+    totalIncome > 0
+        ? "Income Active"
+        : "No Income";
+  
 const monthNames = [
   "Jan",
   "Feb",
@@ -105,21 +108,21 @@ console.log("Income Chart:", chartData);
 
             <p>
 
-              Real-time income overview
+    Money received from successful wallet transactions.
 
-            </p>
+</p>
 
           </div>
 
         </div>
 
-        <span className="growth-badge income-growth">
+      <span className="growth-badge income-growth">
 
-          <FaArrowTrendUp />
+    <FaArrowTrendUp />
 
-          +{growth}%
+    {incomeStatus}
 
-        </span>
+</span>
 
       </div>
 
@@ -127,19 +130,56 @@ console.log("Income Chart:", chartData);
 
       <div className="analytics-main-value">
 
-        ₹{totalIncome.toLocaleString("en-IN")}
+       ₹{Number(totalIncome).toLocaleString("en-IN")}
 
       </div>
 
       <p className="analytics-main-subtitle">
 
-        Total Incoming Money
+       Total income credited to your wallet
 
       </p>
+<div className="analytics-summary">
 
+    <div>
+
+        <span>Largest Income</span>
+
+        <strong>
+
+            ₹{
+                incomeTransactions.length
+                    ? Math.max(
+                        ...incomeTransactions.map(
+                            t => Number(t.amount)
+                        )
+                    ).toLocaleString("en-IN")
+                    : 0
+            }
+
+        </strong>
+
+    </div>
+
+    <div>
+
+        <span>Payments</span>
+
+        <strong>
+
+            {incomeTransactions.length}
+
+        </strong>
+
+    </div>
+
+</div>
       {/* ================= CHART PLACEHOLDER ================= */}
 
        <div className="mini-chart">
+
+{
+incomeTransactions.length > 0 ? (
 
     <ResponsiveContainer
         width="100%"
@@ -185,8 +225,19 @@ console.log("Income Chart:", chartData);
         </AreaChart>
 
     </ResponsiveContainer>
+    ) : (
+
+<div className="analytics-empty-chart">
+
+No income available
 
 </div>
+
+)
+}
+
+</div>
+
 
       {/* ================= FOOTER ================= */}
 
@@ -206,7 +257,7 @@ console.log("Income Chart:", chartData);
 
         <span className="analytics-updated">
 
-          Updated just now
+          Live Backend Data
 
         </span>
 

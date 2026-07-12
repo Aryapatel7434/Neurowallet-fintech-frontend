@@ -16,27 +16,78 @@ function ExpenseChart({
   transactions = [],
 }) {
 
+  // Logged-in user
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  // Expense Transactions
   const expenseTransactions =
     transactions.filter(
-      (t) => t.type === "DEBIT"
+      tx => tx.senderEmail === user?.email
     );
-
-  const totalExpense =
+const totalExpense =
     expenseTransactions.reduce(
-      (sum, t) => sum + (t.amount || 0),
-      0
+        (sum, tx) => sum + Number(tx.amount),
+        0
     );
+ const monthNames = [
 
-  const chartData = [
-    { value: 3200 },
-    { value: 2700 },
-    { value: 2900 },
-    { value: 2200 },
-    { value: 1800 },
-    { value: 1400 },
-    { value: totalExpense || 0 }
-  ];
+"Jan","Feb","Mar","Apr",
 
+"May","Jun","Jul","Aug",
+
+"Sep","Oct","Nov","Dec"
+
+];
+
+const monthlyExpense = {};
+
+expenseTransactions.forEach(tx=>{
+
+const month=
+
+monthNames[
+new Date(tx.timestamp).getMonth()
+];
+
+monthlyExpense[month]=
+
+(monthlyExpense[month]||0)
+
++
+
+Number(tx.amount);
+
+});
+
+const chartData=
+
+monthNames.map(month=>({
+
+month,
+
+value:
+
+monthlyExpense[month]
+
+||
+
+0
+
+}));
+
+const expenseStatus =
+
+totalExpense>0
+
+?
+
+"High Spending"
+
+:
+
+"No Expense";
   return (
 
     <div className="analytics-card">
@@ -55,7 +106,7 @@ function ExpenseChart({
 
             <h3>Expense Analytics</h3>
 
-            <p>Real-time expense overview</p>
+            <p>Money spent from successful wallet transactions.</p>
 
           </div>
 
@@ -63,27 +114,93 @@ function ExpenseChart({
 
         <div className="growth-badge expense-growth">
 
-          <FaArrowTrendDown />
+<FaArrowTrendDown/>
 
-          -9.2%
+{expenseStatus}
 
-        </div>
-
+</div>
       </div>
 
       <div className="analytics-main-value">
 
-        ₹{totalExpense.toLocaleString()}
+        ₹{
+Number(totalExpense)
+.toLocaleString("en-IN")
+}
 
       </div>
 
       <p className="analytics-main-subtitle">
 
-        Total Outgoing Money
+       Total amount debited from your wallet
 
       </p>
+<div className="analytics-summary">
 
-      <div className="mini-chart">
+<div>
+
+<span>
+
+Largest Expense
+
+</span>
+
+<strong>
+
+₹{
+
+expenseTransactions.length
+
+?
+
+Math.max(
+
+...expenseTransactions.map(
+
+t=>Number(t.amount)
+
+)
+
+).toLocaleString("en-IN")
+
+:
+
+0
+
+}
+
+</strong>
+
+</div>
+
+<div>
+
+<span>
+
+Payments
+
+</span>
+
+<strong>
+
+{
+
+expenseTransactions.length
+
+}
+
+</strong>
+
+</div>
+
+</div>
+     <div className="mini-chart">
+
+{
+
+expenseTransactions.length>0
+
+?
 
         <ResponsiveContainer
           width="100%"
@@ -130,6 +247,20 @@ function ExpenseChart({
 
         </ResponsiveContainer>
 
+        :
+
+(
+
+<div className="analytics-empty-chart">
+
+No expense available
+
+</div>
+
+)
+
+}
+
       </div>
 
       <div className="analytics-footer">
@@ -148,7 +279,7 @@ function ExpenseChart({
 
         <span className="analytics-updated">
 
-          Updated just now
+          Live Backend Data
 
         </span>
 

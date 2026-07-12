@@ -212,29 +212,29 @@ return (
           FINANCIAL OVERVIEW
       ========================== */}
 
-      <FinancialOverview
-        wallet={wallet}
-        transactions={transactions}
-      />
+     <FinancialOverview
+    wallet={wallet}
+    dashboardInsights={dashboardInsights}
+/>
 
       {/* =========================
           COMMAND CENTER
       ========================== */}
 
-      <div className="command-grid">
+ <div className="health-layout">
 
-        <FinancialHealth
-          wallet={wallet}
-          transactions={transactions}
-        />
+    <FinancialHealth
+        wallet={wallet}
+        transactions={transactions}
+    />
 
-       <AIInsights
-    transactions={transactions}
+    <div className="ai-right-panel">
+<AIInsights
     dashboardInsights={dashboardInsights}
-  loading={loading}
 />
+    </div>
 
-      </div>
+</div>
 
       {/* =========================
           RECENT TRANSACTIONS

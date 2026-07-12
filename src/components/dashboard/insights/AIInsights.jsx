@@ -1,280 +1,297 @@
 import {
-  FaArrowRight,
-  FaArrowTrendDown,
-  FaArrowTrendUp,
+    FaArrowRight,
+    FaArrowTrendDown,
+    FaArrowTrendUp
 } from "react-icons/fa6";
 
 function AIInsights({
-  dashboardInsights,
-  loading,
+    dashboardInsights,
+    loading
 }) {
 
-  if (loading) {
-    return (
-      <div className="insight-card">
-        <div className="recommendation">
-          <h4>Loading AI Insights...</h4>
-        </div>
-      </div>
-    );
-  }
-
-  if (!dashboardInsights) {
-    return (
-      <div className="insight-card">
-        <div className="recommendation">
-          <h4>No Insight Available</h4>
-        </div>
-      </div>
-    );
-  }
-
-  const {
-    totalIncome,
-    totalExpense,
-    netCashFlow,
-    transactionCount,
-    topCategory,
-    topCategoryAmount,
-  } = dashboardInsights;
-
-  /* =============================
-      AI Recommendation
-  ============================== */
-
-  let recommendation = "";
-
-  if (netCashFlow < 0) {
-
-    switch (topCategory) {
-
-      case "FOOD":
-        recommendation =
-          "Food expenses are your largest cost. Consider cooking at home more often to improve your monthly savings.";
-        break;
-
-      case "SHOPPING":
-        recommendation =
-          "Shopping is your highest expense. Setting a monthly shopping budget can significantly improve your cash flow.";
-        break;
-
-      case "TRAVEL":
-        recommendation =
-          "Travel expenses are dominating your spending. Planning trips in advance can help reduce costs.";
-        break;
-
-      case "BILLS":
-        recommendation =
-          "Bills account for most of your spending. Review subscriptions and recurring payments to reduce monthly expenses.";
-        break;
-
-      case "ENTERTAINMENT":
-        recommendation =
-          "Entertainment spending is relatively high. A small reduction could improve your monthly savings.";
-        break;
-
-      default:
-        recommendation =
-          `Your expenses are higher than your income. Try reducing your spending on ${topCategory}.`;
+    if (loading) {
+        return (
+            <div className="ai-panel">
+                <h3>Loading AI Insights...</h3>
+            </div>
+        );
     }
 
-  } else {
+    if (!dashboardInsights) {
+        return (
+            <div className="ai-panel">
+                <h3>No Insights Available</h3>
+            </div>
+        );
+    }
 
-    recommendation =
-      "Excellent financial discipline! Your income currently exceeds your expenses. Keep maintaining this healthy spending pattern.";
+    const {
+        totalIncome,
+        totalExpense,
+        netCashFlow,
+        transactionCount,
+        topCategory,
+        topCategoryAmount
+    } = dashboardInsights;
 
-  }
+    /* ==========================
+        AI Recommendation
+    =========================== */
 
-  /* =============================
-      Financial Risk
-  ============================== */
+    let recommendationTitle = "";
+    let recommendationText = "";
+    let recommendationPriority = "";
 
-  let risk = "Low Risk";
+    if (netCashFlow < 0) {
 
-  if (totalExpense > totalIncome) {
+        recommendationPriority = "High Priority";
 
-    risk = "High Risk";
+        switch (topCategory) {
 
-  } else if (totalExpense > totalIncome * 0.7) {
+            case "BILLS":
+                recommendationTitle = "Reduce Recurring Bills";
+                recommendationText =
+                    `Bills account for ₹${Number(topCategoryAmount).toLocaleString("en-IN")} of your spending. Review subscriptions and recurring payments to improve your monthly cash flow.`;
+                break;
 
-    risk = "Medium Risk";
+            case "FOOD":
+                recommendationTitle = "Optimize Food Budget";
+                recommendationText =
+                    `Food is currently your highest expense. Weekly budgeting can significantly improve your savings.`;
+                break;
 
-  }
+            case "SHOPPING":
+                recommendationTitle = "Control Shopping Expenses";
+                recommendationText =
+                    `Shopping is your largest spending category. Consider setting a monthly shopping budget.`;
+                break;
 
-  return (
+            case "TRAVEL":
+                recommendationTitle = "Reduce Travel Expenses";
+                recommendationText =
+                    `Travel expenses are impacting your cash flow. Advance planning can reduce unnecessary costs.`;
+                break;
 
-    <div className="insight-card">
+            default:
+                recommendationTitle = "Reduce Monthly Spending";
+                recommendationText =
+                    `Your expenses currently exceed your income. Focus on reducing spending in ${topCategory}.`;
+        }
 
-      {/* ================= HEADER ================= */}
+    } else {
 
-    <div className="ai-header">
+        recommendationPriority = "Healthy";
 
-    <div>
+        recommendationTitle = "Excellent Financial Discipline";
 
-        <h3>🤖 AI Smart Insight</h3>
+        recommendationText =
+            "Your income currently exceeds your expenses. Continue maintaining this healthy financial behaviour.";
 
-        <p>
-            Personalized Financial Analysis
-        </p>
+    }
 
-    </div>
+    /* ==========================
+        Risk
+    =========================== */
 
-    <span className="ai-status">
+    let risk = "Low Risk";
 
-        Live
+    if (totalExpense > totalIncome) {
 
-    </span>
+        risk = "High Risk";
 
-</div>
-      {/* ================= INCOME ================= */}
+    } else if (totalExpense > totalIncome * 0.7) {
 
-      <div className="expense-row">
+        risk = "Medium Risk";
 
-        <span>💰 Total Income</span>
+    }
 
-        <strong>
-          ₹{Number(totalIncome).toLocaleString("en-IN")}
-        </strong>
+    return (
 
-        <span className="up">
-          <FaArrowTrendUp />
-        </span>
+        <div className="ai-panel">
 
-      </div>
+            {/* ================= HEADER ================= */}
 
-      {/* ================= EXPENSE ================= */}
+            <div className="ai-header">
 
-      <div className="expense-row">
+                <div>
 
-        <span>💸 Total Expense</span>
+                    <h3>
+                        🤖 AI Smart Insight
+                    </h3>
 
-      <strong
-style={{
-color:
-netCashFlow>=0
-?
-"#22c55e"
-:
-"#ef4444"
-}}
->
+                    <p>
+                        Personalized Financial Analysis
+                    </p>
 
-{netCashFlow>=0?"+":"-"}₹
-{Math.abs(netCashFlow).toLocaleString()}
+                </div>
 
-</strong>
-        <span className="down">
-          <FaArrowTrendDown />
-        </span>
+                <span className="ai-status">
+                    Live
+                </span>
 
-      </div>
+            </div>
 
-      {/* ================= CATEGORY ================= */}
+            <div className="ai-divider"></div>
 
-      <div className="expense-row">
+            {/* ================= AI RECOMMENDATION ================= */}
 
-        <span>🏷 Top Category</span>
+            <div className="recommendation-section">
 
-        <strong>
-          {topCategory}
-        </strong>
+                <div className="recommendation-top">
 
-        <span>
+                    <span className="recommendation-tag">
 
-          ₹{Number(topCategoryAmount).toLocaleString("en-IN")}
+                        🤖 AI Recommendation
 
-        </span>
+                    </span>
 
-      </div>
+                    <span
+                        className={`priority-badge ${
+                            recommendationPriority === "Healthy"
+                                ? "healthy"
+                                : "high"
+                        }`}
+                    >
+                        {recommendationPriority}
+                    </span>
 
-      {/* ================= AI RECOMMENDATION ================= */}
+                </div>
 
-      <div className="recommendation">
+                <h2>
 
-      <h4>🤖 AI Recommendation</h4>
+                    {recommendationTitle}
 
-<p className="recommendation-text">
-    {recommendation}
-</p>
+                </h2>
 
-<div className="recommendation-tip">
-    💡 Suggested Action
-</div>
+                <p>
 
-<p className="tip-text">
-    Review recurring subscriptions and reduce unnecessary monthly expenses.
-</p>
+                    {recommendationText}
 
-        {/* ================= SUMMARY ================= */}
+                </p>
 
-        <div className="summary-grid">
+            </div>
 
-          <div className="summary-item">
-    <span>💸 Spending</span>
-    <strong>₹{Number(topCategoryAmount).toLocaleString()}</strong>
-</div>
+            <div className="ai-divider"></div>
 
-<div className="summary-item">
-    <span>📈 Cash Flow</span>
-    <strong>
-        {netCashFlow >= 0 ? "+" : "-"}₹
-        {Math.abs(netCashFlow).toLocaleString()}
-    </strong>
-</div>
+            {/* ================= FINANCIAL SUMMARY ================= */}
 
-<div className="summary-item">
-    <span>🧾 Transactions</span>
-    <strong>{transactionCount}</strong>
-</div>
+            <div className="summary-grid">
+
+                <div className="summary-item">
+
+                    <span>
+
+                        Top Category
+
+                    </span>
+
+                    <strong>
+
+                        {topCategory}
+
+                    </strong>
+
+                </div>
+
+                <div className="summary-item">
+
+                    <span>
+
+                        Category Spend
+
+                    </span>
+
+                    <strong>
+
+                        ₹{Number(topCategoryAmount).toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+                <div className="summary-item">
+
+                    <span>
+
+                        Cash Flow
+
+                    </span>
+
+                    <strong
+                        style={{
+                            color:
+                                netCashFlow >= 0
+                                    ? "#22c55e"
+                                    : "#ef4444"
+                        }}
+                    >
+                        {netCashFlow >= 0 ? "+" : "-"}₹
+                        {Math.abs(netCashFlow).toLocaleString("en-IN")}
+                    </strong>
+
+                </div>
+
+                <div className="summary-item">
+
+                    <span>
+
+                        Transactions
+
+                    </span>
+
+                    <strong>
+
+                        {transactionCount}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div className="ai-divider"></div>
+
+            {/* ================= RISK ================= */}
+
+            <div className="risk-section">
+
+                <span>
+
+                    Financial Risk
+
+                </span>
+
+                <span
+                    className={`risk-badge ${
+                        risk === "High Risk"
+                            ? "high"
+                            : risk === "Medium Risk"
+                            ? "medium"
+                            : "low"
+                    }`}
+                >
+
+                    {risk}
+
+                </span>
+
+            </div>
+
+            <div className="ai-divider"></div>
+
+            {/* ================= CTA ================= */}
+
+            <button className="analysis-btn">
+
+                View Complete Financial Analysis
+
+                <FaArrowRight />
+
+            </button>
 
         </div>
 
-        {/* ================= RISK ================= */}
-      <div className="risk-section">
-
-    <span>Financial Risk</span>
-
-    <span
-        className={`risk-badge ${
-            risk === "High Risk"
-                ? "high"
-                : risk === "Medium Risk"
-                ? "medium"
-                : "low"
-        }`}
-    >
-        {risk === "High Risk" && "🔴"}
-        {risk === "Medium Risk" && "🟡"}
-        {risk === "Low Risk" && "🟢"}
-
-        {" "}
-        {risk}
-
-    </span>
-
-</div>
-
-      </div>
-
-      {/* ================= BUTTON ================= */}
-
-      <button className="analysis-btn">
-
-       <button className="analysis-btn">
-
-    View Complete Financial Analysis
-
-    <FaArrowRight />
-
-</button>
-
-        <FaArrowRight />
-
-      </button>
-
-    </div>
-
-  );
+    );
 
 }
 
