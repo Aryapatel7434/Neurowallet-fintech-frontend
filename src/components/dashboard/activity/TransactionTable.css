@@ -905,3 +905,55 @@
     }
 
 }
+
+
+
+.active-user{
+
+border:2px solid #22c55e;
+
+box-shadow:0 0 12px rgba(34,197,94,.35);
+
+}
+
+.record-count{
+
+display:flex;
+
+align-items:center;
+
+gap:8px;
+
+white-space:nowrap;
+
+font-size:15px;
+
+color:#94a3b8;
+
+}
+
+.record-count strong{
+
+font-size:18px;
+
+font-weight:700;
+
+color:#ffffff;
+
+}
+
+.amount-credit{
+
+color:#22c55e;
+
+font-weight:700;
+
+}
+
+.amount-debit{
+
+color:#ef4444;
+
+font-weight:700;
+
+}

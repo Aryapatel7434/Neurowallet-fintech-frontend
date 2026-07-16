@@ -18,52 +18,152 @@ function ExpenseTrendChart({
   transactions = []
 }) {
 
-  const monthlyData = [
-    { month: "Jan", expense: 0 },
-    { month: "Feb", expense: 0 },
-    { month: "Mar", expense: 0 },
-    { month: "Apr", expense: 0 },
-    { month: "May", expense: 0 },
-    { month: "Jun", expense: 0 }
-  ];
+  // ================= CURRENT USER =================
 
-  transactions.forEach((tx) => {
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
-    if (tx.type !== "DEBIT") return;
+  // ================= EXPENSE TRANSACTIONS =================
 
-    const month = new Date(tx.timestamp)
-      .toLocaleString("default", {
-        month: "short"
-      });
-
-    const item = monthlyData.find(
-      (m) => m.month === month
+  const expenseTransactions =
+    transactions.filter(
+      tx => tx.senderEmail === user?.email
     );
 
-    if (item) {
+  // ================= MONTHS =================
 
-      item.expense += tx.amount || 0;
+// ================= LAST 6 MONTHS =================
+
+const allMonths = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
+
+const currentMonth = new Date().getMonth();
+
+const previousMonth =
+  currentMonth === 0
+    ? 11
+    : currentMonth - 1;
+
+const monthNames = [];
+
+for (let i = 5; i >= 0; i--) {
+
+  const index =
+    (currentMonth - i + 12) % 12;
+
+  monthNames.push(allMonths[index]);
+
+}
+const monthlyExpense = {};
+
+expenseTransactions.forEach(tx => {
+
+    const month =
+        allMonths[
+            new Date(tx.timestamp).getMonth()
+        ];
+
+    if (monthNames.includes(month)) {
+
+        monthlyExpense[month] =
+            (monthlyExpense[month] || 0) +
+            Number(tx.amount);
+
+    }
+
+});
+
+const monthlyData =
+    monthNames.map(month => ({
+
+        month,
+
+        expense:
+            monthlyExpense[month] || 0
+
+    }));
+
+  // ================= KPI =================
+
+  const totalExpense =
+    expenseTransactions.reduce(
+
+      (sum, tx) =>
+        sum + Number(tx.amount),
+
+      0
+
+    );
+
+const peakExpense =
+  monthlyData.length
+    ? Math.max(
+        ...monthlyData.map(item => item.expense)
+      )
+    : 0;
+
+  const averageExpense =
+    expenseTransactions.length
+
+      ? Math.round(
+        totalExpense /
+        expenseTransactions.length
+      )
+
+      : 0;
+
+  // ================= GROWTH =================
+
+  let currentExpense = 0;
+  let previousExpense = 0;
+
+  expenseTransactions.forEach(tx => {
+
+    const month =
+      new Date(tx.timestamp).getMonth();
+
+if (month === currentMonth) {
+
+    currentExpense += Number(tx.amount);
+
+}
+
+    if (month === previousMonth) {
+
+      previousExpense += Number(tx.amount);
 
     }
 
   });
 
-  const totalExpense = monthlyData.reduce(
-    (sum, item) => sum + item.expense,
-    0
-  );
+  let growthPercentage = 0;
 
-  const peakExpense = Math.max(
-    ...monthlyData.map(item => item.expense),
-    0
-  );
+  if (previousExpense > 0) {
 
-  const averageExpense =
-    transactions.length
-      ? Math.round(
-          totalExpense / transactions.length
+    growthPercentage =
+      (
+        (
+          currentExpense -
+          previousExpense
         )
-      : 0;
+        /
+        previousExpense
+      ) * 100;
+
+  }
 
   return (
 
@@ -91,7 +191,7 @@ function ExpenseTrendChart({
 
             <p className="trend-subtitle">
 
-              Monthly expense performance
+              Money spent from successful wallet transactions.
 
             </p>
 
@@ -103,7 +203,15 @@ function ExpenseTrendChart({
 
           <FaArrowTrendDown />
 
-          -9.2%
+          {
+
+            totalExpense > 0
+
+              ? "Expense Active"
+
+              : "No Expense"
+
+          }
 
         </div>
 
@@ -115,13 +223,21 @@ function ExpenseTrendChart({
 
         <h1>
 
-          ₹{totalExpense.toLocaleString()}
+          ₹{totalExpense.toLocaleString("en-IN")}
 
         </h1>
 
         <span>
 
-          ↓ 9.2% vs last month
+          {
+
+            growthPercentage >= 0
+
+              ? `↑ ${growthPercentage.toFixed(1)}% vs last month`
+
+              : `↓ ${Math.abs(growthPercentage).toFixed(1)}% vs last month`
+
+          }
 
         </span>
 
@@ -131,103 +247,146 @@ function ExpenseTrendChart({
 
       <div className="chart-container">
 
-        <ResponsiveContainer
-          width="100%"
-          height={280}
-        >
+        {
 
-          <AreaChart data={monthlyData}>
+          expenseTransactions.length > 0
 
-            <defs>
+            ?
 
-              <linearGradient
-                id="expenseTrendFill"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
+            (
+
+              <ResponsiveContainer
+                width="100%"
+                height={280}
               >
 
-                <stop
-                  offset="0%"
-                  stopColor="#a855f7"
-                  stopOpacity={0.45}
-                />
+                <AreaChart data={monthlyData}>
 
-                <stop
-                  offset="100%"
-                  stopColor="#a855f7"
-                  stopOpacity={0}
-                />
+                  <defs>
 
-              </linearGradient>
+                    <linearGradient
+                      id="expenseTrendFill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
 
-            </defs>
+                     <stop
+    offset="0%"
+    stopColor="#a855f7"
+    stopOpacity={0.60}
+/>
 
-            <CartesianGrid
-              vertical={false}
-              strokeDasharray="3 3"
-              stroke="rgba(255,255,255,.06)"
-            />
+                      <stop
+                        offset="100%"
+                        stopColor="#a855f7"
+                        stopOpacity={0}
+                      />
 
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tick={{
-                fill:"#8fa3c7",
-                fontSize:13,
-                fontWeight:600
-              }}
-            />
+                    </linearGradient>
 
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tick={{
-                fill:"#8fa3c7",
-                fontSize:12
-              }}
-            />
+                  </defs>
 
-            <Tooltip
-              cursor={false}
-              contentStyle={{
-                background:"#101c35",
-                border:"1px solid rgba(255,255,255,.08)",
-                borderRadius:"16px",
-                color:"#fff",
-                boxShadow:"0 15px 35px rgba(0,0,0,.35)"
-              }}
-              labelStyle={{
-                color:"#94a3b8",
-                fontWeight:600
-              }}
-              itemStyle={{
-                color:"#c084fc",
-                fontWeight:700
-              }}
-            />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    stroke="rgba(255,255,255,.06)"
+                  />
 
-            <Area
-              type="monotone"
-              dataKey="expense"
-              stroke="#c084fc"
-              strokeWidth={4}
-              fill="url(#expenseTrendFill)"
-              animationDuration={1500}
-              dot={false}
-              activeDot={{
-                r:7,
-                fill:"#c084fc",
-                stroke:"#fff",
-                strokeWidth:3
-              }}
-            />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{
+                      fill: "#8fa3c7",
+                      fontSize: 13,
+                      fontWeight: 600
+                    }}
+                  />
 
-          </AreaChart>
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{
+                      fill: "#8fa3c7",
+                      fontSize: 12
+                    }}
+                  />
 
-        </ResponsiveContainer>
+                  <Tooltip
+
+                    formatter={(value) => [
+
+                      `₹${Number(value).toLocaleString("en-IN")}`,
+
+                      "Expense"
+
+                    ]}
+
+                    labelFormatter={(label) =>
+
+                      `${label} ${new Date().getFullYear()}`
+
+                    }
+
+                    cursor={false}
+
+                    contentStyle={{
+                      background: "#101c35",
+                      border: "1px solid rgba(255,255,255,.08)",
+                      borderRadius: "16px",
+                      color: "#fff",
+                      boxShadow: "0 15px 35px rgba(0,0,0,.35)"
+                    }}
+
+                    labelStyle={{
+                      color: "#94a3b8",
+                      fontWeight: 600
+                    }}
+
+                    itemStyle={{
+                      color: "#c084fc",
+                      fontWeight: 700
+                    }}
+
+                  />
+
+               <Area
+    type="monotone"
+    dataKey="expense"
+    stroke="#c084fc"
+    strokeWidth={4}
+    fill="url(#expenseTrendFill)"
+    animationDuration={1500}
+    dot={false}
+    activeDot={{
+        r: 7,
+        fill: "#c084fc",
+        stroke: "#fff",
+        strokeWidth: 3
+    }}
+/>
+                </AreaChart>
+
+              </ResponsiveContainer>
+
+            )
+
+            :
+
+            (
+
+              <div className="analytics-empty-chart">
+
+                No expense recorded yet.
+
+              </div>
+
+            )
+
+        }
 
       </div>
 
@@ -245,7 +404,7 @@ function ExpenseTrendChart({
 
           <strong>
 
-            {transactions.length}
+            {expenseTransactions.length}
 
           </strong>
 
@@ -261,7 +420,7 @@ function ExpenseTrendChart({
 
           <strong>
 
-            ₹{averageExpense.toLocaleString()}
+            ₹{averageExpense.toLocaleString("en-IN")}
 
           </strong>
 
@@ -277,7 +436,7 @@ function ExpenseTrendChart({
 
           <strong>
 
-            ₹{peakExpense.toLocaleString()}
+            ₹{peakExpense.toLocaleString("en-IN")}
 
           </strong>
 
@@ -295,7 +454,7 @@ function ExpenseTrendChart({
 
           <span>
 
-            Updated just now
+            {`Updated ${new Date().toLocaleString("en-IN")}`}
 
           </span>
 

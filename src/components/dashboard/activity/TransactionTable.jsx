@@ -6,8 +6,18 @@ import {
   FaShieldHalved,
   FaEllipsisVertical
 } from "react-icons/fa6";
-import { FaCircleCheck } from "react-icons/fa6";
-import { useState } from "react";
+
+import {
+    FaCircleCheck,
+    FaCircleXmark
+} from "react-icons/fa6";
+import {
+
+useState,
+
+useRef
+
+} from "react";
 import "./TransactionTable.css";
 
 function TransactionTable({
@@ -19,8 +29,13 @@ function TransactionTable({
 
     const [statusFilter, setStatusFilter] = useState("ALL");
 
-    const [sortBy, setSortBy] = useState("NEWEST");
+const [sortBy, setSortBy] = useState("NEWEST");
 
+const tableRef = useRef(null);
+
+const user = JSON.parse(
+    localStorage.getItem("user")
+);
     const formatCurrency = (amount) => {
 
         return new Intl.NumberFormat(
@@ -38,49 +53,50 @@ function TransactionTable({
                 SUMMARY DATA
     ========================================== */
 
-    const totalReceived = transactions.reduce(
+const totalReceived = transactions.reduce(
 
-        (sum, tx) =>
+(sum,tx)=>
 
-            sum +
+tx.receiverEmail===user?.email
 
-            Number(tx.amount || 0),
+?
 
-        0
+sum+Number(tx.amount)
 
-    );
+:
 
-    const totalSent = transactions.reduce(
+sum,
 
-        (sum, tx) =>
+0
 
-            tx.senderEmail === "arya@gmail.com"
+);
+  const totalSent = transactions.reduce(
 
-                ? sum + Number(tx.amount)
+    (sum, tx) =>
 
-                : sum,
+        tx.senderEmail === user?.email
 
-        0
+            ? sum + Number(tx.amount)
 
-    );
+            : sum,
 
-    const successRate = transactions.length
+    0
 
+);
+const successfulTransactions =
+    transactions.filter(
+        tx => tx.status === "SUCCESS"
+    ).length;
+
+const successRate =
+    transactions.length
         ? Math.round(
-
-              (transactions.filter(
-
-                  tx => tx.status === "SUCCESS"
-
-              ).length /
-
+              (successfulTransactions /
                   transactions.length) *
-
                   100
-
           )
-
         : 0;
+  
 
     /* ==========================================
                 FILTER
@@ -141,7 +157,102 @@ function TransactionTable({
         }
 
     });
+const exportCSV = () => {
 
+const headers=[
+
+"Transaction ID",
+
+"Sender",
+
+"Receiver",
+
+"Amount",
+
+"Status",
+
+"Date"
+
+];
+
+const rows=
+
+sortedTransactions.map(tx=>[
+
+tx.transactionId,
+
+tx.senderEmail,
+
+tx.receiverEmail,
+
+tx.amount,
+
+tx.status,
+
+new Date(tx.timestamp).toLocaleString("en-IN")
+
+]);
+
+const csv=[headers,...rows]
+
+.map(e=>e.join(","))
+
+.join("\n");
+
+const blob=new Blob(
+
+[csv],
+
+{type:"text/csv;charset=utf-8;"}
+
+);
+
+const url=
+
+URL.createObjectURL(blob);
+
+const link=
+
+document.createElement("a");
+
+link.href=url;
+
+const today = new Date().toISOString().split("T")[0];
+
+link.download = `NeuroWallet_Transactions_${today}.csv`;
+
+document.body.appendChild(link);
+
+link.click();
+
+document.body.removeChild(link);
+
+URL.revokeObjectURL(url);
+
+};
+const handleViewAll = () => {
+
+    // Reset all filters
+    setSearch("");
+
+    setStatusFilter("ALL");
+
+    setSortBy("NEWEST");
+
+    // Scroll to the table
+    setTimeout(() => {
+
+        tableRef.current?.scrollIntoView({
+
+            behavior: "smooth",
+
+            block: "start"
+
+        });
+
+    }, 100);
+
+};
     return (
 
         <div className="transaction-card">
@@ -170,18 +281,23 @@ function TransactionTable({
 
                 <div className="transaction-header-actions">
 
-                    <button className="export-btn">
+               <button
+className="export-btn"
+onClick={exportCSV}
+>
 
-                        Export CSV
+Export CSV
 
-                    </button>
+</button>
 
-                    <button className="view-btn">
+                    <button
+className="view-btn"
+onClick={handleViewAll}
+>
 
-                        View All →
+View All →
 
-                    </button>
-
+</button>
                 </div>
 
             </div>
@@ -302,12 +418,27 @@ function TransactionTable({
 
                 <div className="toolbar-right">
 
-                    <div className="record-count">
+             <div className="record-count">
 
-                        Showing {sortedTransactions.length} Records
+<span>Showing</span>
 
-                    </div>
+<strong>
 
+{sortedTransactions.length}
+
+</strong>
+
+<span>of</span>
+
+<strong>
+
+{transactions.length}
+
+</strong>
+
+<span>Transactions</span>
+
+</div>
                 </div>
 
             </div>
@@ -375,7 +506,10 @@ function TransactionTable({
   </div>
 
 </div>
-<div className="table-wrapper">
+<div
+className="table-wrapper"
+ref={tableRef}
+>
 
     <table className="transaction-table">
         <thead>
@@ -438,7 +572,15 @@ function TransactionTable({
 
                     <div className="user-cell">
 
-                        <div className="user-avatar">
+                        <div
+className={`user-avatar ${
+tx.senderEmail===user?.email
+?
+"secondary"
+:
+""
+}`}
+>
 
                             {tx.senderEmail
                                 ?.substring(0, 2)
@@ -450,8 +592,17 @@ function TransactionTable({
 
                             <span className="user-name">
 
-                                {tx.senderEmail
-                                    ?.split("@")[0]}
+                             {
+tx.senderEmail===user?.email
+
+?
+
+"You"
+
+:
+
+tx.senderEmail?.split("@")[0]
+}
 
                             </span>
 
@@ -473,7 +624,15 @@ function TransactionTable({
 
                     <div className="user-cell">
 
-                        <div className="user-avatar secondary">
+                        <div
+className={`user-avatar secondary ${
+tx.receiverEmail===user?.email
+?
+"active-user"
+:
+""
+}`}
+>
 
                             {tx.receiverEmail
                                 ?.substring(0, 2)
@@ -485,8 +644,17 @@ function TransactionTable({
 
                             <span className="user-name">
 
-                                {tx.receiverEmail
-                                    ?.split("@")[0]}
+                               {
+tx.receiverEmail===user?.email
+
+?
+
+"You"
+
+:
+
+tx.receiverEmail?.split("@")[0]
+}
 
                             </span>
 
@@ -508,15 +676,34 @@ function TransactionTable({
 
                     <div
                         className={
-                            tx.status === "SUCCESS"
-                                ? "amount-credit"
-                                : "amount-debit"
-                        }
+
+tx.receiverEmail===user?.email
+
+?
+
+"amount-credit"
+
+:
+
+"amount-debit"
+
+}
                     >
 
                         <span className="amount-sign">
 
-                            {tx.status === "SUCCESS" ? "+" : "-"}
+                            {
+tx.receiverEmail===user?.email
+
+?
+
+"+"
+
+:
+
+"-"
+
+}
 
                         </span>
 
@@ -538,10 +725,21 @@ function TransactionTable({
                         }`}
                     >
 
-                       <FaCircleCheck />
+                  {
 
-                        {tx.status}
+tx.status==="SUCCESS"
 
+?
+
+<FaCircleCheck/>
+
+:
+
+<FaCircleXmark/>
+
+}
+
+{tx.status}
                     </span>
 
                 </td>

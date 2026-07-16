@@ -17,53 +17,156 @@ function IncomeTrendChart({
   transactions = []
 }) {
 
-  const monthlyData = [
-    { month: "Jan", income: 0 },
-    { month: "Feb", income: 0 },
-    { month: "Mar", income: 0 },
-    { month: "Apr", income: 0 },
-    { month: "May", income: 0 },
-    { month: "Jun", income: 0 }
-  ];
-
-  transactions.forEach((tx) => {
-
-    if (tx.type !== "CREDIT") return;
-
-    const month = new Date(tx.timestamp)
-      .toLocaleString("default", {
-        month: "short"
-      });
-
-    const item = monthlyData.find(
-      (m) => m.month === month
-    );
-
-    if (item) {
-
-      item.income += tx.amount || 0;
-
-    }
-
-  });
-
-  const totalIncome = monthlyData.reduce(
-    (sum, item) => sum + item.income,
-    0
+  const user = JSON.parse(
+    localStorage.getItem("user")
   );
 
-  const peakIncome = Math.max(
-    ...monthlyData.map(item => item.income),
-    0
+  const incomeTransactions = transactions.filter(
+    tx =>
+      tx.receiverEmail === user?.email
   );
 
-  const averageIncome =
-    transactions.length
-      ? Math.round(
-          totalIncome / transactions.length
+// ================= LAST 6 MONTHS =================
+
+const allMonths = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+];
+
+const currentMonthIndex =
+    new Date().getMonth();
+
+const monthNames = [];
+
+for (let i = 5; i >= 0; i--) {
+
+    const index =
+        (currentMonthIndex - i + 12) % 12;
+
+    monthNames.push(allMonths[index]);
+
+}
+
+const monthlyIncome = {};
+
+incomeTransactions.forEach(tx => {
+
+ const month =
+    allMonths[
+        new Date(tx.timestamp).getMonth()
+    ];
+  monthlyIncome[month] =
+    (monthlyIncome[month] || 0) +
+    Number(tx.amount);
+
+});
+
+const monthlyData =
+  monthNames.map(month => ({
+
+    month,
+
+    income:
+      monthlyIncome[month] || 0
+
+  }));
+  console.log("monthNames:", monthNames);
+console.log("monthlyIncome:", monthlyIncome);
+console.log("monthlyData:", monthlyData);
+const totalIncome =
+  incomeTransactions.reduce(
+
+    (sum, tx) =>
+      sum + Number(tx.amount),
+
+    0
+
+  );
+
+const peakIncome =
+  incomeTransactions.length
+
+    ? Math.max(
+        ...incomeTransactions.map(
+
+          tx => Number(tx.amount)
+
         )
-      : 0;
+      )
 
+    : 0;
+
+const averageIncome =
+  incomeTransactions.length
+
+    ? Math.round(
+        totalIncome /
+        incomeTransactions.length
+      )
+
+    : 0;
+
+    // ================= GROWTH CALCULATION =================
+
+const currentMonth =
+  new Date().getMonth();
+
+const previousMonth =
+  currentMonth === 0
+    ? 11
+    : currentMonth - 1;
+
+let currentIncome = 0;
+let previousIncome = 0;
+
+incomeTransactions.forEach(tx => {
+
+  const month =
+    new Date(tx.timestamp).getMonth();
+
+  if (month === currentMonth) {
+
+    currentIncome += Number(tx.amount);
+
+  }
+
+  if (month === previousMonth) {
+
+    previousIncome += Number(tx.amount);
+
+  }
+console.log(
+    tx.timestamp,
+    new Date(tx.timestamp).toLocaleString("default", {
+        month: "short"
+    })
+);
+});
+
+let growthPercentage = 0;
+
+if (previousIncome > 0) {
+
+  growthPercentage =
+    (
+      (
+        currentIncome -
+        previousIncome
+      ) /
+      previousIncome
+    ) * 100;
+
+}
   return (
 
     <div className="chart-card">
@@ -100,9 +203,15 @@ function IncomeTrendChart({
 
         <div className="trend-growth-badge income-growth">
 
-          <FaArrowTrendUp />
+     <FaArrowTrendUp />
 
-          +18.4%
+{
+totalIncome > 0
+?
+"Income Active"
+:
+"No Income"
+}
 
         </div>
 
@@ -118,122 +227,147 @@ function IncomeTrendChart({
 
         </h1>
 
-        <span>
+       <span>
 
-          ↑ 18.4% vs last month
+{
+growthPercentage >= 0
+?
+`↑ ${growthPercentage.toFixed(1)}% vs last month`
+:
+`↓ ${Math.abs(growthPercentage).toFixed(1)}% vs last month`
+}
 
-        </span>
+</span>
 
       </div>
 
       {/* ================= CHART ================= */}
 
-      <div className="chart-container">
+   
+<div className="chart-container">
 
-        <ResponsiveContainer
-          width="100%"
-          height={280}
-        >
+{
+incomeTransactions.length > 0
+?
 
-          <AreaChart data={monthlyData}>
+(
 
-            <defs>
+<ResponsiveContainer
+    width="100%"
+    height={280}
+>
 
-              <linearGradient
-                id="incomeTrendFill"
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
+<AreaChart data={monthlyData}>
 
-                <stop
-                  offset="0%"
-                  stopColor="#22c55e"
-                  stopOpacity={0.45}
-                />
+    {/* Paste your ORIGINAL chart code here */}
 
-                <stop
-                  offset="100%"
-                  stopColor="#22c55e"
-                  stopOpacity={0}
-                />
+    <defs>
 
-              </linearGradient>
+      <linearGradient
+        id="incomeTrendFill"
+        x1="0"
+        y1="0"
+        x2="0"
+        y2="1"
+      >
 
-            </defs>
-            <CartesianGrid
-    vertical={false}
-    strokeDasharray="3 3"
-    stroke="rgba(255,255,255,.06)"
-/>
-           <XAxis
-    dataKey="month"
-    tickLine={false}
-    axisLine={false}
-    tick={{
-        fill: "#8fa3c7",
-        fontSize: 13,
-        fontWeight: 600
-    }}
-/>
-<YAxis
-    tickLine={false}
-    axisLine={false}
-    tick={{
-        fill: "#8fa3c7",
-        fontSize: 12
-    }}
-/>
+        <stop
+          offset="0%"
+          stopColor="#22c55e"
+          stopOpacity={0.45}
+        />
 
-          <Tooltip
-    cursor={false}
-    contentStyle={{
-        background: "#101c35",
-        border: "1px solid rgba(255,255,255,.08)",
-        borderRadius: "16px",
-        color: "#fff",
-        boxShadow: "0 15px 35px rgba(0,0,0,.35)"
-    }}
-    labelStyle={{
-        color: "#94a3b8",
-        fontWeight: 600
-    }}
-    itemStyle={{
-        color: "#22c55e",
-        fontWeight: 700
-    }}
-/>
+        <stop
+          offset="100%"
+          stopColor="#22c55e"
+          stopOpacity={0}
+        />
 
-         <Area
-    type="monotone"
+      </linearGradient>
 
-    dataKey="income"
+    </defs>
 
-    stroke="#22c55e"
+    <CartesianGrid
+        vertical={false}
+        strokeDasharray="3 3"
+        stroke="rgba(255,255,255,.06)"
+    />
 
-    strokeWidth={4}
+    <XAxis
+        dataKey="month"
+        tickLine={false}
+        axisLine={false}
+        tick={{
+            fill:"#8fa3c7",
+            fontSize:13,
+            fontWeight:600
+        }}
+    />
 
-    fill="url(#incomeTrendFill)"
+    <YAxis
+        domain={['auto','auto']}
+        tickLine={false}
+        axisLine={false}
+        tick={{
+            fill:"#8fa3c7",
+            fontSize:12
+        }}
+    />
 
-    animationDuration={1500}
+    <Tooltip
+        formatter={(value)=>[
+            `₹${Number(value).toLocaleString("en-IN")}`,
+            "Income"
+        ]}
+        labelFormatter={(label)=>
+            `${label} ${new Date().getFullYear()}`
+        }
+        cursor={false}
+        contentStyle={{
+            background:"#101c35",
+            border:"1px solid rgba(255,255,255,.08)",
+            borderRadius:"16px",
+            color:"#fff"
+        }}
+    />
 
-    activeDot={{
-        r:7,
-        fill:"#22c55e",
-        stroke:"#fff",
-        strokeWidth:3
-    }}
+    <Area
+        type="monotone"
+        dataKey="income"
+        stroke="#22c55e"
+        strokeWidth={4}
+        fill="url(#incomeTrendFill)"
+        animationDuration={1500}
+        activeDot={{
+            r:7,
+            fill:"#22c55e",
+            stroke:"#fff",
+            strokeWidth:3
+        }}
+        dot={false}
+    />
 
-    dot={false}
-/>
+</AreaChart>
 
-          </AreaChart>
+</ResponsiveContainer>
 
-        </ResponsiveContainer>
+)
 
-      </div>
+:
 
+(
+
+<div className="analytics-empty-chart">
+
+    No income recorded yet.
+
+</div>
+
+)
+
+}
+
+</div>
       {/* ================= FOOTER ================= */}
 
       <div className="trend-stats">
@@ -248,7 +382,7 @@ function IncomeTrendChart({
 
           <strong>
 
-            {transactions.length}
+          {incomeTransactions.length}
 
           </strong>
 
@@ -296,7 +430,9 @@ function IncomeTrendChart({
 
           <span>
 
-            Updated just now
+          {
+`Updated ${new Date().toLocaleString("en-IN")}`
+}
 
           </span>
 
