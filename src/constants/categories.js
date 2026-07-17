@@ -1,0 +1,15 @@
+export const TRANSACTION_CATEGORIES = [
+  "FOOD",
+  "SHOPPING",
+  "BILLS",
+  "TRAVEL",
+  "HEALTH",
+  "ENTERTAINMENT",
+  "EDUCATION",
+  "INVESTMENT",
+  "RENT",
+  "EMI",
+  "SALARY",
+  "TRANSFER",
+  "OTHER",
+];

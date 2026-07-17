@@ -1,0 +1,31 @@
+import {
+  FaUtensils,
+  FaShoppingBag,
+  FaFileInvoiceDollar,
+  FaPlane,
+  FaHeartbeat,
+  FaFilm,
+  FaGraduationCap,
+  FaChartLine,
+  FaHome,
+  FaCreditCard,
+  FaMoneyCheckAlt,
+  FaExchangeAlt,
+  FaQuestionCircle,
+} from "react-icons/fa";
+
+export const CATEGORY_ICONS = {
+  FOOD: FaUtensils,
+  SHOPPING: FaShoppingBag,
+  BILLS: FaFileInvoiceDollar,
+  TRAVEL: FaPlane,
+  HEALTH: FaHeartbeat,
+  ENTERTAINMENT: FaFilm,
+  EDUCATION: FaGraduationCap,
+  INVESTMENT: FaChartLine,
+  RENT: FaHome,
+  EMI: FaCreditCard,
+  SALARY: FaMoneyCheckAlt,
+  TRANSFER: FaExchangeAlt,
+  OTHER: FaQuestionCircle,
+};

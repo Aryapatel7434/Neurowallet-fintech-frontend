@@ -1,0 +1,15 @@
+export const CATEGORY_LABELS = {
+  FOOD: "Food",
+  SHOPPING: "Shopping",
+  BILLS: "Bills",
+  TRAVEL: "Travel",
+  HEALTH: "Health",
+  ENTERTAINMENT: "Entertainment",
+  EDUCATION: "Education",
+  INVESTMENT: "Investment",
+  RENT: "Rent",
+  EMI: "EMI",
+  SALARY: "Salary",
+  TRANSFER: "Transfer",
+  OTHER: "Other",
+};

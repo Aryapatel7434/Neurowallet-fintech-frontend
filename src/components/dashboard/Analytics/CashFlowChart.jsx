@@ -18,36 +18,61 @@ import "./Analytics.css";
 
 function CashFlowChart({ transactions = [] }) {
 
-  const monthlyData = [
-    { month: "Jan", income: 0, expense: 0 },
-    { month: "Feb", income: 0, expense: 0 },
-    { month: "Mar", income: 0, expense: 0 },
-    { month: "Apr", income: 0, expense: 0 },
-    { month: "May", income: 0, expense: 0 },
-    { month: "Jun", income: 0, expense: 0 },
-  ];
-const user = JSON.parse(localStorage.getItem("user"));
- transactions.forEach((tx) => {
+const allMonths = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+];
+
+const currentMonth =
+    new Date().getMonth();
+
+const monthNames = [];
+
+for (let i = 5; i >= 0; i--) {
+
+    const index =
+        (currentMonth - i + 12) % 12;
+
+    monthNames.push(
+        allMonths[index]
+    );
+
+}
+const monthlyData = monthNames.map(month => ({
+    month,
+    income: 0,
+    expense: 0
+}));
+const user = JSON.parse(localStorage.getItem("user")) || {};
+transactions.forEach(tx => {
 
     if (tx.status !== "SUCCESS") return;
 
-    const month = new Date(tx.timestamp).toLocaleString(
-      "default",
-      { month: "short" }
-    );
+    const month =
+        allMonths[new Date(tx.timestamp).getMonth()];
 
     const item = monthlyData.find(
-      (m) => m.month === month
+        m => m.month === month
     );
 
     if (!item) return;
 
     if (tx.receiverEmail === user.email) {
-        item.income += Number(tx.amount || 0);
+        item.income += Number(tx.amount);
     }
 
     if (tx.senderEmail === user.email) {
-        item.expense += Number(tx.amount || 0);
+        item.expense += Number(tx.amount);
     }
 
 });
@@ -55,7 +80,7 @@ const user = JSON.parse(localStorage.getItem("user"));
     .filter(
         tx =>
             tx.status === "SUCCESS" &&
-            tx.receiverEmail === user.email
+            tx.receiverEmail === user?.email
     )
     .reduce(
       (sum, tx) => sum + Number(tx.amount || 0),
@@ -74,7 +99,53 @@ const totalExpense = transactions
     );
 
   const netCashFlow = totalIncome - totalExpense;
+const previousMonth =
+    currentMonth === 0
+        ? 11
+        : currentMonth - 1;
 
+let currentNet = 0;
+let previousNet = 0;
+
+transactions.forEach(tx => {
+
+    if (tx.status !== "SUCCESS") return;
+
+    const month =
+        new Date(tx.timestamp).getMonth();
+
+    if (month === currentMonth) {
+
+        if (tx.receiverEmail === user.email)
+            currentNet += Number(tx.amount);
+
+        if (tx.senderEmail === user.email)
+            currentNet -= Number(tx.amount);
+
+    }
+
+    if (month === previousMonth) {
+
+        if (tx.receiverEmail === user.email)
+            previousNet += Number(tx.amount);
+
+        if (tx.senderEmail === user.email)
+            previousNet -= Number(tx.amount);
+
+    }
+
+});
+
+let growthPercentage = 0;
+
+if (previousNet !== 0) {
+
+    growthPercentage =
+        ((currentNet - previousNet) /
+            Math.abs(previousNet)) *
+        100;
+
+}
   return (
 
     <div className="chart-card">
@@ -102,9 +173,11 @@ const totalExpense = transactions
         </div>
 
         <div className="growth-badge trend-growth">
-
-          +5.2%
-
+{
+growthPercentage >= 0
+? `↑ ${growthPercentage.toFixed(1)}%`
+: `↓ ${Math.abs(growthPercentage).toFixed(1)}%`
+}
         </div>
 
       </div>
@@ -117,7 +190,11 @@ const totalExpense = transactions
 
       <p className="analytics-main-subtitle">
 
-        Net Cash Flow
+      {
+growthPercentage >= 0
+? `↑ ${growthPercentage.toFixed(1)}% vs last month`
+: `↓ ${Math.abs(growthPercentage).toFixed(1)}% vs last month`
+}
 
       </p>
 
@@ -142,20 +219,35 @@ const totalExpense = transactions
               stroke="#94a3b8"
             />
 
-            <YAxis
-              stroke="#94a3b8"
-            />
+           <YAxis
+    stroke="#94a3b8"
+    tickFormatter={(value) =>
+        `₹${value / 1000}k`
+    }
+/>
+<Tooltip
+    cursor={false}
+    formatter={(value, name) => [
 
-            <Tooltip
-              contentStyle={{
-                background: "#132344",
-                border: "1px solid #2f5cff",
-                borderRadius: "14px",
-                color: "#fff",
-              }}
-            />
+        `₹${Number(value).toLocaleString("en-IN")}`,
+        name
 
-            <Legend />
+    ]}
+    labelFormatter={label =>
+        `${label} ${new Date().getFullYear()}`
+    }
+    contentStyle={{
+        background:"#101c35",
+        border:"1px solid rgba(255,255,255,.08)",
+        borderRadius:"16px",
+        color:"#fff",
+        boxShadow:"0 15px 35px rgba(0,0,0,.35)"
+    }}
+/>
+           <Legend
+    verticalAlign="bottom"
+    iconType="circle"
+/>
 
             <Line
               type="monotone"
@@ -175,6 +267,7 @@ const totalExpense = transactions
               strokeWidth={3}
               dot={false}
               activeDot={{ r: 6 }}
+              animationDuration={1800}
             />
 
           </LineChart>
@@ -191,7 +284,11 @@ const totalExpense = transactions
 
           <span>
 
-            {transactions.length} Transactions
+           {
+transactions.filter(
+tx => tx.status === "SUCCESS"
+).length
+} Transactions
 
           </span>
 
@@ -199,7 +296,7 @@ const totalExpense = transactions
 
         <div className="analytics-updated">
 
-          Updated just now
+          {`Updated ${new Date().toLocaleString("en-IN")}`}
 
         </div>
 

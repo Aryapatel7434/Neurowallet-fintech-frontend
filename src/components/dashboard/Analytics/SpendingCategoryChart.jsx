@@ -12,7 +12,9 @@ import {
   FaChartPie,
   FaLayerGroup,
 } from "react-icons/fa6";
-
+import { CATEGORY_COLORS } from "../../../constants/categoryColors";
+import { CATEGORY_LABELS } from "../../../constants/categoryLabels";
+import { CATEGORY_ICONS } from "../../../constants/categoryIcons";
 function SpendingCategoryChart({
   transactions = [],
 }) {
@@ -23,30 +25,15 @@ function SpendingCategoryChart({
     localStorage.getItem("user") || "{}"
   );
 
-  console.log("USER:", user);
-
-  console.log("ALL TRANSACTIONS:");
-  console.log(transactions);
 
   // ================= FILTER USER EXPENSES =================
 
- console.log("USER EMAIL:", user?.email);
-
-transactions.forEach((tx) => {
-    console.log(
-        tx.senderEmail,
-        "===",
-        user?.email,
-        "=",
-        tx.senderEmail === user?.email
-    );
-});
-
-const expenseTransactions = transactions.filter(
-    tx => tx.senderEmail === user?.email
+const expenseTransactions =
+transactions.filter(
+tx =>
+tx.senderEmail === user?.email &&
+tx.status === "SUCCESS"
 );
-  console.log("EXPENSE TRANSACTIONS:");
-  console.log(expenseTransactions);
 
   // ================= CATEGORY TOTALS =================
 
@@ -63,9 +50,6 @@ const expenseTransactions = transactions.filter(
 
   });
 
-  console.log("CATEGORY OBJECT:");
-  console.log(categories);
-
   // ================= CHART DATA =================
 
  const chartData = Object.entries(categories)
@@ -75,21 +59,10 @@ const expenseTransactions = transactions.filter(
   }))
   .sort((a, b) => b.value - a.value);
 
-  console.log("CHART DATA:");
-  console.log(chartData);
 
+console.log(expenseTransactions);
   // ================= COLORS =================
 
-  const COLORS = [
-    "#3B82F6",
-    "#8B5CF6",
-    "#22C55E",
-    "#F59E0B",
-    "#EF4444",
-    "#06B6D4",
-    "#EC4899",
-    "#14B8A6",
-  ];
 
   // ================= TOTAL =================
 
@@ -129,7 +102,7 @@ const expenseTransactions = transactions.filter(
         </div>
 
         <div className="growth-badge spending-badge">
-          Distribution
+         {chartData.length} Categories
         </div>
 
       </div>
@@ -155,7 +128,7 @@ const expenseTransactions = transactions.filter(
             <FaChartPie size={42} />
 
             <p>
-              No spending data available
+              No expense transactions yet.
             </p>
 
           </div>
@@ -175,25 +148,27 @@ const expenseTransactions = transactions.filter(
     nameKey="name"
     cx="50%"
     cy="50%"
-    innerRadius={70}
-    outerRadius={105}
+    innerRadius={62}
+    outerRadius={110}
     paddingAngle={4}
     cornerRadius={8}
-    animationDuration={1000}
+    animationDuration={1800}
+
+    activeShape={{
+outerRadius:118
+}}
 >
 
                 {chartData.map(
                   (entry, index) => (
 
-                    <Cell
-                      key={index}
-                      fill={
-                        COLORS[
-                          index %
-                            COLORS.length
-                        ]
-                      }
-                    />
+                  <Cell
+  key={index}
+  fill={
+    CATEGORY_COLORS[entry.name] ||
+    CATEGORY_COLORS.OTHER
+  }
+/>
 
                   )
                 )}
@@ -230,20 +205,25 @@ const expenseTransactions = transactions.filter(
 
    </Pie>
 
-             <Tooltip
-    formatter={(value, name) => [
-        `₹${Number(value).toLocaleString("en-IN")}`,
-        name,
-    ]}
-    separator=" : "
-    cursor={{ fill: "rgba(255,255,255,0.05)" }}
-    contentStyle={{
-        background: "#111827",
-        border: "1px solid #374151",
-        borderRadius: "12px",
-        color: "#fff",
-        boxShadow: "0 8px 30px rgba(0,0,0,.35)"
-    }}
+      <Tooltip
+cursor={false}
+formatter={(value, name) => [
+  `₹${Number(value).toLocaleString("en-IN")}`,
+  CATEGORY_LABELS[name] || name
+]}
+contentStyle={{
+background:"#101c35",
+border:"1px solid rgba(255,255,255,.08)",
+borderRadius:"16px",
+boxShadow:"0 15px 35px rgba(0,0,0,.35)"
+}}
+labelStyle={{
+color:"#fff",
+fontWeight:700
+}}
+itemStyle={{
+color:"#60a5fa"
+}}
 />
 
             </PieChart>
@@ -277,24 +257,28 @@ const expenseTransactions = transactions.filter(
                   key={item.name}
                 >
 
-                  <div className="category-left">
+                 <div className="category-left">
 
-                    <span
-                      className="category-dot"
-                      style={{
-                        background:
-                          COLORS[
-                            index %
-                              COLORS.length
-                          ],
-                      }}
-                    />
+  {(() => {
+    const Icon =
+      CATEGORY_ICONS[item.name];
 
-                    <div>
+    return Icon ? (
+      <Icon
+        size={18}
+        style={{
+          color:
+            CATEGORY_COLORS[item.name]
+        }}
+      />
+    ) : null;
+  })()}
+
+  <div>
 
                       <div className="category-name">
-                        {item.name}
-                      </div>
+  {CATEGORY_LABELS[item.name] || item.name}
+</div>
 
                       <div className="category-percent">
                         {percent}%
@@ -332,7 +316,7 @@ const expenseTransactions = transactions.filter(
         </div>
 
         <div className="analytics-updated">
-          Updated just now
+           {`Updated ${new Date().toLocaleString("en-IN")}`}
         </div>
 
       </div>

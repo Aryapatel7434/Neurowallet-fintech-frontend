@@ -23,6 +23,8 @@ import TransactionModal
 from "../../components/wallet/TransactionModal";
 import WalletHeader
 from "../../components/wallet/WalletHeader";
+import { TRANSACTION_CATEGORIES } from "../../constants/categories";
+import { CATEGORY_LABELS } from "../../constants/categoryLabels";
 import { toast } from "react-toastify";
 import {
   getMyWallet,
@@ -434,59 +436,19 @@ const handleTransfer = async () => {
 
   <br />
   <br />
-  <select
+<select
   value={category}
-  onChange={(e) =>
-    setCategory(e.target.value)
-  }
+  onChange={(e) => setCategory(e.target.value)}
 >
-
-  <option value="FOOD">
-    🍔 Food
-  </option>
-
-  <option value="SHOPPING">
-    🛒 Shopping
-  </option>
-
-  <option value="BILLS">
-    🧾 Bills
-  </option>
-
-  <option value="TRAVEL">
-    ✈️ Travel
-  </option>
-
-  <option value="HEALTH">
-    💊 Health
-  </option>
-
-  <option value="ENTERTAINMENT">
-    🎬 Entertainment
-  </option>
-
-  <option value="EDUCATION">
-    🎓 Education
-  </option>
-
-  <option value="INVESTMENT">
-    📈 Investment
-  </option>
-
-  <option value="SALARY">
-    💼 Salary
-  </option>
-
-  <option value="TRANSFER">
-    💸 Transfer
-  </option>
-
-  <option value="OTHER">
-    📦 Other
-  </option>
-
+  {TRANSACTION_CATEGORIES.map((category) => (
+    <option
+      key={category}
+      value={category}
+    >
+      {CATEGORY_LABELS[category]}
+    </option>
+  ))}
 </select>
-
 <br />
 <br />
   <button
