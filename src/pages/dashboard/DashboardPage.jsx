@@ -66,6 +66,7 @@ import AIAssistantHeader
 from "../../components/dashboard/ai/AIAssistantHeader";
 import DashboardSkeleton
 from "../../components/dashboard/common/DashboardSkeleton";
+import useAI from "../../hooks/useAI";
 function DashboardPage() {
 const [wallet, setWallet] = useState(null);
  const totalBalance =
@@ -78,6 +79,14 @@ useState([]);
 const [error, setError] = useState("");
 const [dashboardInsights, setDashboardInsights] = useState(null);
 
+const {
+    insights,
+    financialScore,
+    budgetHealth,
+    goalRecommendation,
+    loading: aiLoading,
+    error: aiError
+} = useAI();
 useEffect(() => {
 
     const loadDashboard = async () => {
@@ -370,27 +379,31 @@ return (
     <AIAssistantHeader />
 
     <div className="ai-grid">
+<AIFinancialAssistant
+    transactions={transactions}
+    insights={insights}
+    loading={aiLoading}
+/>
+<BudgetHealth
+    wallet={wallet}
+    budgetHealth={budgetHealth}
+    loading={aiLoading}
+/>
+       <FinancialScore
+    wallet={wallet}
+    financialScore={financialScore}
+    loading={aiLoading}
+/>
 
-        <AIFinancialAssistant
-            transactions={transactions}
-        />
-
-        <BudgetHealth
-            wallet={wallet}
-        />
-
-        <FinancialScore
-            wallet={wallet}
-        />
-
-        <SmartGoals
-            wallet={wallet}
-        />
-
-        <GoalRecommendation
-            wallet={wallet}
-        />
-
+  <SmartGoals
+    goalRecommendation={goalRecommendation}
+    loading={aiLoading}
+/>
+      <GoalRecommendation
+    wallet={wallet}
+    goalRecommendation={goalRecommendation}
+    loading={aiLoading}
+/>
       <QuickActions
     onRefresh={fetchDashboardData}
 />

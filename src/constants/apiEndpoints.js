@@ -37,6 +37,22 @@ export const API_ENDPOINTS = {
     // ==========================
 
     DASHBOARD_INSIGHTS:
-        "/dashboard/insights"
+        "/dashboard/insights",
+
+    // ==========================
+    // AI
+    // ==========================
+
+    AI_INSIGHTS:
+        "/ai/insights",
+
+    FINANCIAL_SCORE:
+        "/ai/financial-score",
+
+    BUDGET_HEALTH:
+        "/ai/budget-health",
+
+    GOAL_RECOMMENDATION:
+        "/ai/goals"
 
 };

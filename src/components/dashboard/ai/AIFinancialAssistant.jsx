@@ -1,224 +1,302 @@
 import "./AIFinancialAssistant.css";
 import {
-  FaRobot,
-  FaPiggyBank,
-  FaTriangleExclamation,
-  FaChartLine,
-  FaShieldHeart,
-  FaCircleCheck
+    FaRobot,
+    FaPiggyBank,
+    FaTriangleExclamation,
+    FaChartLine,
+    FaShieldHeart,
+    FaCircleCheck
 } from "react-icons/fa6";
 
-function AIFinancialAssistant() {
+function AIFinancialAssistant({
+    insights,
+    loading
+}) {
 
-  const confidence = 98;
+    if (loading) {
 
-  return (
+        return (
 
-    <div className="ai-advisor-card">
+            <div className="ai-advisor-card">
 
-      {/* ================= HEADER ================= */}
+                <div className="advisor-header">
 
-      <div className="advisor-header">
+                    <div className="advisor-title">
 
-        <div className="advisor-title">
+                        <div className="advisor-icon">
 
-          <div className="advisor-icon">
+                            <FaRobot />
 
-            <FaRobot />
+                        </div>
 
-          </div>
+                        <div>
 
-          <div>
+                            <h2>
 
-            <h2>NeuroWallet AI Advisor</h2>
+                                NeuroWallet AI Advisor
 
-            <p>
-              AI Powered Personal Financial Assistant
-            </p>
+                            </h2>
 
-          </div>
+                            <p>
+
+                                AI Powered Personal Financial Assistant
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <span className="advisor-badge">
+
+                        Loading...
+
+                    </span>
+
+                </div>
+
+                <div
+                    style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        fontWeight: "600"
+                    }}
+                >
+                    Generating AI Insights...
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+    const confidence =
+        insights?.confidence ?? 0;
+
+    const savingOpportunity =
+        insights?.savingOpportunity ??
+        "No saving opportunities available.";
+
+    const budgetAlert =
+        insights?.budgetAlert ??
+        "No budget alerts.";
+
+    const investmentSuggestion =
+        insights?.investmentSuggestion ??
+        "No investment suggestion available.";
+
+    const financialRisk =
+        insights?.financialRisk ??
+        "Unknown";
+
+    const confidenceStatus =
+        confidence >= 90
+            ? "Excellent"
+            : confidence >= 75
+            ? "Good"
+            : confidence >= 60
+            ? "Average"
+            : "Needs Attention";
+
+    const riskClass =
+        financialRisk.toLowerCase() === "low"
+            ? "risk-low"
+            : financialRisk.toLowerCase() === "medium"
+            ? "risk-medium"
+            : "risk-high";
+
+    return (
+
+        <div className="ai-advisor-card">
+
+            {/* ================= HEADER ================= */}
+
+            <div className="advisor-header">
+
+                <div className="advisor-title">
+
+                    <div className="advisor-icon">
+
+                        <FaRobot />
+
+                    </div>
+
+                    <div>
+
+                        <h2>
+
+                            NeuroWallet AI Advisor
+
+                        </h2>
+
+                        <p>
+
+                            AI Powered Personal Financial Assistant
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <span className="advisor-badge">
+
+                    <span className="live-dot"></span>
+
+                    LIVE AI
+
+                </span>
+
+            </div>
+
+            {/* ================= AI CONFIDENCE ================= */}
+
+            <div className="advisor-confidence">
+
+                <div>
+
+                    <span className="confidence-label">
+
+                        AI Confidence
+
+                    </span>
+
+                    <h1>
+
+                        {confidence}%
+
+                    </h1>
+
+                </div>
+
+                <div className="confidence-status">
+
+                    {confidenceStatus}
+
+                </div>
+
+            </div>
+
+            {/* ================= SAVING ================= */}
+
+            <div className="advisor-item positive">
+
+                <div className="advisor-item-header">
+
+                    <h4>
+
+                        <FaPiggyBank />
+
+                        Saving Opportunity
+
+                    </h4>
+
+                </div>
+
+                <p>
+
+                    {savingOpportunity}
+
+                </p>
+
+            </div>
+
+            {/* ================= WARNING ================= */}
+
+            <div className="advisor-item warning">
+
+                <div className="advisor-item-header">
+
+                    <h4>
+
+                        <FaTriangleExclamation />
+
+                        Budget Alert
+
+                    </h4>
+
+                </div>
+
+                <p>
+
+                    {budgetAlert}
+
+                </p>
+
+            </div>
+
+            {/* ================= INVESTMENT ================= */}
+
+            <div className="advisor-item success">
+
+                <div className="advisor-item-header">
+
+                    <h4>
+
+                        <FaChartLine />
+
+                        Investment Suggestion
+
+                    </h4>
+
+                </div>
+
+                <p>
+
+                    {investmentSuggestion}
+
+                </p>
+
+            </div>
+
+            {/* ================= RISK ================= */}
+
+            <div className="advisor-risk">
+
+                <div>
+
+                    <FaShieldHeart />
+
+                    <span>
+
+                        Financial Risk
+
+                    </span>
+
+                </div>
+
+                <span className={riskClass}>
+
+                    {financialRisk}
+
+                </span>
+
+            </div>
+
+            {/* ================= FOOTER ================= */}
+
+            <div className="advisor-footer">
+
+                <div>
+
+                    <FaCircleCheck />
+
+                    Updated Just Now
+
+                </div>
+
+                <span>
+
+                    Powered by NeuroWallet AI
+
+                </span>
+
+            </div>
 
         </div>
 
-        <span className="advisor-badge">
-
-          <span className="live-dot"></span>
-
-          LIVE
-
-        </span>
-
-      </div>
-
-      {/* ================= AI CONFIDENCE ================= */}
-
-      <div className="advisor-confidence">
-
-        <div>
-
-          <span className="confidence-label">
-
-            AI Confidence
-
-          </span>
-
-          <h1>{confidence}%</h1>
-
-        </div>
-
-        <div className="confidence-status">
-
-          Excellent
-
-        </div>
-
-      </div>
-
-      {/* ================= SAVING ================= */}
-
-      <div className="advisor-item positive">
-
-        <div className="advisor-item-header">
-
-          <h4>
-
-            <FaPiggyBank />
-
-            Saving Opportunity
-
-          </h4>
-
-          <span className="advisor-score">
-
-            97%
-
-          </span>
-
-        </div>
-
-        <p>
-
-          You can save approximately
-          <strong> ₹2,450 </strong>
-          this month by reducing food
-          delivery expenses.
-
-        </p>
-
-      </div>
-
-      {/* ================= WARNING ================= */}
-
-      <div className="advisor-item warning">
-
-        <div className="advisor-item-header">
-
-          <h4>
-
-            <FaTriangleExclamation />
-
-            Budget Alert
-
-          </h4>
-
-          <span className="advisor-score">
-
-            91%
-
-          </span>
-
-        </div>
-
-        <p>
-
-          Shopping expenses are
-          <strong> 22% </strong>
-          higher than your monthly
-          average.
-
-        </p>
-
-      </div>
-
-      {/* ================= INVESTMENT ================= */}
-
-      <div className="advisor-item success">
-
-        <div className="advisor-item-header">
-
-          <h4>
-
-            <FaChartLine />
-
-            Investment Suggestion
-
-          </h4>
-
-          <span className="advisor-score">
-
-            95%
-
-          </span>
-
-        </div>
-
-        <p>
-
-          You currently have positive
-          cash flow. Consider starting a
-          monthly SIP investment.
-
-        </p>
-
-      </div>
-
-      {/* ================= RISK ================= */}
-
-      <div className="advisor-risk">
-
-        <div>
-
-          <FaShieldHeart />
-
-          <span>
-
-            Financial Risk
-
-          </span>
-
-        </div>
-
-        <span className="risk-low">
-
-          LOW
-
-        </span>
-
-      </div>
-
-      {/* ================= FOOTER ================= */}
-
-      <div className="advisor-footer">
-
-        <div>
-
-          <FaCircleCheck />
-
-          Updated Just Now
-
-        </div>
-
-        <span>
-
-          Powered by NeuroWallet AI
-
-        </span>
-
-      </div>
-
-    </div>
-
-  );
+    );
 
 }
 

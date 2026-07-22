@@ -7,29 +7,80 @@ import {
     FaArrowTrendUp
 } from "react-icons/fa6";
 
-function GoalRecommendation({ wallet }) {
+function GoalRecommendation({
+    goalRecommendation,
+    loading
+}) {
 
-    const balance = wallet?.balance || 0;
+    const formatCurrency = (amount) =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0,
+        }).format(amount || 0);
 
-    const confidence = 96;
+    if (loading) {
 
-    let priority = "Medium";
+        return (
 
-    if (balance >= 50000) {
+            <div className="recommend-card">
 
-        priority = "Low";
+                <div className="recommend-header">
 
-    } else if (balance < 10000) {
+                    <h2>
 
-        priority = "High";
+                        <FaLightbulb />
+
+                        Goal Recommendation
+
+                    </h2>
+
+                    <span className="recommend-live">
+
+                        Loading...
+
+                    </span>
+
+                </div>
+
+                <div
+                    style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        fontWeight: "600"
+                    }}
+                >
+                    Generating AI Recommendation...
+                </div>
+
+            </div>
+
+        );
 
     }
+
+    const goalName =
+        goalRecommendation?.goalName ??
+        "Emergency Fund";
+
+    const targetAmount =
+        goalRecommendation?.targetAmount ?? 0;
+
+    const currentAmount =
+        goalRecommendation?.currentAmount ?? 0;
+
+    const progress =
+        goalRecommendation?.progressPercentage ?? 0;
+
+    const recommendation =
+        goalRecommendation?.recommendation ??
+        "Continue saving regularly.";
 
     return (
 
         <div className="recommend-card">
 
-            {/* ================= HEADER ================= */}
+            {/* Header */}
 
             <div className="recommend-header">
 
@@ -43,13 +94,13 @@ function GoalRecommendation({ wallet }) {
 
                 <span className="recommend-live">
 
-                    LIVE
+                    LIVE AI
 
                 </span>
 
             </div>
 
-            {/* ================= CONFIDENCE ================= */}
+            {/* Progress */}
 
             <div className="recommend-confidence">
 
@@ -57,13 +108,13 @@ function GoalRecommendation({ wallet }) {
 
                     <span>
 
-                        AI Confidence
+                        Goal Progress
 
                     </span>
 
                     <h1>
 
-                        {confidence}%
+                        {progress}%
 
                     </h1>
 
@@ -71,13 +122,13 @@ function GoalRecommendation({ wallet }) {
 
                 <div className="recommend-priority">
 
-                    {priority} Priority
+                    Active Goal
 
                 </div>
 
             </div>
 
-            {/* ================= RECOMMENDATION ================= */}
+            {/* Goal */}
 
             <div className="recommend-box">
 
@@ -87,16 +138,33 @@ function GoalRecommendation({ wallet }) {
 
                     <h4>
 
-                        Smart Saving Goal
+                        {goalName}
 
                     </h4>
 
                     <p>
 
-                        Increase your monthly savings by
-                        <strong> ₹5,000 </strong>
-                        to reach your target sooner and
-                        improve your financial stability.
+                        Target:
+
+                        <strong>
+
+                            {" "}
+                            {formatCurrency(targetAmount)}
+
+                        </strong>
+
+                    </p>
+
+                    <p>
+
+                        Current:
+
+                        <strong>
+
+                            {" "}
+                            {formatCurrency(currentAmount)}
+
+                        </strong>
 
                     </p>
 
@@ -104,13 +172,13 @@ function GoalRecommendation({ wallet }) {
 
             </div>
 
-            {/* ================= IMPACT ================= */}
+            {/* Recommendation */}
 
             <div className="recommend-impact">
 
                 <span>
 
-                    Expected Impact
+                    AI Recommendation
 
                 </span>
 
@@ -118,13 +186,15 @@ function GoalRecommendation({ wallet }) {
 
                     <FaArrowTrendUp />
 
-                    High
+                    {" "}
+
+                    {recommendation}
 
                 </strong>
 
             </div>
 
-            {/* ================= FOOTER ================= */}
+            {/* Footer */}
 
             <div className="recommend-footer">
 

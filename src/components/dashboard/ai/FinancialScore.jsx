@@ -2,37 +2,81 @@ import "./FinancialScore.css";
 
 import {
     FaShieldHeart,
-    FaArrowTrendUp,
     FaCircleCheck
 } from "react-icons/fa6";
 
-function FinancialScore({ wallet }) {
+function FinancialScore({
+    wallet,
+    financialScore,
+    loading
+}) {
 
     const balance = wallet?.balance || 0;
 
-   const score =
-    balance >= 100000
-        ? 98
-        : balance >= 50000
-        ? 90
-        : balance >= 25000
-        ? 82
-        : balance >= 10000
-        ? 70
-        : balance >= 5000
-        ? 58
-        : 40;
+    if (loading) {
+        return (
+            <div className="score-card">
 
-  const status =
-    score >= 95
-        ? "Elite"
-        : score >= 90
-        ? "Excellent"
-        : score >= 75
-        ? "Good"
-        : score >= 60
-        ? "Average"
-        : "Needs Improvement";
+                <div className="score-header">
+
+                    <h2>
+                        <FaShieldHeart />
+                        Financial Score
+                    </h2>
+
+                    <span className="score-live">
+                        Loading...
+                    </span>
+
+                </div>
+
+                <div
+                    style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        fontWeight: "600",
+                    }}
+                >
+                    Calculating AI Financial Score...
+                </div>
+
+            </div>
+        );
+    }
+
+    const score = financialScore?.score ?? 0;
+
+    const status =
+        financialScore?.rating ??
+        "Unknown";
+
+  const remark =
+    financialScore?.remark ?? "";
+
+const risk =
+    financialScore?.risk ?? "Unknown";
+    const formatCurrency = (amount) =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0,
+        }).format(amount || 0);
+
+    let creditRating = "B";
+
+    if (score >= 95)
+        creditRating = "A++";
+    else if (score >= 90)
+        creditRating = "A+";
+    else if (score >= 75)
+        creditRating = "A";
+    else if (score >= 60)
+        creditRating = "B++";
+
+
+  const recommendation =
+    financialScore?.remark ??
+    "Improve your savings to increase your financial score.";
 
     return (
 
@@ -52,7 +96,7 @@ function FinancialScore({ wallet }) {
 
                 <span className="score-live">
 
-                    LIVE
+                    LIVE AI
 
                 </span>
 
@@ -81,25 +125,18 @@ function FinancialScore({ wallet }) {
                 {status}
 
             </p>
+
             <div className="score-badge">
 
-    Credit Rating
+                Credit Rating
 
-    <strong>
+                <strong>
 
-        {score >= 95
-            ? "  A++"
-            : score >= 85
-            ? "  A+"
-            : score >= 70
-            ? "  A"
-            : score >= 55
-            ? "  B++"
-            : "  B+"}
+                    {creditRating}
 
-    </strong>
+                </strong>
 
-</div>
+            </div>
 
             {/* Progress */}
 
@@ -120,11 +157,15 @@ function FinancialScore({ wallet }) {
 
                 <div>
 
-                    <span>Wallet</span>
+                    <span>
+
+                        Wallet
+
+                    </span>
 
                     <strong>
 
-                        ₹{balance.toLocaleString("en-IN")}
+                        {formatCurrency(balance)}
 
                     </strong>
 
@@ -132,11 +173,15 @@ function FinancialScore({ wallet }) {
 
                 <div>
 
-                    <span>Rating</span>
+                    <span>
+
+                        Rating
+
+                    </span>
 
                     <strong>
 
-                        A+
+                       {status}
 
                     </strong>
 
@@ -144,11 +189,15 @@ function FinancialScore({ wallet }) {
 
                 <div>
 
-                    <span>Risk</span>
+                    <span>
+
+                        Risk
+
+                    </span>
 
                     <strong>
 
-                        Low
+                        {risk}
 
                     </strong>
 
@@ -158,20 +207,17 @@ function FinancialScore({ wallet }) {
 
             {/* Recommendation */}
 
-            <div className="score-tip">
+           <div className="score-tip">
 
-                <FaCircleCheck />
+    <FaCircleCheck />
 
-                <p>
+    <p>
 
-                   {score >= 90
-    ? "Excellent financial discipline. Continue your current saving strategy to maintain a top credit profile."
-    : score >= 75
-    ? "Healthy financial behavior. Increasing your monthly savings can further improve your score."
-    : "Focus on reducing unnecessary expenses and increasing savings to improve your financial health."}
-                </p>
+        {recommendation}
 
-            </div>
+    </p>
+
+</div>
 
         </div>
 

@@ -1,32 +1,98 @@
 import "./BudgetHealth.css";
 import { FaChartLine, FaCircleCheck } from "react-icons/fa6";
 
-function BudgetHealth({ wallet }) {
-
-    const balance = wallet?.balance || 0;
-
-    // Demo Budget
-    const totalBudget = 100000;
-
-    const spent = totalBudget - balance;
-
-    const remaining = balance;
-
-    const score =
-        balance > 50000
-            ? 90
-            : balance > 20000
-            ? 75
-            : balance > 5000
-            ? 60
-            : 35;
+function BudgetHealth({
+    wallet,
+    budgetHealth,
+    loading
+}) {
 
     const formatCurrency = (amount) =>
         new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: "INR",
             maximumFractionDigits: 0,
-        }).format(amount);
+        }).format(amount || 0);
+
+    if (loading) {
+        return (
+            <div className="budget-card">
+                <div className="budget-header">
+                    <h2>
+                        <FaChartLine />
+                        Budget Health
+                    </h2>
+
+                    <span className="budget-live">
+                        Loading...
+                    </span>
+                </div>
+
+                <div
+                    style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        fontWeight: "600",
+                    }}
+                >
+                    Fetching AI Budget Analysis...
+                </div>
+            </div>
+        );
+    }
+const rawPercentage =
+    budgetHealth?.healthPercentage ?? 0;
+
+const displayPercentage =
+    rawPercentage <= 0
+        ? 5
+        : Math.min(100, rawPercentage);
+
+const percentage =
+    rawPercentage <= 0
+        ? 0
+        : Math.min(100, rawPercentage);
+
+    const remaining =
+        budgetHealth?.remainingBudget ?? 0;
+
+    const status =
+        budgetHealth?.status ??
+        "Unknown";
+
+const income =
+    budgetHealth?.totalIncome ?? 0;
+
+const expense =
+    budgetHealth?.totalExpense ?? 0;
+
+const totalBudget = income;
+
+const spent = expense;
+
+    let recommendation;
+
+switch (status) {
+
+    case "Excellent":
+        recommendation =
+            "Excellent budgeting! Continue your current financial discipline.";
+        break;
+
+    case "Healthy":
+        recommendation =
+            "Your budget is healthy. Try increasing your monthly savings.";
+        break;
+
+    case "Average":
+        recommendation =
+            "Monitor your expenses and reduce unnecessary spending.";
+        break;
+
+    default:
+        recommendation =
+            "Critical budget alert! Focus on reducing spending immediately.";
+}
 
     return (
 
@@ -46,7 +112,7 @@ function BudgetHealth({ wallet }) {
 
                 <span className="budget-live">
 
-                    LIVE
+                    LIVE AI
 
                 </span>
 
@@ -59,7 +125,8 @@ function BudgetHealth({ wallet }) {
                 <div
                     className="budget-fill"
                     style={{
-                        width: `${score}%`,
+                        width: `${percentage}%`,
+                        
                     }}
                 />
 
@@ -69,15 +136,15 @@ function BudgetHealth({ wallet }) {
 
             <div className="budget-score">
 
-                <h3>{score}%</h3>
+                <h3>
+
+                    {percentage.toFixed(0)}%
+
+                </h3>
 
                 <p>
 
-                    {score >= 80
-                        ? "Excellent Financial Position"
-                        : score >= 60
-                        ? "Healthy Spending"
-                        : "Budget Needs Attention"}
+                    {status}
 
                 </p>
 
@@ -89,7 +156,11 @@ function BudgetHealth({ wallet }) {
 
                 <div>
 
-                    <span>Spent</span>
+                    <span>
+
+                        Spent
+
+                    </span>
 
                     <strong className="money-value">
 
@@ -101,7 +172,11 @@ function BudgetHealth({ wallet }) {
 
                 <div>
 
-                    <span>Remaining</span>
+                    <span>
+
+                        Remaining
+
+                    </span>
 
                     <strong className="money-value">
 
@@ -113,7 +188,11 @@ function BudgetHealth({ wallet }) {
 
                 <div>
 
-                    <span>Budget</span>
+                    <span>
+
+                        Budget
+
+                    </span>
 
                     <strong className="money-value">
 
@@ -135,14 +214,13 @@ function BudgetHealth({ wallet }) {
 
                     <h4>
 
-                        Recommendation
+                        AI Recommendation
 
                     </h4>
 
                     <p>
 
-                        Maintain your current spending pattern.
-                        Your financial health remains strong.
+                        {recommendation}
 
                     </p>
 

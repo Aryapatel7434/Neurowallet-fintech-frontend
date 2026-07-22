@@ -6,18 +6,77 @@ import {
     FaCircleCheck
 } from "react-icons/fa6";
 
-function SmartGoals({ wallet }) {
+function SmartGoals({
+    goalRecommendation,
+    loading
+}) {
 
-    const balance = wallet?.balance || 0;
+    const formatCurrency = (amount) =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0,
+        }).format(amount || 0);
 
-    const goalAmount = 100000;
+    if (loading) {
 
-    const progress = Math.min(
-        Math.round((balance / goalAmount) * 100),
-        100
-    );
+        return (
 
-    const remaining = goalAmount - balance;
+            <div className="goal-card">
+
+                <div className="goal-header">
+
+                    <h2>
+
+                        <FaBullseye />
+
+                        Smart Goal
+
+                    </h2>
+
+                    <span className="goal-live">
+
+                        Loading...
+
+                    </span>
+
+                </div>
+
+                <div
+                    style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        fontWeight: "600"
+                    }}
+                >
+                    Loading Smart Goal...
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+    const goalName =
+        goalRecommendation?.goalName ??
+        "Emergency Fund";
+
+    const target =
+        goalRecommendation?.targetAmount ?? 0;
+
+    const current =
+        goalRecommendation?.currentAmount ?? 0;
+
+    const progress =
+        goalRecommendation?.progressPercentage ?? 0;
+
+    const recommendation =
+        goalRecommendation?.recommendation ??
+        "No recommendation available.";
+
+    const remaining =
+        Math.max(0, target - current);
 
     return (
 
@@ -55,7 +114,13 @@ function SmartGoals({ wallet }) {
 
                 <p>
 
-                    Goal Completed
+                    {progress >= 100
+                        ? "Goal Completed"
+                        : progress >= 75
+                        ? "Almost There"
+                        : progress >= 40
+                        ? "Good Progress"
+                        : "Start Saving"}
 
                 </p>
 
@@ -64,15 +129,10 @@ function SmartGoals({ wallet }) {
             <div className="goal-progress">
 
                 <div
-
                     className="goal-fill"
-
                     style={{
-
                         width: `${progress}%`
-
                     }}
-
                 />
 
             </div>
@@ -83,11 +143,15 @@ function SmartGoals({ wallet }) {
 
                 <div>
 
-                    <span>Current</span>
+                    <span>
+
+                        Current
+
+                    </span>
 
                     <strong>
 
-                        ₹{balance.toLocaleString("en-IN")}
+                        {formatCurrency(current)}
 
                     </strong>
 
@@ -95,11 +159,15 @@ function SmartGoals({ wallet }) {
 
                 <div>
 
-                    <span>Target</span>
+                    <span>
+
+                        Target
+
+                    </span>
 
                     <strong>
 
-                        ₹{goalAmount.toLocaleString("en-IN")}
+                        {formatCurrency(target)}
 
                     </strong>
 
@@ -107,11 +175,15 @@ function SmartGoals({ wallet }) {
 
                 <div>
 
-                    <span>Remaining</span>
+                    <span>
+
+                        Remaining
+
+                    </span>
 
                     <strong>
 
-                        ₹{remaining.toLocaleString("en-IN")}
+                        {formatCurrency(remaining)}
 
                     </strong>
 
@@ -135,11 +207,7 @@ function SmartGoals({ wallet }) {
 
                     <p>
 
-                        {progress >= 80
-                            ? "You're close to achieving your savings goal. Keep maintaining your current financial discipline."
-                            : progress >= 50
-                            ? "Excellent progress. Continue saving consistently to reach your target."
-                            : "Increase your monthly savings to accelerate goal completion."}
+                        {recommendation}
 
                     </p>
 
@@ -155,7 +223,7 @@ function SmartGoals({ wallet }) {
 
                 <span>
 
-                    Target: ₹1,00,000
+                    Goal: {goalName}
 
                 </span>
 
