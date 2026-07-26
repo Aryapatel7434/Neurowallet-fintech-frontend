@@ -30,7 +30,8 @@ import {
   getMyWallet,
   getTransactions,
   addMoney,
-  withdrawMoney
+  withdrawMoney,
+  getWalletSummary
 }
 from "../../services/walletService";
 
@@ -63,18 +64,24 @@ const [transferAmount,
   setCategory] =
   useState("OTHER");
 
+const [walletSummary, setWalletSummary] = useState(null);
  const refreshWalletData = async () => {
 
     try {
 
-        const [walletData, transactionData] =
-            await Promise.all([
+       const [
+    walletData,
+    transactionData,
+    summaryData
+] = await Promise.all([
+    getMyWallet(),
+    getTransactions(),
+    getWalletSummary()
+]);
 
-                getMyWallet(),
-
-                getTransactions()
-
-            ]);
+setWallet(walletData);
+setTransactions(transactionData);
+setWalletSummary(summaryData);
 
         setWallet(walletData);
 
@@ -103,14 +110,16 @@ console.log(
   wallet
 );
 
-console.log(
-  "Transactions:",
-  transactions
-);
+// console.log(
+//   "Transactions:",
+//   transactions
+// );
+console.log("Transactions API:", transactions);
 console.log(
   "FIRST TRANSACTION:",
   transactions[0]
 );
+console.log("Current Login:", localStorage.getItem("email"));
 useEffect(() => {
 
   const loadWallet = async () => {
@@ -359,12 +368,9 @@ const handleTransfer = async () => {
 {/* console.log("Analytics Transactions:", transactions); */}
 <WalletAnalytics
   wallet={wallet}
-  transactions={transactions}
+  summary={walletSummary}
 />
-{/* console.log(
-  "WalletPage Transactions:",
-  transactions
-); */}
+
 <TransferActivity
   transactions={
     transactions

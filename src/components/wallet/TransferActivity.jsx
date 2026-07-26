@@ -1,44 +1,62 @@
-function TransferActivity({
-  transactions = []
-}) {
+function TransferActivity({ transactions = [] }) {
 
-  const transfers = transactions.filter(
-    tx => tx.type === "TRANSFER"
-  );
+   const transfers =
+    transactions.filter(
+        tx => tx.category === "TRANSFER"
+    );
+    console.log("TRANSFERS:", transfers);
 
-  console.log("TRANSFERS:", transfers);
+    const latestTransfer =
+        transfers.length > 0
+            ? transfers[0]
+            : null;
 
-  const latestTransfer =
-    transfers.length > 0
-      ? transfers[0]
-      : null;
-console.log("LATEST TRANSFER:", latestTransfer);
-  return (
-    <div className="wallet-card">
+    return (
 
-      <h2>Transfer Activity</h2>
+        <div className="wallet-card">
 
-      {latestTransfer ? (
-        <>
-          <p>
-            <strong>Latest Transfer:</strong>
-            {" "}₹{latestTransfer.amount}
-          </p>
+            <h2>Transfer Activity</h2>
 
-          <p>
-            <strong>Date:</strong>
-            {" "}
-            {new Date(
-              latestTransfer.createdAt
-            ).toLocaleString()}
-          </p>
-        </>
-      ) : (
-        <p>No transfers yet</p>
-      )}
+            {latestTransfer ? (
 
-    </div>
-  );
+                <>
+                    <p>
+                        <strong>Latest Transfer:</strong>
+                        {" "}
+                        ₹{latestTransfer.amount}
+                    </p>
+
+                    <p>
+                        <strong>Receiver:</strong>
+                        {" "}
+                        {latestTransfer.receiverEmail}
+                    </p>
+
+                    <p>
+                        <strong>Date:</strong>
+                        {" "}
+                        {new Date(
+                            latestTransfer.timestamp
+                        ).toLocaleString()}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {" "}
+                        {latestTransfer.status}
+                    </p>
+                </>
+
+            ) : (
+
+                <p>No transfers yet</p>
+
+            )}
+
+        </div>
+
+    );
+
 }
 
 export default TransferActivity;

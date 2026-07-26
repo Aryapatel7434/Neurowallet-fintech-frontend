@@ -24,11 +24,11 @@ function RecentTransactions({
 
             transactions.map((tx) => (
 
-              <tr key={tx.id}>
+              <tr key={tx.transactionId}>
 
                 <td>
-                  {tx.createdAt}
-                </td>
+    {new Date(tx.timestamp).toLocaleDateString()}
+</td>
 
                 <td>
                   ₹{tx.amount}

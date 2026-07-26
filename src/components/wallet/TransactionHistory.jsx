@@ -9,10 +9,10 @@ import {
 
 import { useState } from "react";
 
- function TransactionHistory({
+function TransactionHistory({
   transactions = [],
   onSelectTransaction
-}){
+}) {
 
   const [search, setSearch] =
     useState("");
@@ -23,31 +23,34 @@ import { useState } from "react";
   const [currentPage,
     setCurrentPage] =
     useState(1);
+const recordsPerPage = 10;
 
-  const recordsPerPage = 10;
+const loggedInUser =
+  localStorage.getItem("email");
 
-  const filteredTransactions =
-    transactions.filter((tx) => {
+const filteredTransactions =
+  transactions.filter((tx) => {
 
-      const matchesSearch =
-        (tx.type || "")
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          );
+ const type = tx.type;
 
-      const matchesFilter =
-        filter === "ALL"
-          ? true
-          : tx.type === filter;
+    const matchesSearch =
+      type
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        );
 
-      return (
-        matchesSearch &&
-        matchesFilter
-      );
+    const matchesFilter =
+      filter === "ALL"
+        ? true
+        : type === filter;
 
-    });
+    return (
+      matchesSearch &&
+      matchesFilter
+    );
 
+  });
   const lastIndex =
     currentPage *
     recordsPerPage;
@@ -70,6 +73,46 @@ import { useState } from "react";
         recordsPerPage
       )
     );
+
+  const getBadgeClass = (type) => {
+
+    switch (type) {
+
+      case "CREDIT":
+        return "credit-badge";
+
+      case "DEBIT":
+        return "debit-badge";
+
+      case "TRANSFER":
+        return "transfer-badge";
+
+      default:
+        return "transfer-badge";
+
+    }
+
+  };
+
+  const getIcon = (type) => {
+
+    switch (type) {
+
+      case "CREDIT":
+        return <FaArrowTrendUp />;
+
+      case "DEBIT":
+        return <FaArrowTrendDown />;
+
+      case "TRANSFER":
+        return <MdSwapHoriz />;
+
+      default:
+        return <MdSwapHoriz />;
+
+    }
+
+  };
 
   return (
 
@@ -181,112 +224,111 @@ import { useState } from "react";
 
         <tbody>
 
-          {currentTransactions.length === 0 ? (
+          {
+            currentTransactions.length === 0 ? (
 
-            <tr>
+              <tr>
 
-              <td
-                colSpan="4"
-                className="empty-state"
-              >
-                No Transactions Found
-              </td>
-
-            </tr>
-
-          ) : (
-
-            currentTransactions.map((tx) => (
-
-              <tr
-  key={
-    tx.id ||
-    tx.transactionId
-  }
-  onClick={() =>
-    onSelectTransaction(tx)
-  }
-  style={{
-    cursor: "pointer"
-  }}
->
-
-                <td>
-
-                  {
-                    tx.createdAt
-                      ? new Date(
-                          tx.createdAt
-                        ).toLocaleDateString()
-                      : "-"
-                  }
-
-                </td>
-
-                <td>
-
-                  <span
-                    className={
-                      tx.type === "CREDIT"
-                        ? "credit-badge"
-                        : tx.type === "DEBIT"
-                        ? "debit-badge"
-                        : "transfer-badge"
-                    }
-                  >
-
-                    {tx.type === "CREDIT" && (
-                      <>
-                        <FaArrowTrendUp />
-                        {" "}
-                        CREDIT
-                      </>
-                    )}
-
-                    {tx.type === "DEBIT" && (
-                      <>
-                        <FaArrowTrendDown />
-                        {" "}
-                        DEBIT
-                      </>
-                    )}
-
-                    {tx.type === "TRANSFER" && (
-                      <>
-                        <MdSwapHoriz />
-                        {" "}
-                        TRANSFER
-                      </>
-                    )}
-
-                  </span>
-
-                </td>
-
-                <td>
-
-                  ₹
-                  {Number(
-                    tx.amount || 0
-                  ).toLocaleString()}
-
-                </td>
-
-                <td>
-
-                  <span
-                    className="status-success"
-                  >
-                    Completed
-                  </span>
-
+                <td
+                  colSpan="4"
+                  className="empty-state"
+                >
+                  No Transactions Found
                 </td>
 
               </tr>
 
-            ))
+            ) : (
 
-          )}
+              currentTransactions.map((tx) => (
+
+                <tr
+                  key={
+                    tx.id ||
+                    tx.transactionId
+                  }
+                  onClick={() =>
+                    onSelectTransaction(tx)
+                  }
+                  style={{
+                    cursor: "pointer"
+                  }}
+                >
+
+                  <td>
+
+                    {
+                      tx.timestamp
+                        ? new Date(
+                            tx.timestamp
+                          ).toLocaleDateString()
+                        : tx.createdAt
+                        ? new Date(
+                            tx.createdAt
+                          ).toLocaleDateString()
+                        : "-"
+                    }
+
+                  </td>
+
+                  <td>
+
+                    <span
+                    className={
+    getBadgeClass(tx.type)
+}
+                    >
+
+                      {
+    getIcon(tx.type)
+}
+
+                      {" "}
+
+                     {
+    tx.type
+}
+
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    ₹
+                    {Number(
+                      tx.amount || 0
+                    ).toLocaleString()}
+
+                  </td>
+
+                  <td>
+
+                    <span
+                      className={
+                        tx.status === "SUCCESS"
+                          ? "status-success"
+                          : tx.status === "FAILED"
+                          ? "status-failed"
+                          : "status-pending"
+                      }
+                    >
+
+                      {
+                        tx.status ||
+                        "SUCCESS"
+                      }
+
+                    </span>
+
+                  </td>
+
+                </tr>
+
+              ))
+
+            )
+          }
 
         </tbody>
 
@@ -308,15 +350,16 @@ import { useState } from "react";
         </button>
 
         <span>
+
           Page {currentPage}
           {" "}of{" "}
           {totalPages}
+
         </span>
 
         <button
           disabled={
-            currentPage ===
-            totalPages
+            currentPage === totalPages
           }
           onClick={() =>
             setCurrentPage(

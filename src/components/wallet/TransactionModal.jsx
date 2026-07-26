@@ -4,11 +4,11 @@ function TransactionModal({
   transaction,
   onClose
 }) {
-   
-    console.log(
-  "SELECTED TX:",
-  transaction
-);
+
+  console.log(
+    "SELECTED TX:",
+    transaction
+  );
 
   if (!transaction) {
     return null;
@@ -46,51 +46,67 @@ function TransactionModal({
         <div className="modal-body">
 
           <p>
-  <strong>ID:</strong>
-  {" "}
-  {transaction.id}
-</p>
+            <strong>ID:</strong>{" "}
+            {transaction.id || transaction.transactionId}
+          </p>
 
-<p>
-  <strong>Type:</strong>
-  {" "}
-  {transaction.type}
-</p>
+          <p>
+            <strong>Category:</strong>{" "}
+            {transaction.category || transaction.type}
+          </p>
 
-<p>
-  <strong>Amount:</strong>
-  {" "}
-   ₹{
-  Number(
-    transaction.amount
-  )}
-</p>
+          <p>
+            <strong>Amount:</strong>{" "}
+            ₹{Number(
+              transaction.amount || 0
+            ).toLocaleString()}
+          </p>
 
-<p>
-  <strong>Date:</strong>
-  {" "}
-  {new Date(
-    transaction.createdAt
-  ).toLocaleString()}
-</p>
+          <p>
+            <strong>Date:</strong>{" "}
+            {
+              new Date(
+                transaction.timestamp ||
+                transaction.createdAt
+              ).toLocaleString()
+            }
+          </p>
 
-<p>
-  <strong>Wallet ID:</strong>
-  {" "}
-  {transaction.wallet?.walletId}
-</p>
+          {/* Transfer Transaction */}
+          {transaction.senderEmail && (
+            <p>
+              <strong>Sender:</strong>{" "}
+              {transaction.senderEmail}
+            </p>
+          )}
 
-<p>
-  <strong>Status:</strong>
-  {" "}
-  SUCCESS
-</p>
+          {transaction.receiverEmail && (
+            <p>
+              <strong>Receiver:</strong>{" "}
+              {transaction.receiverEmail}
+            </p>
+          )}
 
-<p>
-  <strong>Reference:</strong>
-  {" "}
-  NW-{transaction.id}
-</p>
+          {/* Wallet Transaction */}
+          {transaction.wallet && (
+            <p>
+              <strong>Wallet ID:</strong>{" "}
+              {transaction.wallet.walletId}
+            </p>
+          )}
+
+          <p>
+            <strong>Status:</strong>{" "}
+            {transaction.status || "SUCCESS"}
+          </p>
+
+          <p>
+            <strong>Reference:</strong>{" "}
+            NW-
+            {transaction.id ||
+              transaction.transactionId}
+          </p>
+
         </div>
 
       </div>
@@ -98,6 +114,7 @@ function TransactionModal({
     </div>
 
   );
+
 }
 
 export default TransactionModal;
