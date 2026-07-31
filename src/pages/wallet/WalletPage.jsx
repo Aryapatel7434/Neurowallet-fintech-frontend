@@ -23,6 +23,8 @@ import TransactionModal
 from "../../components/wallet/TransactionModal";
 import WalletHeader
 from "../../components/wallet/WalletHeader";
+import TransactionDetailsDrawer
+from "../../components/wallet/TransactionDetailsDrawer";
 import { TRANSACTION_CATEGORIES } from "../../constants/categories";
 import { CATEGORY_LABELS } from "../../constants/categoryLabels";
 import { toast } from "react-toastify";
@@ -47,6 +49,8 @@ const [
   selectedTransaction,
   setSelectedTransaction
 ] = useState(null);
+const [drawerOpen, setDrawerOpen] =
+useState(false);
   const [loading, setLoading] =
     useState(true);
 
@@ -466,20 +470,37 @@ const handleTransfer = async () => {
 
 </div>
 <TransactionHistory
-  transactions={transactions}
-  onSelectTransaction={
-    setSelectedTransaction
-  }
-/>
+transactions={transactions}
+onSelectTransaction={(tx)=>{
 
-<TransactionModal
+setSelectedTransaction(tx);
+
+setDrawerOpen(true);
+
+}}
+/>
+<TransactionDetailsDrawer
+
+transaction={selectedTransaction}
+
+open={drawerOpen}
+
+onClose={() => {
+
+setDrawerOpen(false);
+
+}}
+
+ />
+
+{/* <TransactionModal
   transaction={
     selectedTransaction
   }
   onClose={() =>
     setSelectedTransaction(null)
   }
-/>
+/> */}
 
     </div>
 
