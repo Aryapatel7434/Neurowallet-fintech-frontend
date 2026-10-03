@@ -1,12 +1,25 @@
-import axiosInstance from "../api/axiosConfig";
+import api from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
-export const registerUser = async (userData) => {
+/*
+=================================================
+REGISTER USER
+POST /users/register
+=================================================
+*/
 
-    const response = await axiosInstance.post(
-        "/users/register",
-        userData
-    );
+export const registerUser = async (
+    userData
+) => {
+
+    const response =
+        await api.post(
+
+            API_ENDPOINTS.REGISTER,
+
+            userData
+
+        );
 
     return response.data;
-
 };

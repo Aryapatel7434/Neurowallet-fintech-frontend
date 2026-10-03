@@ -1,30 +1,45 @@
 export const API_ENDPOINTS = {
 
-    // ==========================
-    // AUTH
-    // ==========================
+    // =========================================================
+    // AUTHENTICATION
+    // =========================================================
 
-    LOGIN: "/auth/login",
+    LOGIN:
+        "/auth/login",
 
-    REGISTER: "/auth/register",
+    REFRESH:
+        "/auth/refresh",
 
-    FORGOT_PASSWORD: "/auth/forgot-password",
+    REGISTER:
+        "/users/register",
 
-    RESET_PASSWORD: "/auth/reset-password",
+    FORGOT_PASSWORD:
+        "/auth/forgot-password",
 
-    // ==========================
+    RESET_PASSWORD:
+        "/auth/reset-password",
+
+
+    // =========================================================
     // WALLET
-    // ==========================
+    // =========================================================
 
-    GET_WALLET: "/wallet/me",
+    GET_WALLET:
+        "/wallet/me",
 
-    ADD_MONEY: "/wallet/add-money",
+    WALLET_SUMMARY:
+        "/wallet/summary",
 
-    WITHDRAW: "/wallet/withdraw",
+    ADD_MONEY:
+        "/wallet/add-money",
 
-    // ==========================
+    WITHDRAW:
+        "/wallet/withdraw",
+
+
+    // =========================================================
     // TRANSACTIONS
-    // ==========================
+    // =========================================================
 
     TRANSACTION_HISTORY:
         "/transactions/history",
@@ -32,16 +47,35 @@ export const API_ENDPOINTS = {
     TRANSFER:
         "/transactions/send",
 
-    // ==========================
+
+    // =========================================================
     // DASHBOARD
-    // ==========================
+    // =========================================================
 
     DASHBOARD_INSIGHTS:
         "/dashboard/insights",
 
-    // ==========================
+
+    // =========================================================
+    // NOTIFICATIONS
+    // =========================================================
+
+    NOTIFICATIONS:
+        "/notifications",
+
+    UNREAD_NOTIFICATIONS:
+        "/notifications/unread",
+
+    MARK_NOTIFICATION_READ:
+        (id) => `/notifications/${id}/read`,
+
+    MARK_ALL_NOTIFICATIONS_READ:
+        "/notifications/read-all",
+
+
+    // =========================================================
     // AI
-    // ==========================
+    // =========================================================
 
     AI_INSIGHTS:
         "/ai/insights",
@@ -53,6 +87,5 @@ export const API_ENDPOINTS = {
         "/ai/budget-health",
 
     GOAL_RECOMMENDATION:
-        "/ai/goals"
-
+        "/ai/goals",
 };

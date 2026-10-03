@@ -1,135 +1,517 @@
 import axios from "axios";
 
-const ACCESS_TOKEN_KEY = "accessToken";
+import { STORAGE_KEYS } from "../constants/storageKeys";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
+import { ApiError } from "./apiError";
+
+const API_BASE_URL =
+    process.env.REACT_APP_API_URL;
+
+/* ============================================================
+   MAIN API CLIENT
+============================================================ */
 
 const axiosInstance = axios.create({
 
-  baseURL: process.env.REACT_APP_API_URL,
+    baseURL: API_BASE_URL,
 
-  timeout: 10000,
+    timeout: 15000,
 
-  headers: {
-    "Content-Type": "application/json",
-  },
+    headers: {
+        "Content-Type": "application/json",
+    },
 
 });
 
-/* ==========================
-   Request Interceptor
-========================== */
+/* ============================================================
+   REFRESH TOKEN CLIENT
+============================================================ */
+
+const refreshClient = axios.create({
+
+    baseURL: API_BASE_URL,
+
+    timeout: 10000,
+
+    headers: {
+        "Content-Type": "application/json",
+    },
+
+});
+
+/* ============================================================
+   SHARED REFRESH PROMISE
+============================================================ */
+
+let refreshPromise = null;
+
+/* ============================================================
+   CLEAR AUTHENTICATION
+============================================================ */
+
+const clearAuthentication = () => {
+
+    localStorage.removeItem(
+        STORAGE_KEYS.ACCESS_TOKEN
+    );
+
+    localStorage.removeItem(
+        STORAGE_KEYS.REFRESH_TOKEN
+    );
+
+    localStorage.removeItem(
+        STORAGE_KEYS.EMAIL
+    );
+
+    localStorage.removeItem(
+        STORAGE_KEYS.USER
+    );
+
+};
+
+/* ============================================================
+   REDIRECT TO LOGIN
+============================================================ */
+
+const redirectToLogin = () => {
+
+    clearAuthentication();
+
+    if (
+        window.location.pathname !== "/"
+    ) {
+
+        window.location.assign("/");
+
+    }
+
+};
+
+/* ============================================================
+   API ERROR NORMALIZATION
+============================================================ */
+
+const normalizeApiError = (error) => {
+
+    /*
+     * Network / timeout / unavailable backend
+     */
+    if (!error.response) {
+
+        const isTimeout =
+    error.code === "ECONNABORTED" ||
+    error.code === "ETIMEDOUT";
+
+        return new ApiError({
+
+            message: isTimeout
+                ? "The request timed out. Please try again."
+                : "Unable to connect to the server. Please check your connection.",
+
+            status: null,
+
+            code: error.code || "NETWORK_ERROR",
+
+            data: null,
+
+            isNetworkError: true,
+
+            originalError: error,
+
+        });
+
+    }
+
+    const status =
+        error.response.status;
+
+    const responseData =
+        error.response.data;
+
+    /*
+     * Support standardized backend ApiResponse:
+     *
+     * {
+     *   success,
+     *   message,
+     *   data,
+     *   timestamp
+     * }
+     */
+
+    let message =
+        responseData?.message;
+
+    /*
+     * Support validation/error responses
+     * that may contain a different structure.
+     */
+
+    if (
+        !message &&
+        typeof responseData === "string"
+    ) {
+
+        message =
+            responseData;
+
+    }
+
+    if (!message) {
+
+        switch (status) {
+
+            case 400:
+                message =
+                    "Invalid request.";
+
+                break;
+
+            case 401:
+                message =
+                    "Authentication required.";
+
+                break;
+
+            case 403:
+                message =
+                    "You are not authorized to perform this action.";
+
+                break;
+
+            case 404:
+                message =
+                    "The requested resource was not found.";
+
+                break;
+
+            case 409:
+                message =
+                    "The request conflicts with the current state.";
+
+                break;
+
+            case 422:
+                message =
+                    "The submitted data is invalid.";
+
+                break;
+
+            case 429:
+                message =
+                    "Too many requests. Please try again later.";
+
+                break;
+
+            case 500:
+                message =
+                    "An internal server error occurred.";
+
+                break;
+
+            case 502:
+            case 503:
+            case 504:
+                message =
+                    "The service is temporarily unavailable.";
+
+                break;
+
+            default:
+                message =
+                    "Something went wrong. Please try again.";
+
+        }
+
+    }
+
+    return new ApiError({
+
+        message,
+
+        status,
+
+        code:
+            responseData?.code ||
+            `HTTP_${status}`,
+
+        data:
+            responseData?.data ??
+            responseData,
+
+        isNetworkError: false,
+
+        originalError: error,
+
+    });
+
+};
+
+/* ============================================================
+   REFRESH ACCESS TOKEN
+============================================================ */
+
+const refreshAccessToken = async () => {
+
+    const refreshToken =
+        localStorage.getItem(
+            STORAGE_KEYS.REFRESH_TOKEN
+        );
+
+    if (!refreshToken) {
+
+        throw new Error(
+            "Refresh token is unavailable."
+        );
+
+    }
+
+    const response =
+        await refreshClient.post(
+
+            API_ENDPOINTS.REFRESH,
+
+            {
+                refreshToken,
+            }
+
+        );
+
+    const accessToken =
+        response?.data?.accessToken;
+
+    if (!accessToken) {
+
+        throw new Error(
+            "Refresh response did not contain an access token."
+        );
+
+    }
+
+    localStorage.setItem(
+
+        STORAGE_KEYS.ACCESS_TOKEN,
+
+        accessToken
+
+    );
+
+    /*
+     * Supports refresh-token rotation.
+     */
+    if (
+        response?.data?.refreshToken
+    ) {
+
+        localStorage.setItem(
+
+            STORAGE_KEYS.REFRESH_TOKEN,
+
+            response.data.refreshToken
+
+        );
+
+    }
+
+    return accessToken;
+
+};
+
+/* ============================================================
+   GET / CREATE SHARED REFRESH PROMISE
+============================================================ */
+
+const getRefreshAccessToken = async () => {
+
+    if (refreshPromise) {
+
+        return refreshPromise;
+
+    }
+
+    refreshPromise =
+        refreshAccessToken();
+
+    try {
+
+        return await refreshPromise;
+
+    } finally {
+
+        refreshPromise = null;
+
+    }
+
+};
+
+/* ============================================================
+   REQUEST INTERCEPTOR
+============================================================ */
 
 axiosInstance.interceptors.request.use(
 
-  (config) => {
+    (config) => {
 
-    const token =
-      localStorage.getItem(
-        ACCESS_TOKEN_KEY
-      );
+        const token =
+            localStorage.getItem(
+                STORAGE_KEYS.ACCESS_TOKEN
+            );
 
-    if (token) {
+        if (token) {
 
-      config.headers.Authorization =
-        `Bearer ${token}`;
+            config.headers =
+                config.headers || {};
 
-    }
+            config.headers.Authorization =
+                `Bearer ${token}`;
 
-    return config;
+        }
 
-  },
+        return config;
 
-  (error) => Promise.reject(error)
+    },
+
+    (error) =>
+        Promise.reject(
+            normalizeApiError(error)
+        )
 
 );
 
-/* ==========================
-   Response Interceptor
-========================== */
+/* ============================================================
+   RESPONSE INTERCEPTOR
+============================================================ */
 
 axiosInstance.interceptors.response.use(
 
-  (response) => response,
+    (response) =>
+        response,
 
-  (error) => {
+    async (error) => {
 
-    /*
-      Future Implementation
+        const originalRequest =
+            error.config;
 
-      401 → Refresh Token
+        const status =
+            error.response?.status;
 
-      403 → Access Denied
+        /*
+         * Non-401 errors:
+         *
+         * Normalize centrally.
+         */
+        if (
+            !originalRequest ||
+            status !== 401
+        ) {
 
-      500 → Server Error
+            return Promise.reject(
+                normalizeApiError(error)
+            );
 
-      Network Error
+        }
 
-      Global Toast Notification
-    */
+        const requestUrl =
+            originalRequest.url || "";
 
-    return Promise.reject(error);
+        /*
+         * Login must not trigger refresh.
+         */
+        if (
+            requestUrl.includes(
+                API_ENDPOINTS.LOGIN
+            )
+        ) {
 
-  }
+            return Promise.reject(
+                normalizeApiError(error)
+            );
 
-);
-axiosInstance.interceptors.response.use(
+        }
 
-  (response) => {
+        /*
+         * Refresh failure means
+         * authentication is no longer valid.
+         */
+        if (
+            requestUrl.includes(
+                API_ENDPOINTS.REFRESH
+            )
+        ) {
 
-    return response;
+            redirectToLogin();
 
-  },
+            return Promise.reject(
+                normalizeApiError(error)
+            );
 
-  (error) => {
+        }
 
-    if (error.response) {
+        /*
+         * Prevent infinite retry loops.
+         */
+        if (
+            originalRequest._retry
+        ) {
 
-      switch (error.response.status) {
+            redirectToLogin();
 
-        case 401:
+            return Promise.reject(
+                normalizeApiError(error)
+            );
 
-          console.warn("Session expired.");
+        }
 
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          localStorage.removeItem("user");
+        originalRequest._retry = true;
 
-          window.location.href = "/login";
+        try {
 
-          break;
+            const newAccessToken =
+                await getRefreshAccessToken();
 
-        case 403:
+            originalRequest.headers =
+                originalRequest.headers || {};
 
-          console.warn("Access denied.");
+            originalRequest.headers.Authorization =
+                `Bearer ${newAccessToken}`;
 
-          break;
+            return axiosInstance(
+                originalRequest
+            );
 
-        case 404:
+        } catch (refreshError) {
 
-          console.warn("Resource not found.");
+            redirectToLogin();
 
-          break;
+            return Promise.reject(
 
-        case 500:
+                refreshError instanceof ApiError
+                    ? refreshError
+                    : new ApiError({
 
-          console.warn("Internal server error.");
+                        message:
+                            "Your session has expired. Please log in again.",
 
-          break;
+                        status: 401,
 
-        default:
+                        code:
+                            "SESSION_EXPIRED",
 
-          console.warn("Unexpected API error.");
+                        data: null,
 
-      }
+                        isNetworkError: false,
 
-    } else {
+                        originalError:
+                            refreshError,
 
-      console.error("Network Error");
+                    })
+
+            );
+
+        }
 
     }
 
-    return Promise.reject(error);
-
-  }
-
 );
+
 export default axiosInstance;

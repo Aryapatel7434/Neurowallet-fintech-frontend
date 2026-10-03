@@ -1,98 +1,80 @@
-import axiosInstance from "../api/axiosConfig";
+import api from "../api/axiosConfig";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
-/* ==========================
-   LOGIN
-========================== */
+/*
+=================================================
+LOGIN
+POST /auth/login
+=================================================
+*/
 
-/**
- * Login User
- * @param {string} email
- * @param {string} password
- * @returns {Promise<Object>}
- */
-
-export const loginUser = async (email, password) => {
-
-    const loginRequest = {
-        email,
-        password,
-    };
-
-    const response = await axiosInstance.post(
-
-        API_ENDPOINTS.LOGIN,
-
-        loginRequest
-
-    );
-
-    return response.data;
-
-};
-
-/* ==========================
-   FORGOT PASSWORD
-========================== */
-
-/**
- * Send Password Reset Link
- * @param {string} email
- * @returns {Promise<Object>}
- */
-
-export const forgotPassword = async (email) => {
-
-    const forgotPasswordRequest = {
-        email,
-    };
-
-    const response = await axiosInstance.post(
-
-        API_ENDPOINTS.FORGOT_PASSWORD,
-
-        forgotPasswordRequest
-
-    );
-
-    return response.data;
-
-};
-
-/* ==========================
-   RESET PASSWORD
-========================== */
-
-/**
- * Reset Password
- * @param {string} token
- * @param {string} newPassword
- * @returns {Promise<Object>}
- */
-
-export const resetPassword = async (
-
-    token,
-    newPassword
-
+export const loginUser = async (
+    email,
+    password
 ) => {
 
-    const resetPasswordRequest = {
-
-        token,
-
-        newPassword,
-
-    };
-
-    const response = await axiosInstance.post(
-
-        API_ENDPOINTS.RESET_PASSWORD,
-
-        resetPasswordRequest
-
-    );
+    const response =
+        await api.post(
+            API_ENDPOINTS.LOGIN,
+            {
+                email,
+                password,
+            }
+        );
 
     return response.data;
+};
 
+
+/*
+=================================================
+FORGOT PASSWORD
+POST /auth/forgot-password
+=================================================
+*/
+
+export const forgotPassword = async (
+    email
+) => {
+
+    const response =
+        await api.post(
+
+            API_ENDPOINTS.FORGOT_PASSWORD,
+
+            {
+                email,
+            }
+
+        );
+
+    return response.data;
+};
+
+
+/*
+=================================================
+RESET PASSWORD
+POST /auth/reset-password
+=================================================
+*/
+
+export const resetPassword = async (
+    token,
+    newPassword
+) => {
+
+    const response =
+        await api.post(
+
+            API_ENDPOINTS.RESET_PASSWORD,
+
+            {
+                token,
+                newPassword,
+            }
+
+        );
+
+    return response.data;
 };

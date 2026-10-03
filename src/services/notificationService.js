@@ -1,45 +1,77 @@
-import axiosInstance
-from "../api/axiosConfig";
+import api from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
-export const getNotifications =
-  async () => {
+/*
+=================================================
+GET ALL NOTIFICATIONS
+GET /notifications
+=================================================
+*/
+
+export const getNotifications = async () => {
 
     const response =
-      await axiosInstance.get(
-        "/notifications"
-      );
+        await api.get(
+            API_ENDPOINTS.NOTIFICATIONS
+        );
 
     return response.data;
 };
 
-export const getUnreadNotifications =
-  async () => {
+
+/*
+=================================================
+GET UNREAD NOTIFICATIONS
+GET /notifications/unread
+=================================================
+*/
+
+export const getUnreadNotifications = async () => {
 
     const response =
-      await axiosInstance.get(
-        "/notifications/unread"
-      );
+        await api.get(
+            API_ENDPOINTS.UNREAD_NOTIFICATIONS
+        );
 
     return response.data;
 };
 
-export const markNotificationRead =
-  async (id) => {
+
+/*
+=================================================
+MARK NOTIFICATION AS READ
+PUT /notifications/{id}/read
+=================================================
+*/
+
+export const markNotificationRead = async (
+    id
+) => {
 
     const response =
-      await axiosInstance.put(
-        `/notifications/${id}/read`
-      );
+        await api.put(
+            API_ENDPOINTS.MARK_NOTIFICATION_READ(id)
+        );
 
     return response.data;
 };
+
+
+/*
+=================================================
+MARK ALL NOTIFICATIONS AS READ
+PUT /notifications/read-all
+=================================================
+*/
+
 export const markAllNotificationsRead =
-  async () => {
+    async () => {
 
-    const response =
-      await axiosInstance.put(
-        "/notifications/read-all"
-      );
+        const response =
+            await api.put(
+                API_ENDPOINTS
+                    .MARK_ALL_NOTIFICATIONS_READ
+            );
 
-    return response.data;
-};
+        return response.data;
+    };

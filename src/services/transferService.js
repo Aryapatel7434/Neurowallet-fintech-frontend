@@ -1,37 +1,31 @@
-// import api from "../api/axiosConfig";
+import api from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
-// export const transferMoney = async (
-//   receiverEmail,
-//   amount
-// ) => {
-
-//   const response =
-//     await api.post(
-//       "/transactions/send",
-//       {
-//         receiverEmail,
-//         amount
-//       }
-//     );
-
-//   return response.data;
-// };
-import axiosInstance from "../api/axiosConfig";
+/*
+=================================================
+TRANSFER MONEY
+POST /transactions/send
+=================================================
+*/
 
 export const transferMoney = async (
-  receiverEmail,
-  amount,
-  category
+    receiverEmail,
+    amount,
+    category
 ) => {
 
-  const response = await axiosInstance.post(
-    "/wallet/transfer", // Change to "/transactions/send" if that's your actual endpoint
-    {
-      receiverEmail,
-      amount,
-      category
-    }
-  );
+    const response =
+        await api.post(
 
-  return response.data;
+            API_ENDPOINTS.TRANSFER,
+
+            {
+                receiverEmail,
+                amount,
+                category,
+            }
+
+        );
+
+    return response.data;
 };

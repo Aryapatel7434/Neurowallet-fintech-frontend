@@ -1,8 +1,17 @@
-import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
-import AppRoutes from './routes/AppRoutes';
+import AppRoutes from "./routes/AppRoutes";
+
+import NetworkStatusBanner
+    from "./components/common/NetworkStatusBanner";
 
 function App() {
-  return <AppRoutes />;
+
+    return (
+        <>
+            <NetworkStatusBanner />
+
+            <AppRoutes />
+        </>
+    );
 }
 
 export default App;
