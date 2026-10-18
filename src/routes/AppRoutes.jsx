@@ -1,52 +1,49 @@
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
     BrowserRouter,
     Routes,
-    Route
+    Route,
+    Navigate,
 } from "react-router-dom";
 
-import LoginPage
-from "../pages/auth/LoginPage";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 
-import RegisterPage
-from "../pages/auth/RegisterPage";
+import DashboardPage from "../pages/dashboard/DashboardPage";
+import WalletPage from "../pages/wallet/WalletPage";
+import NotificationsPage from "../pages/notifications/NotificationsPage";
 
-import ForgotPasswordPage
-from "../pages/auth/ForgotPasswordPage";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 
-import ResetPasswordPage
-from "../pages/auth/ResetPasswordPage";
-
-import DashboardPage
-from "../pages/dashboard/DashboardPage";
-
-import WalletPage
-from "../pages/wallet/WalletPage";
-
-import NotificationsPage
-from "../pages/notifications/NotificationsPage";
-
-import ProtectedRoute
-from "../components/auth/ProtectedRoute";
+function ComingSoonPage({ title }) {
+    return (
+        <main
+            style={{
+                padding: "40px 24px",
+                textAlign: "center",
+            }}
+        >
+            <h1>{title}</h1>
+            <p>
+                This page is not implemented yet.
+                It will be connected to the NeuroWallet backend
+                when its feature is developed.
+            </p>
+        </main>
+    );
+}
 
 function AppRoutes() {
-
     return (
-
         <BrowserRouter>
-
             <Routes>
-
-                {/* ===========================
-                    Authentication
-                ============================ */}
-
-                <Route
-                    path="/"
-                    element={<LoginPage />}
-                />
+                {/* Public authentication routes */}
+                <Route path="/" element={<LoginPage />} />
 
                 <Route
                     path="/register"
@@ -63,10 +60,7 @@ function AppRoutes() {
                     element={<ResetPasswordPage />}
                 />
 
-                {/* ===========================
-                    Dashboard
-                ============================ */}
-
+                {/* Protected application routes */}
                 <Route
                     path="/dashboard"
                     element={
@@ -94,6 +88,50 @@ function AppRoutes() {
                     }
                 />
 
+                {/* Feature routes — implementation pending */}
+                <Route
+                    path="/transactions"
+                    element={
+                        <ProtectedRoute>
+                            <ComingSoonPage title="Transactions" />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/analytics"
+                    element={
+                        <ProtectedRoute>
+                            <ComingSoonPage title="Analytics" />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/ai-insights"
+                    element={
+                        <ProtectedRoute>
+                            <ComingSoonPage title="AI Insights" />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute>
+                            <ComingSoonPage title="Settings" />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Unknown URLs */}
+                <Route
+                    path="*"
+                    element={
+                        <Navigate to="/dashboard" replace />
+                    }
+                />
             </Routes>
 
             <ToastContainer
@@ -106,11 +144,8 @@ function AppRoutes() {
                 draggable
                 theme="dark"
             />
-
         </BrowserRouter>
-
     );
-
 }
 
 export default AppRoutes;

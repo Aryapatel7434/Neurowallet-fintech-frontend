@@ -1,70 +1,79 @@
+
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../../context/AuthContext";
 
 function Sidebar() {
+    const navigate = useNavigate();
+    const { logout } = useContext(AuthContext);
 
-  const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate("/", { replace: true });
+    };
 
-  const { logout } =
-    useContext(AuthContext);
+    const menuItems = [
+        {
+            label: "🏠 Dashboard",
+            path: "/dashboard",
+            end: true,
+        },
+        {
+            label: "💰 Wallet",
+            path: "/wallet",
+        },
+        {
+            label: "💳 Transactions",
+            path: "/transactions",
+        },
+        {
+            label: "📊 Analytics",
+            path: "/analytics",
+        },
+        {
+            label: "🤖 AI Insights",
+            path: "/ai-insights",
+        },
+        {
+            label: "⚙️ Settings",
+            path: "/settings",
+        },
+    ];
 
-  const handleLogout = () => {
+    return (
+        <aside className="sidebar">
+            <div className="sidebar-logo">NW</div>
 
-    logout();
+            <h2>NeuroWallet</h2>
 
-    navigate("/");
+            <ul className="sidebar-menu">
+                {menuItems.map((item) => (
+                    <li key={item.path}>
+                        <NavLink
+                            to={item.path}
+                            end={item.end}
+                            className={({ isActive }) =>
+                                isActive ? "active" : ""
+                            }
+                        >
+                            {item.label}
+                        </NavLink>
+                    </li>
+                ))}
 
-  };
-
-  return (
-
-    <div className="sidebar">
-
-      <div className="sidebar-logo">
-        NW
-      </div>
-
-      <h2>NeuroWallet</h2>
-
-      <ul className="sidebar-menu">
-
-        <li>🏠 Dashboard</li>
-
-       <li
-           onClick={() =>
-            navigate("/wallet")
-       }
-      style={{
-         cursor: "pointer"
-      }}
-    >
-     💰 Wallet
-    </li>
-
-        <li>💳 Transactions</li>
-
-        <li>📊 Analytics</li>
-
-        <li>🤖 AI Insights</li>
-
-        <li>⚙ Settings</li>
-
-        <li
-          onClick={handleLogout}
-          style={{
-            cursor: "pointer"
-          }}
-        >
-          🚪 Logout
-        </li>
-
-      </ul>
-
-    </div>
-
-  );
+                <li>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="sidebar-logout"
+                    >
+                        🚪 Logout
+                    </button>
+                </li>
+            </ul>
+        </aside>
+    );
 }
 
 export default Sidebar;
