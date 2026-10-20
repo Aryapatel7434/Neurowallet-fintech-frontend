@@ -1,7 +1,7 @@
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import TransactionsPage from "../pages/transactions/TransactionsPage";
 import {
     BrowserRouter,
     Routes,
@@ -90,13 +90,13 @@ function AppRoutes() {
 
                 {/* Feature routes — implementation pending */}
                 <Route
-                    path="/transactions"
-                    element={
-                        <ProtectedRoute>
-                            <ComingSoonPage title="Transactions" />
-                        </ProtectedRoute>
-                    }
-                />
+    path="/transactions"
+    element={
+        <ProtectedRoute>
+            <TransactionsPage />
+        </ProtectedRoute>
+    }
+/>
 
                 <Route
                     path="/analytics"

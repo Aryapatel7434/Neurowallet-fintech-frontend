@@ -44,6 +44,9 @@ export const API_ENDPOINTS = {
     TRANSACTION_HISTORY:
         "/transactions/history",
 
+    TRANSACTION_HISTORY_FILTER:
+    "/transactions/history/filter",
+
     TRANSFER:
         "/transactions/send",
 
