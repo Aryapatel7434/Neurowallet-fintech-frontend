@@ -1,7 +1,6 @@
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import TransactionsPage from "../pages/transactions/TransactionsPage";
+
 import {
     BrowserRouter,
     Routes,
@@ -17,6 +16,9 @@ import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import WalletPage from "../pages/wallet/WalletPage";
 import NotificationsPage from "../pages/notifications/NotificationsPage";
+import TransactionsPage from "../pages/transactions/TransactionsPage";
+import AnalyticsPage from "../pages/analytics/AnalyticsPage";
+import AIInsightsPage from "../pages/ai/AIInsightsPage";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
@@ -80,29 +82,19 @@ function AppRoutes() {
                 />
 
                 <Route
-                    path="/notifications"
+                    path="/transactions"
                     element={
                         <ProtectedRoute>
-                            <NotificationsPage />
+                            <TransactionsPage />
                         </ProtectedRoute>
                     }
                 />
-
-                {/* Feature routes — implementation pending */}
-                <Route
-    path="/transactions"
-    element={
-        <ProtectedRoute>
-            <TransactionsPage />
-        </ProtectedRoute>
-    }
-/>
 
                 <Route
                     path="/analytics"
                     element={
                         <ProtectedRoute>
-                            <ComingSoonPage title="Analytics" />
+                            <AnalyticsPage />
                         </ProtectedRoute>
                     }
                 />
@@ -111,7 +103,16 @@ function AppRoutes() {
                     path="/ai-insights"
                     element={
                         <ProtectedRoute>
-                            <ComingSoonPage title="AI Insights" />
+                            <AIInsightsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute>
+                            <NotificationsPage />
                         </ProtectedRoute>
                     }
                 />
@@ -125,7 +126,7 @@ function AppRoutes() {
                     }
                 />
 
-                {/* Unknown URLs */}
+                {/* Redirect unknown URLs */}
                 <Route
                     path="*"
                     element={
