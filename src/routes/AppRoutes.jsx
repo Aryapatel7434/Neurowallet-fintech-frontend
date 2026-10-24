@@ -1,3 +1,4 @@
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,15 +22,11 @@ import AnalyticsPage from "../pages/analytics/AnalyticsPage";
 import AIInsightsPage from "../pages/ai/AIInsightsPage";
 
 import ProtectedRoute from "../components/auth/ProtectedRoute";
-
+import DashboardLayout from "../layouts/DashboardLayout";
+import SettingsPage from "../pages/settings/SettingsPage";
 function ComingSoonPage({ title }) {
     return (
-        <main
-            style={{
-                padding: "40px 24px",
-                textAlign: "center",
-            }}
-        >
+        <main className="dashboard-page-content-inner">
             <h1>{title}</h1>
             <p>
                 This page is not implemented yet.
@@ -37,6 +34,16 @@ function ComingSoonPage({ title }) {
                 when its feature is developed.
             </p>
         </main>
+    );
+}
+
+function ProtectedLayout({ children }) {
+    return (
+        <ProtectedRoute>
+            <DashboardLayout>
+                {children}
+            </DashboardLayout>
+        </ProtectedRoute>
     );
 }
 
@@ -66,72 +73,72 @@ function AppRoutes() {
                 <Route
                     path="/dashboard"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <DashboardPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
                 <Route
                     path="/wallet"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <WalletPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
                 <Route
                     path="/transactions"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <TransactionsPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
                 <Route
                     path="/analytics"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <AnalyticsPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
                 <Route
                     path="/ai-insights"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <AIInsightsPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
                 <Route
                     path="/notifications"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedLayout>
                             <NotificationsPage />
-                        </ProtectedRoute>
+                        </ProtectedLayout>
                     }
                 />
 
-                <Route
-                    path="/settings"
-                    element={
-                        <ProtectedRoute>
-                            <ComingSoonPage title="Settings" />
-                        </ProtectedRoute>
-                    }
-                />
+               <Route
+    path="/settings"
+    element={
+        <ProtectedRoute>
+            <DashboardLayout>
+                <SettingsPage />
+            </DashboardLayout>
+        </ProtectedRoute>
+    }
+/>
 
                 {/* Redirect unknown URLs */}
                 <Route
                     path="*"
-                    element={
-                        <Navigate to="/dashboard" replace />
-                    }
+                    element={<Navigate to="/dashboard" replace />}
                 />
             </Routes>
 

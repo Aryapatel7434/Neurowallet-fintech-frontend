@@ -1,29 +1,50 @@
-body{
-    margin:0;
-    padding:0;
-    background:#f5f7fa;
-    font-family:Arial, Helvetica, sans-serif;
-}
-::-webkit-scrollbar{
-  width:8px;
+
+:root {
+  color-scheme: dark;
+
+  /* NeuroWallet — Dark theme (existing design preserved) */
+  --nw-bg: #050816;
+  --nw-surface: #10192d;
+  --nw-surface-raised: #162340;
+  --nw-surface-hover: #1b2948;
+  --nw-border: rgba(255, 255, 255, 0.08);
+
+  --nw-text-primary: #f8fafc;
+  --nw-text-secondary: #94a3b8;
+  --nw-text-muted: #64748b;
+
+  --nw-primary: #818cf8;
+  --nw-primary-hover: #a5b4fc;
+  --nw-success: #22c55e;
+  --nw-warning: #f59e0b;
+  --nw-danger: #ef4444;
+
+  --nw-radius-sm: 8px;
+  --nw-radius-md: 14px;
+  --nw-radius-lg: 20px;
+
+  --nw-shadow-card: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
-::-webkit-scrollbar-track{
-  background:#0f172a;
-}
+/* Light theme */
+:root[data-theme="light"] {
+  color-scheme: light;
 
-::-webkit-scrollbar-thumb{
-  background:#8b5cf6;
-  border-radius:20px;
-}
+  --nw-bg: #f5f7fb;
+  --nw-surface: #ffffff;
+  --nw-surface-raised: #eef2ff;
+  --nw-surface-hover: #e5eafe;
+  --nw-border: rgba(15, 23, 42, 0.12);
 
-::-webkit-scrollbar-thumb:hover{
-  background:#a78bfa;
-}
-.ai-card h2,
-.goal-card h2,
-.quick-card h2{
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  --nw-text-primary: #172033;
+  --nw-text-secondary: #475569;
+  --nw-text-muted: #64748b;
+
+  --nw-primary: #4f46e5;
+  --nw-primary-hover: #4338ca;
+  --nw-success: #15803d;
+  --nw-warning: #b45309;
+  --nw-danger: #b91c1c;
+
+  --nw-shadow-card: 0 12px 32px rgba(15, 23, 42, 0.08);
 }

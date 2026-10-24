@@ -273,3 +273,133 @@
         font-size: 12px;
     }
 }
+
+/* ==========================================
+   NEUROWALLET — ANALYTICS LAYOUT ENHANCEMENT
+   Additive overrides: preserve existing styles
+   ========================================== */
+
+.analytics-page {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.analytics-page *,
+.analytics-page *::before,
+.analytics-page *::after {
+    box-sizing: border-box;
+}
+
+.analytics-header > div {
+    min-width: 0;
+}
+
+.analytics-refresh {
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.analytics-refresh:hover {
+    border-color: rgba(122, 162, 255, 0.55);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
+}
+
+.analytics-refresh:active {
+    transform: translateY(1px);
+}
+
+.analytics-refresh:focus-visible {
+    outline: 2px solid #7aa2ff;
+    outline-offset: 3px;
+}
+
+.analytics-metric,
+.analytics-panel {
+    min-width: 0;
+    height: 100%;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.analytics-metric:hover,
+.analytics-panel:hover {
+    border-color: #344665;
+}
+
+.analytics-metric-value {
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+}
+
+.analytics-metrics-grid {
+    align-items: stretch;
+}
+
+.analytics-panels {
+    align-items: stretch;
+}
+
+.analytics-panel {
+    overflow-wrap: anywhere;
+}
+
+.analytics-category,
+.analytics-pattern-item {
+    min-width: 0;
+}
+
+.analytics-progress-fill {
+    background: linear-gradient(90deg, #557cf0, #8b9dff);
+}
+
+.analytics-loading:focus-visible,
+.analytics-error:focus-visible {
+    outline: 2px solid #7aa2ff;
+    outline-offset: 3px;
+}
+
+@media (min-width: 1400px) {
+    .analytics-page {
+        padding: 36px;
+    }
+
+    .analytics-metrics-grid {
+        gap: 20px;
+    }
+
+    .analytics-panels {
+        gap: 24px;
+    }
+}
+
+@media (max-width: 900px) {
+    .analytics-page {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .analytics-page {
+        padding: 20px 14px;
+    }
+
+    .analytics-refresh {
+        min-height: 42px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .analytics-refresh,
+    .analytics-metric,
+    .analytics-panel,
+    .analytics-progress-fill {
+        transition: none;
+    }
+}
