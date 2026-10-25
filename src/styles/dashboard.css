@@ -1284,7 +1284,7 @@ display:none;
 
     height:100%;
 
-    min-height:920px;   /* increase height */
+    min-height:420px;   /* increase height */
 
     box-shadow:
         0 18px 45px rgba(0,0,0,.35);
@@ -4792,4 +4792,288 @@ board-hero::after{
 :root[data-theme="light"] .dashboard-page-content .score-card .score-metrics > div strong {
     color: #172033 !important;
     -webkit-text-fill-color: #172033 !important;
+}
+
+/* NeuroWallet dashboard design tokens */
+:root {
+  --nw-radius-card: 24px;
+  --nw-radius-control: 14px;
+
+  --nw-space-1: 4px;
+  --nw-space-2: 8px;
+  --nw-space-3: 12px;
+  --nw-space-4: 16px;
+  --nw-space-5: 24px;
+  --nw-space-6: 32px;
+
+  --nw-focus-ring: 0 0 0 3px
+    rgba(59, 130, 246, 0.3);
+}
+
+/* NeuroWallet — premium sidebar foundation */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 34px;
+}
+
+.sidebar-brand .sidebar-logo {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    border-radius: 15px;
+    font-size: 19px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.22);
+}
+
+.sidebar-brand-copy {
+    min-width: 0;
+}
+
+.sidebar-brand-copy h2 {
+    margin: 0 0 5px;
+    color: var(--nw-text-primary);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.sidebar-brand-copy > span {
+    color: var(--nw-text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+}
+
+.sidebar-section-label {
+    margin: 0 0 12px 12px;
+    color: var(--nw-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+
+.sidebar-menu li {
+    padding: 0;
+    transform: none;
+}
+
+.sidebar-menu li:hover {
+    transform: none;
+}
+
+.sidebar-menu li a,
+.sidebar-menu li .sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: var(--nw-text-secondary);
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-decoration: none;
+    text-align: left;
+    transition: background-color 180ms ease, color 180ms ease,
+        border-color 180ms ease;
+}
+
+.sidebar-menu-icon {
+    flex: 0 0 17px;
+    width: 17px;
+    font-size: 15px;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li .sidebar-logout:hover {
+    color: var(--nw-text-primary);
+    background: var(--nw-surface-hover);
+}
+
+.sidebar-menu li a.active {
+    color: var(--nw-primary-hover);
+    background: var(--nw-surface-raised);
+    border-color: var(--nw-border);
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: auto;
+    padding: 18px 4px 0;
+    color: var(--nw-text-muted);
+    font-size: 11px;
+}
+
+.sidebar-footer-indicator {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: var(--nw-success);
+}
+
+.sidebar-menu li.sidebar-logout-item {
+    margin-top: 12px;
+}
+
+.sidebar-menu li .sidebar-logout {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        padding: 22px 16px;
+    }
+
+    .sidebar-brand {
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .sidebar-brand-copy h2 {
+        font-size: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-menu li a,
+    .sidebar-menu li .sidebar-logout {
+        transition: none;
+    }
+}
+
+
+/* ==========================================================
+   NeuroWallet Dashboard — final responsive safety layer
+   Appended to preserve existing dashboard styling/features.
+========================================================== */
+
+.dashboard-layout,
+.dashboard-content,
+.dashboard-main,
+.dashboard-grid,
+.financial-overview,
+.overview-card,
+.health-card,
+.ai-panel {
+  min-width: 0;
+}
+
+.dashboard-content {
+  box-sizing: border-box;
+  width: calc(100% - 280px);
+}
+
+.sidebar {
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--primary, #3b82f6);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-content {
+    width: calc(100% - 280px);
+    padding: 28px;
+  }
+
+  .financial-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    display: block;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    margin-left: 0;
+    padding: 18px;
+    gap: 22px;
+  }
+
+  .dashboard-navbar {
+    height: auto;
+    min-height: 0;
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .navbar-left,
+  .navbar-right {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .financial-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .health-card,
+  .ai-panel {
+    min-height: 0;
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
