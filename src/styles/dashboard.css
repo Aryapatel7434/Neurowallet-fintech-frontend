@@ -53,7 +53,7 @@
 .dashboard-layout{
   display:flex;
   min-height:100vh;
-  background:#050816;
+  background: var(--nw-bg);
 }
 
 .dashboard-content{
@@ -70,7 +70,7 @@
 
   gap:36px;
 
-  background:#050816;
+  background: var(--nw-bg);
 
   min-height:100vh;
 
@@ -4009,7 +4009,7 @@ board-hero::after{
     display: flex;
     min-height: 100vh;
     width: 100%;
-    background: #050816;
+   background: var(--nw-bg);
 }
 
 .main-content {
@@ -4105,5 +4105,691 @@ board-hero::after{
         padding: 20px;
     }
 }
+/* =========================================
+   NEUROWALLET — LIGHT THEME OVERRIDES
+   Keep this block at the END of dashboard CSS
+   ========================================= */
 
+:root[data-theme="light"] .dashboard-layout {
+  background: var(--nw-bg) !important;
+  color: var(--nw-text-primary);
+}
 
+:root[data-theme="light"] .dashboard-content {
+  background: var(--nw-bg) !important;
+  color: var(--nw-text-primary);
+}
+
+:root[data-theme="light"] .sidebar {
+  background: #ffffff !important;
+  color: #172033;
+  border-right: 1px solid #e2e8f0;
+}
+
+:root[data-theme="light"] .sidebar h1,
+:root[data-theme="light"] .sidebar h2,
+:root[data-theme="light"] .sidebar .logo,
+:root[data-theme="light"] .sidebar .brand {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .sidebar a,
+:root[data-theme="light"] .sidebar button {
+  color: #475569;
+}
+
+:root[data-theme="light"] .dashboard-navbar {
+  background: #ffffff !important;
+  color: #172033;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+:root[data-theme="light"] .settings-card,
+:root[data-theme="light"] .settings-section,
+:root[data-theme="light"] .profile-card,
+:root[data-theme="light"] .profile-summary,
+:root[data-theme="light"] .personal-info-card,
+:root[data-theme="light"] .settings-container > div {
+  background: #ffffff !important;
+  color: #172033;
+  border-color: #e2e8f0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+:root[data-theme="light"] .dashboard-content h1,
+:root[data-theme="light"] .dashboard-content h2,
+:root[data-theme="light"] .dashboard-content h3,
+:root[data-theme="light"] .dashboard-content h4,
+:root[data-theme="light"] .dashboard-content label {
+  color: #172033;
+}
+
+:root[data-theme="light"] .dashboard-content p,
+:root[data-theme="light"] .dashboard-content small,
+:root[data-theme="light"] .dashboard-content .text-secondary {
+  color: #475569;
+}
+
+:root[data-theme="light"] .dashboard-content input,
+:root[data-theme="light"] .dashboard-content select,
+:root[data-theme="light"] .dashboard-content textarea {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #cbd5e1 !important;
+}
+
+:root[data-theme="light"] .dashboard-content input::placeholder,
+:root[data-theme="light"] .dashboard-content textarea::placeholder {
+  color: #64748b;
+}
+
+:root[data-theme="light"] .dashboard-content hr {
+  border-color: #e2e8f0;
+}
+
+:root[data-theme="light"] .dashboard-content table {
+  background: #ffffff;
+  color: #172033;
+}
+
+:root[data-theme="light"] .dashboard-content th,
+:root[data-theme="light"] .dashboard-content td {
+  border-color: #e2e8f0;
+}
+/* NeuroWallet: fix Settings cards and text in Light mode */
+
+:root[data-theme="light"] .dashboard-content {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .dashboard-content [class*="card"],
+:root[data-theme="light"] .dashboard-content [class*="profile"],
+:root[data-theme="light"] .dashboard-content [class*="settings"] {
+  color: #172033;
+}
+
+/* Main Settings panels */
+:root[data-theme="light"] .dashboard-content .settings-card,
+:root[data-theme="light"] .dashboard-content .settings-section,
+:root[data-theme="light"] .dashboard-content .profile-card,
+:root[data-theme="light"] .dashboard-content .profile-summary,
+:root[data-theme="light"] .dashboard-content .personal-info-card {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Text inside panels */
+:root[data-theme="light"] .dashboard-content [class*="card"] h1,
+:root[data-theme="light"] .dashboard-content [class*="card"] h2,
+:root[data-theme="light"] .dashboard-content [class*="card"] h3,
+:root[data-theme="light"] .dashboard-content [class*="card"] p,
+:root[data-theme="light"] .dashboard-content [class*="card"] label {
+  color: #172033 !important;
+}
+
+/* Inputs: prevent white rectangles inside dark fields */
+:root[data-theme="light"] .dashboard-content input,
+:root[data-theme="light"] .dashboard-content select,
+:root[data-theme="light"] .dashboard-content textarea {
+  background-color: #ffffff !important;
+  color: #172033 !important;
+  border-color: #cbd5e1 !important;
+  -webkit-text-fill-color: #172033;
+}
+
+/* =========================================================
+   NeuroWallet — Dashboard Light Theme
+   Appended overrides: existing Dark theme remains unchanged.
+   Theme switch is driven by document.documentElement.dataset.theme.
+========================================================= */
+
+:root[data-theme="light"] {
+  --card-radius: 24px;
+  --card-border: 1px solid #e2e8f0;
+  --card-bg: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --shadow-sm: 0 6px 18px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 12px 28px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 18px 38px rgba(15, 23, 42, 0.12);
+  --primary: #4f46e5;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --text-primary: #172033;
+  --text-secondary: #475569;
+}
+
+/* Page foundations */
+:root[data-theme="light"] .dashboard-layout,
+:root[data-theme="light"] .dashboard-content,
+:root[data-theme="light"] .main-content,
+:root[data-theme="light"] .dashboard-page-content,
+:root[data-theme="light"] .dashboard-page-content-inner {
+  background: var(--nw-bg, #f5f7fb) !important;
+  color: var(--nw-text-primary, #172033);
+}
+
+/* Sidebar */
+:root[data-theme="light"] .sidebar {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 4px 0 20px rgba(15, 23, 42, 0.035);
+}
+:root[data-theme="light"] .sidebar h1,
+:root[data-theme="light"] .sidebar h2,
+:root[data-theme="light"] .sidebar .logo,
+:root[data-theme="light"] .sidebar .brand {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .sidebar-menu li,
+:root[data-theme="light"] .sidebar-menu li a,
+:root[data-theme="light"] .sidebar-menu li .sidebar-logout,
+:root[data-theme="light"] .sidebar-footer p {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .sidebar-menu li a:hover,
+:root[data-theme="light"] .sidebar-menu li .sidebar-logout:hover {
+  color: #3730a3 !important;
+  background: #eef2ff !important;
+}
+:root[data-theme="light"] .sidebar-menu li a.active {
+  color: #3730a3 !important;
+  background: #eef2ff !important;
+  border-color: #c7d2fe !important;
+}
+
+/* Navbar, search, filters and profile */
+:root[data-theme="light"] .dashboard-navbar {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #172033 !important;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="light"] .dashboard-navbar h2,
+:root[data-theme="light"] .profile-name,
+:root[data-theme="light"] .profile-card h4 {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .search-wrapper,
+:root[data-theme="light"] .dashboard-filter,
+:root[data-theme="light"] .notification-btn {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+:root[data-theme="light"] .search-box {
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033;
+}
+:root[data-theme="light"] .search-box::placeholder {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .sync-status,
+:root[data-theme="light"] .profile-card p {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .profile-card:hover {
+  background: #f1f5f9 !important;
+}
+
+/* Dashboard hero */
+:root[data-theme="light"] .dashboard-hero {
+  background: linear-gradient(135deg, #ffffff 0%, #eef2ff 55%, #f8fafc 100%) !important;
+  border: 1px solid #dbe3f0 !important;
+  box-shadow: var(--shadow-md);
+}
+:root[data-theme="light"] .hero-title,
+:root[data-theme="light"] .hero-name,
+:root[data-theme="light"] .hero-clock {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .hero-subtitle,
+:root[data-theme="light"] .hero-date {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .hero-day {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .hero-stat,
+:root[data-theme="light"] .hero-chip {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0;
+}
+:root[data-theme="light"] .hero-stat h3,
+:root[data-theme="light"] .hero-stat span {
+  color: #172033 !important;
+}
+
+/* Financial overview cards */
+:root[data-theme="light"] .overview-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: var(--shadow-md) !important;
+}
+:root[data-theme="light"] .overview-title,
+:root[data-theme="light"] .overview-card h4 {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .overview-value,
+:root[data-theme="light"] .overview-card h2 {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .overview-subtitle {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .overview-icon {
+  color: #3730a3 !important;
+}
+:root[data-theme="light"] .overview-icon-wrapper {
+  background: #eef2ff !important;
+}
+
+/* Financial health, insight and metric cards */
+:root[data-theme="light"] .health-card,
+:root[data-theme="light"] .ai-panel,
+:root[data-theme="light"] .insight-card,
+:root[data-theme="light"] .metric-box,
+:root[data-theme="light"] .insight-stat,
+:root[data-theme="light"] .health-metrics div,
+:root[data-theme="light"] .health-summary,
+:root[data-theme="light"] .recommendation-card,
+:root[data-theme="light"] .recommendation,
+:root[data-theme="light"] .recommendation-box,
+:root[data-theme="light"] .recommendation-item,
+:root[data-theme="light"] .summary-item {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="light"] .health-title,
+:root[data-theme="light"] .health-card h3,
+:root[data-theme="light"] .insight-card h3,
+:root[data-theme="light"] .health-summary h4,
+:root[data-theme="light"] .score-info strong,
+:root[data-theme="light"] .score-section h1,
+:root[data-theme="light"] .health-metrics strong,
+:root[data-theme="light"] .recommendation h4,
+:root[data-theme="light"] .recommendation-text strong,
+:root[data-theme="light"] .recommendation-item strong,
+:root[data-theme="light"] .summary-item strong {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .health-subtitle,
+:root[data-theme="light"] .health-message,
+:root[data-theme="light"] .analysis-info,
+:root[data-theme="light"] .score-info,
+:root[data-theme="light"] .score-update,
+:root[data-theme="light"] .health-summary li,
+:root[data-theme="light"] .health-metrics label,
+:root[data-theme="light"] .recommendation-description,
+:root[data-theme="light"] .recommendation-text,
+:root[data-theme="light"] .recommendation p,
+:root[data-theme="light"] .summary-item span,
+:root[data-theme="light"] .progress-header {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .health-footer,
+:root[data-theme="light"] .recommendation-divider,
+:root[data-theme="light"] .health-summary li {
+  border-color: #e2e8f0 !important;
+}
+:root[data-theme="light"] .health-summary li {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .progress-track,
+:root[data-theme="light"] .progress-bar,
+:root[data-theme="light"] .goal-progress {
+  background: #e2e8f0 !important;
+}
+:root[data-theme="light"] .score-badge {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+/* Transaction table */
+:root[data-theme="light"] .transaction-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: var(--shadow-md) !important;
+}
+:root[data-theme="light"] .transaction-header h2 {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .transaction-count {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .transaction-table thead {
+  background: #f1f5f9 !important;
+}
+:root[data-theme="light"] .transaction-table th {
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+:root[data-theme="light"] .transaction-table td {
+  color: #334155 !important;
+  border-color: #e2e8f0 !important;
+}
+:root[data-theme="light"] .transaction-table tbody tr:hover,
+:root[data-theme="light"] .transaction-table tbody tr:hover td {
+  background: #f8fafc !important;
+  color: #172033 !important;
+}
+
+/* Charts and analytics */
+:root[data-theme="light"] .chart-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: var(--shadow-md) !important;
+}
+:root[data-theme="light"] .chart-header h3,
+:root[data-theme="light"] .analytics-value,
+:root[data-theme="light"] .analytics-stat h2 {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .analytics-label,
+:root[data-theme="light"] .analytics-stat p {
+  color: #64748b !important;
+}
+
+/* AI advisor, smart goals and quick actions */
+:root[data-theme="light"] .ai-advisor-card,
+:root[data-theme="light"] .goal-card,
+:root[data-theme="light"] .ai-card,
+:root[data-theme="light"] .quick-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #172033 !important;
+  box-shadow: var(--shadow-md) !important;
+}
+:root[data-theme="light"] .ai-advisor-card h2,
+:root[data-theme="light"] .goal-card h2,
+:root[data-theme="light"] .ai-card h2,
+:root[data-theme="light"] .quick-card h2,
+:root[data-theme="light"] .goal-card h1,
+:root[data-theme="light"] .ai-category strong,
+:root[data-theme="light"] .metric-value,
+:root[data-theme="light"] .action-box span {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .ai-category span,
+:root[data-theme="light"] .metric-name,
+:root[data-theme="light"] .ai-card p {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .insight-metric,
+:root[data-theme="light"] .action-box {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+:root[data-theme="light"] .ai-tip {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+}
+:root[data-theme="light"] .ai-tip p {
+  color: #334155 !important;
+}
+:root[data-theme="light"] .recommendation-box p {
+  color: #334155 !important;
+}
+
+/* Shared text and form controls in dashboard modules */
+:root[data-theme="light"] .dashboard-page-content h1,
+:root[data-theme="light"] .dashboard-page-content h2,
+:root[data-theme="light"] .dashboard-page-content h3,
+:root[data-theme="light"] .dashboard-page-content h4,
+:root[data-theme="light"] .dashboard-page-content label {
+  color: #172033;
+}
+:root[data-theme="light"] .dashboard-page-content p,
+:root[data-theme="light"] .dashboard-page-content small {
+  color: #475569;
+}
+:root[data-theme="light"] .dashboard-page-content input,
+:root[data-theme="light"] .dashboard-page-content select,
+:root[data-theme="light"] .dashboard-page-content textarea {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #cbd5e1 !important;
+  -webkit-text-fill-color: #172033;
+}
+:root[data-theme="light"] .dashboard-page-content input::placeholder,
+:root[data-theme="light"] .dashboard-page-content textarea::placeholder {
+  color: #64748b !important;
+}
+:root[data-theme="light"] .dashboard-page-content hr {
+  border-color: #e2e8f0 !important;
+}
+
+/* Keep semantic status colours legible in both themes. */
+:root[data-theme="light"] .live,
+:root[data-theme="light"] .success,
+:root[data-theme="light"] .health-grade.excellent {
+  color: #166534 !important;
+}
+:root[data-theme="light"] .danger,
+:root[data-theme="light"] .health-grade.warning {
+  color: #b91c1c !important;
+}
+:root[data-theme="light"] .health-grade.good {
+  color: #1d4ed8 !important;
+}
+
+/* LIGHT THEME FINAL CONTRAST FIX — only active in Light mode */
+:root[data-theme="light"] .dashboard-page-content [class*="card"],
+:root[data-theme="light"] .dashboard-page-content [class*="panel"],
+:root[data-theme="light"] .dashboard-page-content [class*="activity"],
+:root[data-theme="light"] .dashboard-page-content [class*="timeline"],
+:root[data-theme="light"] .dashboard-page-content [class*="financial-score"],
+:root[data-theme="light"] .dashboard-page-content [class*="budget-health"],
+:root[data-theme="light"] .dashboard-page-content [class*="goal-recommendation"],
+:root[data-theme="light"] .dashboard-page-content [class*="transaction-item"],
+:root[data-theme="light"] .dashboard-page-content [class*="recent-transaction"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #172033 !important;
+  border-color: #e2e8f0 !important;
+}
+:root[data-theme="light"] .dashboard-page-content .financial-score-card,
+:root[data-theme="light"] .dashboard-page-content .score-card,
+:root[data-theme="light"] .dashboard-page-content .budget-health-card,
+:root[data-theme="light"] .dashboard-page-content .goal-recommendation-card,
+:root[data-theme="light"] .dashboard-page-content .activity-card,
+:root[data-theme="light"] .dashboard-page-content .recent-activity-card,
+:root[data-theme="light"] .dashboard-page-content .transaction-item,
+:root[data-theme="light"] .dashboard-page-content .goal-progress-card,
+:root[data-theme="light"] .dashboard-page-content .metric-card,
+:root[data-theme="light"] .dashboard-page-content .stat-card {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #172033 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+:root[data-theme="light"] .dashboard-page-content [class*="card"] h1,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] h2,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] h3,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] h4,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] p,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] span,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] strong,
+:root[data-theme="light"] .dashboard-page-content [class*="card"] label,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] h1,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] h2,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] h3,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] p,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] span,
+:root[data-theme="light"] .dashboard-page-content [class*="panel"] strong {
+  color: #172033 !important;
+}
+:root[data-theme="light"] .dashboard-page-content .activity-item,
+:root[data-theme="light"] .dashboard-page-content .activity-timeline-item,
+:root[data-theme="light"] .dashboard-page-content .timeline-item,
+:root[data-theme="light"] .dashboard-page-content .recent-activity-item,
+:root[data-theme="light"] .dashboard-page-content .transaction-activity-item {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #172033 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06) !important;
+}
+:root[data-theme="light"] .dashboard-page-content .activity-item *,
+:root[data-theme="light"] .dashboard-page-content .activity-timeline-item *,
+:root[data-theme="light"] .dashboard-page-content .timeline-item *,
+:root[data-theme="light"] .dashboard-page-content .recent-activity-item *,
+:root[data-theme="light"] .dashboard-page-content .transaction-activity-item * {
+  color: #334155;
+}
+:root[data-theme="light"] .dashboard-page-content .score-metric,
+:root[data-theme="light"] .dashboard-page-content .health-metric,
+:root[data-theme="light"] .dashboard-page-content .budget-metric,
+:root[data-theme="light"] .dashboard-page-content .goal-metric,
+:root[data-theme="light"] .dashboard-page-content .metric-box,
+:root[data-theme="light"] .dashboard-page-content .insight-metric,
+:root[data-theme="light"] .dashboard-page-content .action-box {
+  background: #f8fafc !important;
+  color: #172033 !important;
+  border-color: #e2e8f0 !important;
+}
+:root[data-theme="light"] .dashboard-page-content .activity-name,
+:root[data-theme="light"] .dashboard-page-content .activity-description,
+:root[data-theme="light"] .dashboard-page-content .activity-email,
+:root[data-theme="light"] .dashboard-page-content .activity-time,
+:root[data-theme="light"] .dashboard-page-content .activity-reference,
+:root[data-theme="light"] .dashboard-page-content .transaction-details,
+:root[data-theme="light"] .dashboard-page-content .transaction-meta {
+  color: #475569 !important;
+}
+:root[data-theme="light"] .dashboard-page-content .success,
+:root[data-theme="light"] .dashboard-page-content .status-success,
+:root[data-theme="light"] .dashboard-page-content .transaction-success {
+  color: #166534 !important;
+}
+:root[data-theme="light"] .dashboard-page-content .danger,
+:root[data-theme="light"] .dashboard-page-content .status-failed,
+:root[data-theme="light"] .dashboard-page-content .transaction-failed {
+  color: #b91c1c !important;
+}
+:root[data-theme="light"] .dashboard-page-content .btn-primary,
+:root[data-theme="light"] .dashboard-page-content .primary-button {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  border-color: #4f46e5 !important;
+}
+
+/* ==========================================
+   LIGHT MODE: FINANCIAL SCORE METRICS
+========================================== */
+
+:root[data-theme="light"] .dashboard-page-content [class*="metric"],
+:root[data-theme="light"] .dashboard-page-content [class*="stat"],
+:root[data-theme="light"] .dashboard-page-content [class*="score-item"] {
+    background: #f8fafc !important;
+    background-image: none !important;
+    color: #172033 !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: none;
+}
+
+:root[data-theme="light"] .dashboard-page-content [class*="metric"] *,
+:root[data-theme="light"] .dashboard-page-content [class*="stat"] *,
+:root[data-theme="light"] .dashboard-page-content [class*="score-item"] * {
+    color: #172033 !important;
+}
+
+/* ==========================================
+   LIGHT MODE: SUCCESS / FAILED BADGES
+========================================== */
+
+:root[data-theme="light"] .dashboard-page-content .success,
+:root[data-theme="light"] .dashboard-page-content .status-success,
+:root[data-theme="light"] .dashboard-page-content .transaction-success {
+    background: #dcfce7 !important;
+    background-image: none !important;
+    color: #166534 !important;
+    border-color: #bbf7d0 !important;
+}
+
+:root[data-theme="light"] .dashboard-page-content .danger,
+:root[data-theme="light"] .dashboard-page-content .failed,
+:root[data-theme="light"] .dashboard-page-content .status-failed,
+:root[data-theme="light"] .dashboard-page-content .transaction-failed {
+    background: #fee2e2 !important;
+    background-image: none !important;
+    color: #991b1b !important;
+    border-color: #fecaca !important;
+}
+
+/* Ensure badge labels and icons remain readable */
+:root[data-theme="light"] .dashboard-page-content .success *,
+:root[data-theme="light"] .dashboard-page-content .status-success *,
+:root[data-theme="light"] .dashboard-page-content .transaction-success *,
+:root[data-theme="light"] .dashboard-page-content .danger *,
+:root[data-theme="light"] .dashboard-page-content .failed *,
+:root[data-theme="light"] .dashboard-page-content .status-failed *,
+:root[data-theme="light"] .dashboard-page-content .transaction-failed * {
+    color: inherit !important;
+}
+
+/* Fix Financial Score inner tiles in Light mode */
+:root[data-theme="light"] .ai-card > div,
+:root[data-theme="light"] .ai-card .score-metric,
+:root[data-theme="light"] .ai-card .score-item,
+:root[data-theme="light"] .ai-card .metric-card {
+    background: #f8fafc !important;
+    background-image: none !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #172033 !important;
+}
+
+/* Ensure Wallet, Rating, Risk labels and values are readable */
+:root[data-theme="light"] .ai-card > div *,
+:root[data-theme="light"] .ai-card .score-metric *,
+:root[data-theme="light"] .ai-card .score-item *,
+:root[data-theme="light"] .ai-card .metric-card * {
+    color: #172033 !important;
+}
+
+/* Financial Score — Light Theme */
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #172033 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+}
+
+/* Inner Wallet / Rating / Risk tiles */
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .score-metric,
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .metric-card,
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .score-item {
+  background: #f1f5f9 !important;
+  background-image: none !important;
+  color: #172033 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+/* Make metric labels and values readable */
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .score-metric *,
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .metric-card *,
+:root[data-theme="light"] .dashboard-page-content-inner .financial-score-card .score-item * {
+  color: #172033 !important;
+}
+
+/* NeuroWallet — Fix Financial Score metrics in Light mode */
+:root[data-theme="light"] .dashboard-page-content .score-card .score-metrics > div {
+    background: #f1f5f9 !important;
+    background-image: none !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px;
+    color: #172033 !important;
+    box-shadow: none !important;
+}
+
+:root[data-theme="light"] .dashboard-page-content .score-card .score-metrics > div span,
+:root[data-theme="light"] .dashboard-page-content .score-card .score-metrics > div strong {
+    color: #172033 !important;
+    -webkit-text-fill-color: #172033 !important;
+}

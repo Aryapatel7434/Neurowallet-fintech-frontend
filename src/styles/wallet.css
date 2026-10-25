@@ -1550,3 +1550,282 @@ font-weight:600;
 
   transition: 0.3s;
 }
+
+
+/* =========================================================
+   NEUROWALLET LIGHT THEME
+   Scoped overrides: preserve the existing dark theme.
+   Theme preference is applied to document.documentElement.
+   ========================================================= */
+
+:root[data-theme="light"] body {
+  background: var(--nw-bg, #f5f7fb);
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .wallet-container,
+:root[data-theme="light"] .notifications-page {
+  color: var(--nw-text-primary, #172033);
+}
+
+/* Main wallet hero */
+:root[data-theme="light"] .wallet-header,
+:root[data-theme="light"] .wallet-header-pro {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f3ff 100%);
+  border: 1px solid var(--nw-border, #dbe2ee);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="light"] .wallet-header-pro h1,
+:root[data-theme="light"] .hero-left h1 {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .wallet-header-pro p,
+:root[data-theme="light"] .hero-left h2 {
+  color: var(--nw-primary, #4f46e5);
+}
+
+:root[data-theme="light"] .wallet-header-pro span,
+:root[data-theme="light"] .hero-left p {
+  color: var(--nw-text-secondary, #475569);
+}
+
+:root[data-theme="light"] .wallet-growth {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #c4b5fd;
+}
+
+/* Balance and premium wallet cards */
+:root[data-theme="light"] .wallet-card,
+:root[data-theme="light"] .hero-balance-card {
+  background: #ffffff;
+  border: 1px solid var(--nw-border, #dbe2ee);
+  color: var(--nw-text-primary, #172033);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  backdrop-filter: none;
+}
+
+:root[data-theme="light"] .wallet-card h2,
+:root[data-theme="light"] .wallet-card-top h3,
+:root[data-theme="light"] .premium-title,
+:root[data-theme="light"] .transfer-title {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .wallet-balance {
+  color: var(--nw-primary, #4f46e5);
+}
+
+:root[data-theme="light"] .wallet-info,
+:root[data-theme="light"] .wallet-details,
+:root[data-theme="light"] .balance-label,
+:root[data-theme="light"] .hero-balance-card span {
+  color: var(--nw-text-secondary, #475569);
+}
+
+:root[data-theme="light"] .hero-balance-card h1 {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .hero-balance-card p {
+  color: var(--nw-success, #15803d);
+}
+
+/* Wallet actions and form controls */
+:root[data-theme="light"] .wallet-actions,
+:root[data-theme="light"] .wallet-transfer {
+  background: #ffffff;
+  border: 1px solid var(--nw-border, #dbe2ee);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+}
+
+:root[data-theme="light"] .wallet-actions input,
+:root[data-theme="light"] .wallet-transfer input,
+:root[data-theme="light"] .transaction-search,
+:root[data-theme="light"] .filter-btn {
+  background: #ffffff;
+  color: var(--nw-text-primary, #172033);
+  border-color: var(--nw-border, #dbe2ee);
+}
+
+:root[data-theme="light"] .wallet-actions input::placeholder,
+:root[data-theme="light"] .wallet-transfer input::placeholder,
+:root[data-theme="light"] .transaction-search::placeholder {
+  color: var(--nw-text-muted, #64748b);
+}
+
+:root[data-theme="light"] .wallet-actions input:focus,
+:root[data-theme="light"] .wallet-transfer input:focus,
+:root[data-theme="light"] .transaction-search:focus {
+  border-color: var(--nw-primary, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  outline: none;
+}
+
+:root[data-theme="light"] .wallet-transfer h3 {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .wallet-transfer input {
+  color: var(--nw-text-primary, #172033);
+}
+
+/* Analytics summary cards */
+:root[data-theme="light"] .analytics-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  border: 1px solid var(--nw-border, #dbe2ee);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+  backdrop-filter: none;
+}
+
+:root[data-theme="light"] .analytics-card h3 {
+  color: var(--nw-text-primary, #172033) !important;
+}
+
+:root[data-theme="light"] .analytics-card h2 {
+  color: var(--nw-primary, #4f46e5) !important;
+}
+
+:root[data-theme="light"] .analytics-growth {
+  color: var(--nw-success, #15803d) !important;
+}
+
+/* Wallet transaction table */
+:root[data-theme="light"] .transaction-card {
+  background: #ffffff;
+  border: 1px solid var(--nw-border, #dbe2ee);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+}
+
+:root[data-theme="light"] .transaction-card h2 {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .transaction-search {
+  background: #ffffff;
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .transaction-table th {
+  background: #f1f5fb;
+  color: var(--nw-text-secondary, #475569);
+  border-bottom-color: var(--nw-border, #dbe2ee);
+}
+
+:root[data-theme="light"] .transaction-table td {
+  color: var(--nw-text-primary, #172033);
+  border-bottom-color: var(--nw-border, #e2e8f0);
+}
+
+:root[data-theme="light"] .transaction-table tbody tr:hover {
+  background: #f5f3ff;
+}
+
+:root[data-theme="light"] .filter-btn {
+  color: var(--nw-text-secondary, #475569);
+}
+
+:root[data-theme="light"] .filter-btn.active {
+  background: linear-gradient(135deg, #6d5ce7, #8b5cf6);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.18);
+}
+
+:root[data-theme="light"] .transaction-count {
+  background: #f1edff;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+}
+
+:root[data-theme="light"] .transaction-count span {
+  color: var(--nw-text-secondary, #475569);
+}
+
+/* Notification controls and dropdowns */
+:root[data-theme="light"] .notification-btn {
+  background: #ffffff;
+  color: var(--nw-text-primary, #172033);
+  border-color: var(--nw-border, #dbe2ee);
+}
+
+:root[data-theme="light"] .notification-dropdown {
+  background: #ffffff;
+  border-color: var(--nw-border, #dbe2ee);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+}
+
+:root[data-theme="light"] .notification-item {
+  color: var(--nw-text-primary, #172033);
+  border-bottom-color: var(--nw-border, #e2e8f0);
+}
+
+:root[data-theme="light"] .notification-item:hover {
+  background: #f5f3ff;
+}
+
+:root[data-theme="light"] .notification-card {
+  background: #ffffff;
+  border-color: var(--nw-border, #dbe2ee);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+:root[data-theme="light"] .notification-card h3 {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .notification-card p,
+:root[data-theme="light"] .empty-state {
+  color: var(--nw-text-secondary, #475569);
+}
+
+/* Activity panel, status, and pagination */
+:root[data-theme="light"] .transfer-activity {
+  background: #ffffff;
+  border-color: var(--nw-border, #dbe2ee);
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .pagination span {
+  color: var(--nw-text-secondary, #475569);
+}
+
+:root[data-theme="light"] .loading-screen {
+  color: var(--nw-text-primary, #172033);
+}
+
+:root[data-theme="light"] .loader {
+  border-color: rgba(79, 70, 229, 0.16);
+  border-top-color: var(--nw-primary, #4f46e5);
+}
+
+/* Preserve semantic badge contrast in Light mode */
+:root[data-theme="light"] .credit-badge,
+:root[data-theme="light"] .status-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+:root[data-theme="light"] .debit-badge {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+:root[data-theme="light"] .transfer-badge {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+:root[data-theme="light"] .status-badge {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Keep secondary action buttons readable */
+:root[data-theme="light"] .mark-read-btn,
+:root[data-theme="light"] .mark-all-btn,
+:root[data-theme="light"] .pagination button {
+  color: #ffffff;
+}

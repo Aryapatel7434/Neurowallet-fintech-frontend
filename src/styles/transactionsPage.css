@@ -1019,3 +1019,50 @@
         gap: 5px;
     }
 }
+/* NeuroWallet — Transactions Light Theme */
+:root[data-theme="light"] .transactions-layout {
+  --tx-bg: #f5f7fb;
+  --tx-panel: #ffffff;
+  --tx-panel-raised: #eef2ff;
+  --tx-input: #ffffff;
+  --tx-border: #dbe2ee;
+  --tx-border-strong: #cbd5e1;
+  --tx-text: #172033;
+  --tx-muted: #475569;
+  --tx-subtle: #64748b;
+  --tx-primary: #4f46e5;
+  --tx-primary-light: #4338ca;
+  --tx-green: #15803d;
+  --tx-red: #b91c1c;
+  --tx-amber: #92400e;
+  background: var(--tx-bg);
+  color: var(--tx-text);
+}
+
+:root[data-theme="light"] .transactions-layout
+.transactions-heading h1,
+:root[data-theme="light"] .transactions-summary-card strong,
+:root[data-theme="light"] .transactions-page-table tbody td,
+:root[data-theme="light"] .transaction-party strong,
+:root[data-theme="light"] .transaction-amount {
+  color: var(--tx-text) !important;
+}
+
+:root[data-theme="light"] .transactions-summary-card {
+  background: linear-gradient(145deg, #ffffff, #f8faff);
+}
+
+:root[data-theme="light"] .transactions-toolbar,
+:root[data-theme="light"] .transactions-page-table thead th,
+:root[data-theme="light"] .transactions-pagination {
+  background: #f8faff;
+}
+
+:root[data-theme="light"] .transactions-search:focus-within {
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .transaction-details-button {
+  color: var(--tx-primary);
+  border-color: var(--tx-border-strong);
+}

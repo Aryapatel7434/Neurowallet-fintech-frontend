@@ -761,3 +761,124 @@
     }
 }
 
+
+/* ==========================================
+   NEUROWALLET — SETTINGS LIGHT THEME
+   Scoped to Settings; Dark mode stays intact.
+   ========================================== */
+
+:root[data-theme="light"] .settings-page {
+  color: #172033;
+}
+
+:root[data-theme="light"] .settings-page-header h1,
+:root[data-theme="light"] .settings-profile-summary h2,
+:root[data-theme="light"] .settings-card-heading h2,
+:root[data-theme="light"] .settings-field label,
+:root[data-theme="light"] .settings-data-export-content h3,
+:root[data-theme="light"] .settings-state h2 {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .settings-page-header p,
+:root[data-theme="light"] .settings-card-heading p,
+:root[data-theme="light"] .settings-summary-email,
+:root[data-theme="light"] .settings-summary-row span,
+:root[data-theme="light"] .settings-summary-row strong,
+:root[data-theme="light"] .settings-field small,
+:root[data-theme="light"] .settings-form-footer p,
+:root[data-theme="light"] .settings-inline-state p,
+:root[data-theme="light"] .settings-notification-copy p,
+:root[data-theme="light"] .settings-data-export-content p {
+  color: #475569 !important;
+}
+
+/* Profile and all Settings cards */
+:root[data-theme="light"] .settings-profile-summary,
+:root[data-theme="light"] .settings-form-card {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Card dividers */
+:root[data-theme="light"] .settings-summary-divider {
+  background: #e2e8f0;
+}
+
+:root[data-theme="light"] .settings-card-heading {
+  border-bottom-color: #e2e8f0;
+}
+
+:root[data-theme="light"] .settings-form-footer {
+  border-top-color: #e2e8f0;
+}
+
+/* Input wrappers remain consistently white */
+:root[data-theme="light"] .settings-input-wrapper,
+:root[data-theme="light"] .settings-input-readonly,
+:root[data-theme="light"] .settings-select-wrapper {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+:root[data-theme="light"] .settings-input-wrapper input,
+:root[data-theme="light"] .settings-select-wrapper select {
+  background: transparent !important;
+  color: #172033 !important;
+  -webkit-text-fill-color: #172033;
+}
+
+:root[data-theme="light"] .settings-input-wrapper input::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
+}
+
+:root[data-theme="light"] .settings-input-readonly input {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569;
+}
+
+:root[data-theme="light"] .settings-readonly-label {
+  color: #64748b !important;
+}
+
+:root[data-theme="light"] .settings-select-wrapper select option {
+  background: #ffffff;
+  color: #172033;
+}
+
+/* Notification preferences */
+:root[data-theme="light"] .settings-notification-row {
+  border-bottom-color: #e2e8f0;
+}
+
+:root[data-theme="light"] .settings-notification-copy label {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .settings-toggle-label {
+  color: #475569;
+}
+
+/* Secondary buttons and loading/error text */
+:root[data-theme="light"] .settings-secondary-btn {
+  background: #f8fafc;
+  color: #172033;
+  border-color: #cbd5e1;
+}
+
+:root[data-theme="light"] .settings-inline-error,
+:root[data-theme="light"] .settings-preference-error {
+  color: #991b1b;
+}
+
+/* Preserve the purple accent and white button text */
+:root[data-theme="light"] .settings-primary-btn {
+  color: #ffffff;
+}
+
+:root[data-theme="light"] .settings-avatar {
+  color: #ffffff;
+}

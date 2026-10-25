@@ -123,10 +123,14 @@ function SettingsPage() {
             const response = await api.get("/users/me/preferences");
 
             const loadedPreferences = {
-                theme: response.data.theme,
+                theme: response.data.theme === "LIGHT" ? "LIGHT" : "DARK",
                 preferredCurrency: response.data.preferredCurrency,
                 language: response.data.language,
             };
+
+            // Apply the saved theme across the document.
+            document.documentElement.dataset.theme =
+                loadedPreferences.theme === "LIGHT" ? "light" : "dark";
 
             setPreferences(loadedPreferences);
             setSavedPreferences(loadedPreferences);
@@ -253,6 +257,12 @@ function SettingsPage() {
             ...current,
             [name]: value,
         }));
+
+        // Apply the selected theme immediately in the UI.
+        if (name === "theme") {
+            document.documentElement.dataset.theme =
+                value === "LIGHT" ? "light" : "dark";
+        }
     };
 
     const preferencesChanged =
@@ -302,6 +312,15 @@ function SettingsPage() {
                 err.response?.data?.message ||
                 err.response?.data?.detail ||
                 "Unable to save preferences. Please try again.";
+
+            // Restore the last saved theme if saving preferences fails.
+            document.documentElement.dataset.theme =
+                savedPreferences.theme === "LIGHT" ? "light" : "dark";
+
+            setPreferences((current) => ({
+                ...current,
+                theme: savedPreferences.theme,
+            }));
 
             setPreferencesError(message);
             toast.error(message);
@@ -746,9 +765,9 @@ function SettingsPage() {
                                     </div>
 
                                     <small>
-                                        Saves your preferred theme.
-                                        Applying it across the application
-                                        will be handled separately.
+                                        Preview your selected theme immediately.
+                                        Save Preferences to persist your choice
+                                        to your NeuroWallet account.
                                     </small>
                                 </div>
 
