@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     FaArrowDown,
     FaArrowUp,
@@ -61,6 +61,7 @@ function TransactionsPage() {
 
     const [refreshKey, setRefreshKey] = useState(0);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const requestIdRef = useRef(0);
 
     // Debounce search input.
     useEffect(() => {
@@ -77,6 +78,9 @@ function TransactionsPage() {
     }, [debouncedSearch, statusFilter, typeFilter, categoryFilter]);
 
     const loadTransactions = useCallback(async () => {
+        // Only the newest request may update the page. Rapid filter changes can
+        // leave earlier HTTP requests in flight; ignore their late responses.
+        const requestId = ++requestIdRef.current;
         setLoading(true);
         setError("");
 
@@ -98,8 +102,11 @@ function TransactionsPage() {
                 );
             }
 
+            if (requestId !== requestIdRef.current) return;
             setPageData(data);
         } catch (err) {
+            if (requestId !== requestIdRef.current) return;
+
             const message =
                 err?.response?.data?.message ||
                 err?.message ||
@@ -108,7 +115,9 @@ function TransactionsPage() {
             setError(message);
             toast.error(message);
         } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) {
+                setLoading(false);
+            }
         }
     }, [
         page,
@@ -121,6 +130,11 @@ function TransactionsPage() {
 
     useEffect(() => {
         loadTransactions();
+
+        // Invalidate an in-flight request when filters change or the page unmounts.
+        return () => {
+            requestIdRef.current += 1;
+        };
     }, [loadTransactions]);
 
     const transactions = useMemo(

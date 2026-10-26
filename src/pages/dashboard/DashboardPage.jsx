@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getMyWallet } from "../../services/walletService";
 import { getTransactionHistory } from "../../services/transactionService";
@@ -47,6 +47,7 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [dashboardInsights, setDashboardInsights] = useState(null);
+    const dashboardRequestId = useRef(0);
 
     const {
         insights,
@@ -57,6 +58,11 @@ function DashboardPage() {
     } = useAI();
 
     const fetchDashboardData = useCallback(async () => {
+        // Each refresh supersedes earlier requests so stale responses cannot
+        // overwrite data from a newer dashboard refresh.
+        const requestId = ++dashboardRequestId.current;
+        const isCurrentRequest = () => dashboardRequestId.current === requestId;
+
         setLoading(true);
         setError("");
 
@@ -66,6 +72,8 @@ function DashboardPage() {
                 getTransactionHistory(),
                 getDashboardInsights(),
             ]);
+
+            if (!isCurrentRequest()) return;
 
             const [walletResult, transactionsResult, insightsResult] = results;
 
@@ -99,12 +107,16 @@ function DashboardPage() {
                 );
             }
         } catch (err) {
+            if (!isCurrentRequest()) return;
+
             console.error("Unexpected dashboard loading error:", err);
             setError(
                 "An unexpected error occurred while loading the dashboard."
             );
         } finally {
-            setLoading(false);
+            if (isCurrentRequest()) {
+                setLoading(false);
+            }
         }
     }, []);
 
@@ -123,6 +135,8 @@ function DashboardPage() {
 
         return () => {
             active = false;
+            // Invalidate in-flight work when leaving the page.
+            dashboardRequestId.current += 1;
         };
     }, [fetchDashboardData]);
 
