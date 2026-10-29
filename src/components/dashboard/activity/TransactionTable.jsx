@@ -1,808 +1,466 @@
-import {
-  FaMagnifyingGlass,
-  FaArrowDown,
-  FaArrowUp,
-  FaReceipt,
-  FaShieldHalved,
-  FaEllipsisVertical
-} from "react-icons/fa6";
 
+import { useMemo, useRef, useState } from "react";
+import {
+    FaMagnifyingGlass,
+    FaArrowDown,
+    FaArrowUp,
+    FaEllipsisVertical,
+    FaDownload,
+    FaArrowRight,
+} from "react-icons/fa6";
 import {
     FaCircleCheck,
-    FaCircleXmark
+    FaCircleXmark,
+    FaClock,
 } from "react-icons/fa6";
-import {
 
-useState,
-
-useRef
-
-} from "react";
 import "./TransactionTable.css";
 
-function TransactionTable({
-    transactions = []
-})
-{
+function getCurrentUser() {
+    try {
+        return JSON.parse(localStorage.getItem("user") || "{}");
+    } catch {
+        return {};
+    }
+}
 
+function TransactionTable({ transactions = [] }) {
     const [search, setSearch] = useState("");
-
     const [statusFilter, setStatusFilter] = useState("ALL");
+    const [sortBy, setSortBy] = useState("NEWEST");
 
-const [sortBy, setSortBy] = useState("NEWEST");
+    const tableRef = useRef(null);
+    const user = useMemo(() => getCurrentUser(), []);
 
-const tableRef = useRef(null);
+    const formatCurrency = (amount) =>
+        new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 2,
+        }).format(Number(amount) || 0);
 
-const user = JSON.parse(
-    localStorage.getItem("user")
-);
-    const formatCurrency = (amount) => {
+    const getTimestamp = (tx) => {
+        const value = tx.timestamp || tx.createdAt || tx.date;
+        const timestamp = new Date(value).getTime();
 
-        return new Intl.NumberFormat(
-            "en-IN",
-            {
-                style: "currency",
-                currency: "INR",
-                maximumFractionDigits: 0
-            }
-        ).format(amount);
-
+        return Number.isFinite(timestamp) ? timestamp : 0;
     };
 
-    /* ==========================================
-                SUMMARY DATA
-    ========================================== */
-
-const totalReceived = transactions.reduce(
-
-(sum,tx)=>
-
-tx.receiverEmail===user?.email
-
-?
-
-sum+Number(tx.amount)
-
-:
-
-sum,
-
-0
-
-);
-  const totalSent = transactions.reduce(
-
-    (sum, tx) =>
-
-        tx.senderEmail === user?.email
-
-            ? sum + Number(tx.amount)
-
-            : sum,
-
-    0
-
-);
-const successfulTransactions =
-    transactions.filter(
-        tx => tx.status === "SUCCESS"
-    ).length;
-
-const successRate =
-    transactions.length
-        ? Math.round(
-              (successfulTransactions /
-                  transactions.length) *
-                  100
-          )
-        : 0;
-  
-
-    /* ==========================================
-                FILTER
-    ========================================== */
-
-    const filteredTransactions = transactions.filter((tx) => {
-
-        const query = search.toLowerCase();
-
-        const matchesSearch =
-
-            tx.senderEmail.toLowerCase().includes(query) ||
-
-            tx.receiverEmail.toLowerCase().includes(query) ||
-
-            String(tx.transactionId).includes(query) ||
-
-            String(tx.amount).includes(query);
-
-        const matchesStatus =
-
-            statusFilter === "ALL" ||
-
-            tx.status === statusFilter;
-
-        return matchesSearch && matchesStatus;
-
-    });
-
-    /* ==========================================
-                SORT
-    ========================================== */
-
-    const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-
-        switch (sortBy) {
-
-            case "NEWEST":
-
-                return new Date(b.timestamp) - new Date(a.timestamp);
-
-            case "OLDEST":
-
-                return new Date(a.timestamp) - new Date(b.timestamp);
-
-            case "HIGH_AMOUNT":
-
-                return b.amount - a.amount;
-
-            case "LOW_AMOUNT":
-
-                return a.amount - b.amount;
-
-            default:
-
-                return 0;
-
-        }
-
-    });
-const exportCSV = () => {
-
-const headers=[
-
-"Transaction ID",
-
-"Sender",
-
-"Receiver",
-
-"Amount",
-
-"Status",
-
-"Date"
-
-];
-
-const rows=
-
-sortedTransactions.map(tx=>[
-
-tx.transactionId,
-
-tx.senderEmail,
-
-tx.receiverEmail,
-
-tx.amount,
-
-tx.status,
-
-new Date(tx.timestamp).toLocaleString("en-IN")
-
-]);
-
-const csv=[headers,...rows]
-
-.map(e=>e.join(","))
-
-.join("\n");
-
-const blob=new Blob(
-
-[csv],
-
-{type:"text/csv;charset=utf-8;"}
-
-);
-
-const url=
-
-URL.createObjectURL(blob);
-
-const link=
-
-document.createElement("a");
-
-link.href=url;
-
-const today = new Date().toISOString().split("T")[0];
-
-link.download = `NeuroWallet_Transactions_${today}.csv`;
-
-document.body.appendChild(link);
-
-link.click();
-
-document.body.removeChild(link);
-
-URL.revokeObjectURL(url);
-
-};
-const handleViewAll = () => {
-
-    // Reset all filters
-    setSearch("");
-
-    setStatusFilter("ALL");
-
-    setSortBy("NEWEST");
-
-    // Scroll to the table
-    setTimeout(() => {
-
-        tableRef.current?.scrollIntoView({
-
-            behavior: "smooth",
-
-            block: "start"
-
+    const filteredTransactions = useMemo(() => {
+        const query = search.trim().toLowerCase();
+
+        const filtered = transactions.filter((tx) => {
+            const sender = String(tx.senderEmail || "").toLowerCase();
+            const receiver = String(tx.receiverEmail || "").toLowerCase();
+            const id = String(tx.transactionId ?? "").toLowerCase();
+            const amount = String(tx.amount ?? "");
+            const status = String(tx.status || "").toUpperCase();
+
+            const matchesSearch =
+                !query ||
+                sender.includes(query) ||
+                receiver.includes(query) ||
+                id.includes(query) ||
+                amount.includes(query) ||
+                status.toLowerCase().includes(query);
+
+            const matchesStatus =
+                statusFilter === "ALL" || status === statusFilter;
+
+            return matchesSearch && matchesStatus;
         });
 
-    }, 100);
+        return filtered.sort((a, b) => {
+            switch (sortBy) {
+                case "OLDEST":
+                    return getTimestamp(a) - getTimestamp(b);
 
-};
+                case "HIGH_AMOUNT":
+                    return Number(b.amount || 0) - Number(a.amount || 0);
+
+                case "LOW_AMOUNT":
+                    return Number(a.amount || 0) - Number(b.amount || 0);
+
+                case "NEWEST":
+                default:
+                    return getTimestamp(b) - getTimestamp(a);
+            }
+        });
+    }, [transactions, search, statusFilter, sortBy]);
+
+    const exportCSV = () => {
+        const headers = [
+            "Transaction ID",
+            "Sender",
+            "Receiver",
+            "Amount",
+            "Status",
+            "Date",
+        ];
+
+        const escapeCSV = (value) =>
+            `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+        const rows = filteredTransactions.map((tx) => [
+            tx.transactionId,
+            tx.senderEmail,
+            tx.receiverEmail,
+            tx.amount,
+            tx.status,
+            getTimestamp(tx)
+                ? new Date(getTimestamp(tx)).toLocaleString("en-IN")
+                : "",
+        ]);
+
+        const csv = [headers, ...rows]
+            .map((row) => row.map(escapeCSV).join(","))
+            .join("\r\n");
+
+        const blob = new Blob(["\uFEFF", csv], {
+            type: "text/csv;charset=utf-8;",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = `NeuroWallet_Transactions_${
+            new Date().toISOString().split("T")[0]
+        }.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleViewAll = () => {
+        setSearch("");
+        setStatusFilter("ALL");
+        setSortBy("NEWEST");
+
+        tableRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    };
+
+    const getDisplayName = (email) => {
+        if (!email) return "Unknown";
+
+        if (email === user?.email) return "You";
+
+        return email.split("@")[0];
+    };
+
+    const getInitials = (email) => {
+        if (!email) return "?";
+
+        if (email === user?.email) return "YO";
+
+        return email.slice(0, 2).toUpperCase();
+    };
+
+    const getStatusIcon = (status) => {
+        switch (String(status || "").toUpperCase()) {
+            case "SUCCESS":
+                return <FaCircleCheck aria-hidden="true" />;
+
+            case "PENDING":
+                return <FaClock aria-hidden="true" />;
+
+            default:
+                return <FaCircleXmark aria-hidden="true" />;
+        }
+    };
+
+    const getStatusClass = (status) => {
+        switch (String(status || "").toUpperCase()) {
+            case "SUCCESS":
+                return "success";
+
+            case "PENDING":
+                return "pending";
+
+            default:
+                return "failed";
+        }
+    };
+
     return (
-
-        <div className="transaction-card">
-
-            {/* ==========================================
-                        HEADER
-            ========================================== */}
-
-            <div className="transaction-header">
-
+        <section className="transaction-card nw-transaction-reference">
+            <header className="transaction-header">
                 <div className="transaction-title">
-
-                    <h2>
-
-                        Recent Transactions
-
-                    </h2>
-
+                    <h2>Recent Transactions</h2>
                     <p className="transaction-subtitle">
-
-                        Latest wallet activity
-
+                        Review your latest wallet activity
                     </p>
-
                 </div>
 
                 <div className="transaction-header-actions">
-
-               <button
-className="export-btn"
-onClick={exportCSV}
->
-
-Export CSV
-
-</button>
+                    <button
+                        type="button"
+                        className="export-btn"
+                        onClick={exportCSV}
+                    >
+                        <FaDownload aria-hidden="true" />
+                        Export CSV
+                    </button>
 
                     <button
-className="view-btn"
-onClick={handleViewAll}
->
-
-View All →
-
-</button>
+                        type="button"
+                        className="view-btn"
+                        onClick={handleViewAll}
+                    >
+                        View All
+                        <FaArrowRight aria-hidden="true" />
+                    </button>
                 </div>
-
-            </div>
-
-            {/* ==========================================
-                        TOOLBAR
-            ========================================== */}
+            </header>
 
             <div className="transaction-toolbar">
-
                 <div className="toolbar-left">
-
                     <div className="search-wrapper">
-
-                        <FaMagnifyingGlass className="search-icon" />
-
-                        <input
-
-                            type="text"
-
-                            className="search-box"
-
-                            placeholder="Search transactions..."
-
-                            value={search}
-
-                            onChange={(e) =>
-
-                                setSearch(e.target.value)
-
-                            }
-
+                        <FaMagnifyingGlass
+                            className="search-icon"
+                            aria-hidden="true"
                         />
 
+                        <input
+                            type="search"
+                            className="search-box"
+                            placeholder="Search transactions..."
+                            aria-label="Search transactions"
+                            value={search}
+                            onChange={(event) =>
+                                setSearch(event.target.value)
+                            }
+                        />
                     </div>
 
                     <select
-
                         className="status-filter"
-
+                        aria-label="Filter by status"
                         value={statusFilter}
-
-                        onChange={(e) =>
-
-                            setStatusFilter(e.target.value)
-
+                        onChange={(event) =>
+                            setStatusFilter(event.target.value)
                         }
-
                     >
-
-                        <option value="ALL">
-
-                            All Status
-
-                        </option>
-
-                        <option value="SUCCESS">
-
-                            Success
-
-                        </option>
-
-                        <option value="FAILED">
-
-                            Failed
-
-                        </option>
-
-                        <option value="PENDING">
-
-                            Pending
-
-                        </option>
-
+                        <option value="ALL">All Status</option>
+                        <option value="SUCCESS">Success</option>
+                        <option value="FAILED">Failed</option>
+                        <option value="PENDING">Pending</option>
                     </select>
 
                     <select
-
                         className="sort-filter"
-
+                        aria-label="Sort transactions"
                         value={sortBy}
-
-                        onChange={(e) =>
-
-                            setSortBy(e.target.value)
-
-                        }
-
+                        onChange={(event) => setSortBy(event.target.value)}
                     >
-
-                        <option value="NEWEST">
-
-                            Newest
-
-                        </option>
-
-                        <option value="OLDEST">
-
-                            Oldest
-
-                        </option>
-
-                        <option value="HIGH_AMOUNT">
-
-                            Highest Amount
-
-                        </option>
-
-                        <option value="LOW_AMOUNT">
-
-                            Lowest Amount
-
-                        </option>
-
+                        <option value="NEWEST">Newest First</option>
+                        <option value="OLDEST">Oldest First</option>
+                        <option value="HIGH_AMOUNT">Highest Amount</option>
+                        <option value="LOW_AMOUNT">Lowest Amount</option>
                     </select>
-
                 </div>
 
                 <div className="toolbar-right">
-
-             <div className="record-count">
-
-<span>Showing</span>
-
-<strong>
-
-{sortedTransactions.length}
-
-</strong>
-
-<span>of</span>
-
-<strong>
-
-{transactions.length}
-
-</strong>
-
-<span>Transactions</span>
-
-</div>
+                    <div className="record-count" aria-live="polite">
+                        <span>Showing</span>
+                        <strong>{filteredTransactions.length}</strong>
+                        <span>of</span>
+                        <strong>{transactions.length}</strong>
+                    </div>
                 </div>
-
             </div>
 
-            {/* ==========================================
-                    PART 2 STARTS HERE
-                    Summary Cards
-            ========================================== */}
-            {/* ==========================================
-        SUMMARY CARDS
-========================================== */}
-
-<div className="transaction-summary">
-
-  <div className="summary-card">
-
-    <div className="summary-icon transactions">
-      <FaReceipt />
-    </div>
-
-    <div className="summary-content">
-      <span>Total Transactions</span>
-      <h3>{transactions.length}</h3>
-    </div>
-
-  </div>
-
-  <div className="summary-card">
-
-    <div className="summary-icon received">
-      <FaArrowDown />
-    </div>
-
-    <div className="summary-content">
-      <span>Total Received</span>
-      <h3>{formatCurrency(totalReceived)}</h3>
-    </div>
-
-  </div>
-
-  <div className="summary-card">
-
-    <div className="summary-icon sent">
-      <FaArrowUp />
-    </div>
-
-    <div className="summary-content">
-      <span>Total Sent</span>
-      <h3>{formatCurrency(totalSent)}</h3>
-    </div>
-
-  </div>
-
-  <div className="summary-card">
-
-    <div className="summary-icon success-rate">
-     <FaShieldHalved />
-    </div>
-
-    <div className="summary-content">
-      <span>Success Rate</span>
-      <h3>{successRate}%</h3>
-    </div>
-
-  </div>
-
-</div>
-<div
-className="table-wrapper"
-ref={tableRef}
->
-
-    <table className="transaction-table">
-        <thead>
-
-            <tr>
-
-                <th>ID</th>
-
-                <th>Sender</th>
-
-                <th>Receiver</th>
-
-                <th>Amount</th>
-
-                <th>Status</th>
-
-                <th>Date</th>
-
-                <th></th>
-
-            </tr>
-
-        </thead>
-        <tbody>
-
-            {
-                sortedTransactions.length === 0 ? (
-
-                    <tr>
-
-                        <td colSpan="7">
-
-                            <div className="empty-state">
-
-                                No Transactions Found
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                ) : (
-
-                    sortedTransactions.map((tx) => (
-
-                        <tr key={tx.transactionId}>
-
-                {/* ID */}
-
-                <td>
-
-                    #{tx.transactionId}
-
-                </td>
-
-                {/* Sender */}
-
-                <td>
-
-                    <div className="user-cell">
-
-                        <div
-className={`user-avatar ${
-tx.senderEmail===user?.email
-?
-"secondary"
-:
-""
-}`}
->
-
-                            {tx.senderEmail
-                                ?.substring(0, 2)
-                                .toUpperCase()}
-
-                        </div>
-
-                        <div className="user-info">
-
-                            <span className="user-name">
-
-                             {
-tx.senderEmail===user?.email
-
-?
-
-"You"
-
-:
-
-tx.senderEmail?.split("@")[0]
-}
-
-                            </span>
-
-                            <span className="user-email">
-
-                                {tx.senderEmail}
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </td>
-
-                {/* Receiver */}
-
-                <td>
-
-                    <div className="user-cell">
-
-                        <div
-className={`user-avatar secondary ${
-tx.receiverEmail===user?.email
-?
-"active-user"
-:
-""
-}`}
->
-
-                            {tx.receiverEmail
-                                ?.substring(0, 2)
-                                .toUpperCase()}
-
-                        </div>
-
-                        <div className="user-info">
-
-                            <span className="user-name">
-
-                               {
-tx.receiverEmail===user?.email
-
-?
-
-"You"
-
-:
-
-tx.receiverEmail?.split("@")[0]
-}
-
-                            </span>
-
-                            <span className="user-email">
-
-                                {tx.receiverEmail}
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </td>
-
-                {/* Amount */}
-
-                <td>
-
-                    <div
-                        className={
-
-tx.receiverEmail===user?.email
-
-?
-
-"amount-credit"
-
-:
-
-"amount-debit"
-
-}
-                    >
-
-                        <span className="amount-sign">
-
-                            {
-tx.receiverEmail===user?.email
-
-?
-
-"+"
-
-:
-
-"-"
-
-}
-
-                        </span>
-
-                        {formatCurrency(tx.amount)}
-
-                    </div>
-
-                </td>
-
-                {/* Status */}
-
-                <td>
-
-                    <span
-                        className={`status ${
-                            tx.status === "SUCCESS"
-                                ? "success"
-                                : "failed"
-                        }`}
-                    >
-
-                  {
-
-tx.status==="SUCCESS"
-
-?
-
-<FaCircleCheck/>
-
-:
-
-<FaCircleXmark/>
-
-}
-
-{tx.status}
-                    </span>
-
-                </td>
-
-                {/* Date */}
-
-                <td>
-
-                    <div className="transaction-date">
-
-                        <span>
-
-                            {new Date(tx.timestamp).toLocaleDateString(
-                                "en-IN",
-                                {
-                                    day: "2-digit",
-                                    month: "short",
-                                    year: "numeric"
-                                }
-                            )}
-
-                        </span>
-
-                        <small>
-
-                            {new Date(tx.timestamp).toLocaleTimeString(
-                                "en-IN",
-                                {
-                                    hour: "2-digit",
-                                    minute: "2-digit"
-                                }
-                            )}
-
-                        </small>
-
-                    </div>
-
-                </td>
-
-                {/* Action */}
-
-                <td>
-
-                    <button className="action-btn">
-
-                        <FaEllipsisVertical />
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-        ))
-
-    )
-
-}
-
-</tbody>
-        </table>
-    </div>
-</div>
+            <div className="table-wrapper" ref={tableRef}>
+                <table className="transaction-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Transaction</th>
+                            <th scope="col">Recipient / Sender</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">
+                                <span className="sr-only">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {filteredTransactions.length === 0 ? (
+                            <tr>
+                                <td colSpan={6}>
+                                    <div className="empty-state">
+                                        {transactions.length === 0
+                                            ? "No transactions available yet."
+                                            : "No transactions match your filters."}
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredTransactions.map((tx, index) => {
+                                const incoming =
+                                    Boolean(user?.email) &&
+                                    tx.receiverEmail === user.email;
+
+                                const timestamp = getTimestamp(tx);
+                                const status = String(
+                                    tx.status || "UNKNOWN"
+                                ).toUpperCase();
+
+                                return (
+                                    <tr
+                                        key={
+                                            tx.transactionId ??
+                                            `${timestamp}-${index}`
+                                        }
+                                    >
+                                        <td>
+                                            <div className="nw-tx-id">
+                                                <span className="nw-tx-icon">
+                                                    {incoming ? (
+                                                        <FaArrowDown
+                                                            aria-hidden="true"
+                                                        />
+                                                    ) : (
+                                                        <FaArrowUp
+                                                            aria-hidden="true"
+                                                        />
+                                                    )}
+                                                </span>
+
+                                                <div className="nw-tx-id-text">
+                                                    <strong>
+                                                        {tx.transactionId != null
+                                                            ? `#${tx.transactionId}`
+                                                            : "Transaction"}
+                                                    </strong>
+                                                    <span>Wallet transfer</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div className="user-cell">
+                                                <div
+                                                    className={`user-avatar ${
+                                                        incoming
+                                                            ? "active-user"
+                                                            : "secondary"
+                                                    }`}
+                                                >
+                                                    {getInitials(
+                                                        incoming
+                                                            ? tx.senderEmail
+                                                            : tx.receiverEmail
+                                                    )}
+                                                </div>
+
+                                                <div className="user-info">
+                                                    <span className="user-name">
+                                                        {getDisplayName(
+                                                            incoming
+                                                                ? tx.senderEmail
+                                                                : tx.receiverEmail
+                                                        )}
+                                                    </span>
+
+                                                    <span className="user-email">
+                                                        {incoming
+                                                            ? tx.senderEmail ||
+                                                              "Sender unavailable"
+                                                            : tx.receiverEmail ||
+                                                              "Recipient unavailable"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div className="transaction-date">
+                                                <span>
+                                                    {timestamp
+                                                        ? new Date(
+                                                              timestamp
+                                                          ).toLocaleDateString(
+                                                              "en-IN",
+                                                              {
+                                                                  day: "2-digit",
+                                                                  month: "short",
+                                                                  year: "numeric",
+                                                              }
+                                                          )
+                                                        : "Date unavailable"}
+                                                </span>
+
+                                                <small>
+                                                    {timestamp
+                                                        ? new Date(
+                                                              timestamp
+                                                          ).toLocaleTimeString(
+                                                              "en-IN",
+                                                              {
+                                                                  hour: "2-digit",
+                                                                  minute: "2-digit",
+                                                              }
+                                                          )
+                                                        : ""}
+                                                </small>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div
+                                                className={
+                                                    incoming
+                                                        ? "amount-credit"
+                                                        : "amount-debit"
+                                                }
+                                            >
+                                                <span className="amount-sign">
+                                                    {incoming ? "+" : "-"}
+                                                </span>
+                                                {formatCurrency(tx.amount)}
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <span
+                                                className={`status ${getStatusClass(
+                                                    status
+                                                )}`}
+                                            >
+                                                {getStatusIcon(status)}
+                                                {status}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="action-btn"
+                                                aria-label={`Actions for transaction ${
+                                                    tx.transactionId ?? ""
+                                                }`}
+                                                title="Transaction actions"
+                                            >
+                                                <FaEllipsisVertical
+                                                    aria-hidden="true"
+                                                />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </section>
     );
 }
 

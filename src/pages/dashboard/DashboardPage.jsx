@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getMyWallet } from "../../services/walletService";
 import { getTransactionHistory } from "../../services/transactionService";
@@ -8,8 +8,7 @@ import { getDashboardInsights } from "../../services/dashboardService";
 import "../../styles/dashboard.css";
 import "../../styles/loading.css";
 
-import IncomeChart from "../../components/dashboard/Analytics/IncomeChart";
-import ExpenseChart from "../../components/dashboard/Analytics/ExpenseChart";
+import IncomeExpenseComparison from "../../components/dashboard/Analytics/IncomeExpenseComparison";
 import IncomeTrendChart from "../../components/dashboard/Analytics/IncomeTrendChart";
 import ExpenseTrendChart from "../../components/dashboard/Analytics/ExpenseTrendChart";
 import CashFlowChart from "../../components/dashboard/Analytics/CashFlowChart";
@@ -47,7 +46,6 @@ function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [dashboardInsights, setDashboardInsights] = useState(null);
-    const dashboardRequestId = useRef(0);
 
     const {
         insights,
@@ -58,22 +56,15 @@ function DashboardPage() {
     } = useAI();
 
     const fetchDashboardData = useCallback(async () => {
-        // Each refresh supersedes earlier requests so stale responses cannot
-        // overwrite data from a newer dashboard refresh.
-        const requestId = ++dashboardRequestId.current;
-        const isCurrentRequest = () => dashboardRequestId.current === requestId;
-
         setLoading(true);
         setError("");
 
         try {
             const results = await Promise.allSettled([
                 getMyWallet(),
-                getTransactionHistory(),
+                getTransactionHistory(0, 100),
                 getDashboardInsights(),
             ]);
-
-            if (!isCurrentRequest()) return;
 
             const [walletResult, transactionsResult, insightsResult] = results;
 
@@ -107,16 +98,12 @@ function DashboardPage() {
                 );
             }
         } catch (err) {
-            if (!isCurrentRequest()) return;
-
             console.error("Unexpected dashboard loading error:", err);
             setError(
                 "An unexpected error occurred while loading the dashboard."
             );
         } finally {
-            if (isCurrentRequest()) {
-                setLoading(false);
-            }
+            setLoading(false);
         }
     }, []);
 
@@ -135,8 +122,6 @@ function DashboardPage() {
 
         return () => {
             active = false;
-            // Invalidate in-flight work when leaving the page.
-            dashboardRequestId.current += 1;
         };
     }, [fetchDashboardData]);
 
@@ -193,13 +178,13 @@ function DashboardPage() {
             {/* Recent transactions */}
             <TransactionTable transactions={transactions} />
 
-            {/* Transaction analytics */}
-            <section className="dashboard-section">
+            {/* Section 2 — target dashboard analytics row */}
+            <section className="dashboard-section nw-dashboard-primary-analytics">
                 <AnalyticsHeader />
 
                 <div className="analytics-row">
-                    <IncomeChart transactions={transactions} />
-                    <ExpenseChart transactions={transactions} />
+                    <IncomeExpenseComparison transactions={transactions} />
+                    <SpendingCategoryChart transactions={transactions} />
                 </div>
             </section>
 
@@ -219,21 +204,19 @@ function DashboardPage() {
 
                 <div className="analytics-row">
                     <CashFlowChart transactions={transactions} />
-                    <SpendingCategoryChart transactions={transactions} />
+                    <MonthlyTrend
+                        transactions={transactions}
+                        dashboardInsights={dashboardInsights}
+                    />
                 </div>
             </section>
 
-            {/* Spending insights and monthly trends */}
+            {/* Spending insights */}
             <section className="dashboard-section">
                 <InsightsHeader />
 
                 <div className="analytics-row">
                     <SpendingInsights transactions={transactions} />
-
-                    <MonthlyTrend
-                        transactions={transactions}
-                        dashboardInsights={dashboardInsights}
-                    />
                 </div>
             </section>
 

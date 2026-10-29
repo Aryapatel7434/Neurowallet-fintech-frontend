@@ -200,7 +200,7 @@ function AIInsightsPage() {
                         Rating: {displayValue(score.rating)}
                     </p>
                     <p className="ai-insights-muted">
-                        Risk level: {displayValue(score.riskLevel)}
+                       Risk level: {displayValue(score.risk)}
                     </p>
                     <p>
                         {displayValue(score.remark)}
@@ -216,10 +216,10 @@ function AIInsightsPage() {
                         <span>Expenses</span>
                         <strong>{formatINR(budget.totalExpense)}</strong>
                     </div>
-                    <div className="ai-insights-detail-row">
-                        <span>Savings</span>
-                        <strong>{formatINR(budget.savings)}</strong>
-                    </div>
+                  <div className="ai-insights-detail-row">
+    <span>Remaining budget</span>
+    <strong>{formatINR(budget.remainingBudget)}</strong>
+</div>
                     <p>
                         {displayValue(
                             budget.healthStatus ??

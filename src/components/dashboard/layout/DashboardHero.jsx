@@ -1,171 +1,60 @@
-import { useContext, useEffect, useState } from "react";
 
-import {
-  FaRobot,
-  FaShieldHalved
-} from "react-icons/fa6";
-
+import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
-function DashboardHero() {
+const getGreeting = () => {
+    const hour = new Date().getHours();
 
-  const { user } = useContext(AuthContext);
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+};
 
-  const [currentTime, setCurrentTime] = useState(new Date());
+const formatDate = (date) =>
+    new Intl.DateTimeFormat("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    }).format(date);
 
-  useEffect(() => {
+const getDisplayName = (user) => {
+    if (!user) return "there";
 
-    const timer = setInterval(() => {
+    const name =
+        user.name ??
+        user.fullName ??
+        user.username ??
+        user.firstName ??
+        user.email?.split("@")[0];
 
-      setCurrentTime(new Date());
+    return typeof name === "string" && name.trim()
+        ? name.trim().split(/\s+/)[0]
+        : "there";
+};
 
-    }, 1000);
+export default function DashboardHero() {
+    const { user } = useContext(AuthContext);
 
-    return () => clearInterval(timer);
+    const displayName = getDisplayName(user);
+    const today = new Date();
 
-  }, []);
+    return (
+        <section
+            className="dashboard-hero"
+            aria-labelledby="dashboard-hero-title"
+        >
+            <div className="hero-header">
+                <div className="hero-left">
+                    <h1 className="hero-title" id="dashboard-hero-title">
+                        {getGreeting()}, {displayName}!
+                    </h1>
 
-  const hour = currentTime.getHours();
-
-  let greeting = "Good Evening";
-
-  if (hour < 12) {
-
-    greeting = "Good Morning";
-
-  } else if (hour < 18) {
-
-    greeting = "Good Afternoon";
-
-  }
-
-  const dayName = currentTime.toLocaleDateString(
-    "en-IN",
-    {
-      weekday: "long"
-    }
-  );
-
-  const formattedDate = currentTime.toLocaleDateString(
-    "en-IN",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    }
-  );
-
-  const formattedTime = currentTime.toLocaleTimeString(
-    "en-IN",
-    {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  );
-
-  return (
-
-    <section className="dashboard-hero">
-
-      <div className="hero-header">
-
-        {/* LEFT */}
-
-        <div className="hero-left">
-
-          <h1 className="hero-title">
-
-    {greeting},
-
-    <span className="hero-name">
-
-        {user?.name || "Arya"}
-
-    </span>
-
-    <span className="hero-wave">
-
-        👋
-
-    </span>
-
-</h1>
-          <p className="hero-subtitle">
-
-            Welcome back. Everything looks healthy today.
-
-          </p>
-
-          <div className="hero-status-row">
-
-            <div className="hero-chip backend">
-
-              <span className="chip-dot"></span>
-
-              Backend Connected
-
+                    <p className="hero-subtitle">
+                        Here's your financial overview for today,{" "}
+                        {formatDate(today)}
+                    </p>
+                </div>
             </div>
-
-            <div className="hero-chip wallet">
-
-              💳 Wallet Active
-
-            </div>
-
-            <div className="hero-chip ai">
-
-              <FaRobot />
-
-              AI Ready
-
-            </div>
-
-            <div className="hero-chip secure">
-
-              <FaShieldHalved />
-
-              Secure Session
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* RIGHT */}
-
-        <div className="hero-right">
-
-          <div className="hero-time-card">
-
-            <span className="hero-day">
-
-              {dayName}
-
-            </span>
-
-            <span className="hero-date">
-
-              {formattedDate}
-
-            </span>
-
-            <h2 className="hero-clock">
-
-              {formattedTime}
-
-            </h2>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  );
-
+        </section>
+    );
 }
-
-export default DashboardHero;

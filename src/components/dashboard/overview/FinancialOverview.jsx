@@ -1,303 +1,108 @@
-import {
-  FaWallet,
-  FaArrowTrendUp,
-  FaArrowTrendDown,
-  FaPiggyBank,
-} from "react-icons/fa6";
+import { FaWallet, FaArrowTrendUp, FaArrowTrendDown, FaPiggyBank } from "react-icons/fa6";
+import "./FinancialOverview.css";
 
-function FinancialOverview({
-  wallet,
-  dashboardInsights,
-}) {
-  const balance = wallet?.balance || 0;
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 2,
+});
 
-  const totalIncome =
-    dashboardInsights?.totalIncome || 0;
+const compactCurrencyFormatter = new Intl.NumberFormat("en-IN", {
+  notation: "compact",
+  compactDisplay: "short",
+  maximumFractionDigits: 1,
+});
 
-  const totalExpense =
-    dashboardInsights?.totalExpense || 0;
-
-  const netCashFlow =
-    dashboardInsights?.netCashFlow || 0;
-
-
-    const incomeTrend =
-    totalIncome > 0
-        ? "+8.2%"
-        : "0%";
-
-const expenseTrend =
-    totalExpense > 0
-        ? "-4.5%"
-        : "0%";
-
-const cashFlowTrend =
-    netCashFlow >= 0
-        ? "Healthy"
-        : "Needs Attention";
-
-  // -------------------------
-  // Dynamic Badge Logic
-  // -------------------------
-
-  let incomeBadge = "No Income";
-
-  if (totalIncome > 0) {
-    incomeBadge = "+ Income";
-  }
-
-  let expenseBadge = "Expense";
-
-  if (totalExpense > totalIncome && totalIncome > 0) {
-    expenseBadge = "High Spend";
-  }
-
-  if (totalExpense === 0) {
-    expenseBadge = "No Expense";
-  }
-
-  let cashFlowBadge = "Healthy";
-
-  if (netCashFlow < 0) {
-    cashFlowBadge = "Warning";
-  }
-
-  if (netCashFlow < -10000) {
-    cashFlowBadge = "Critical";
-  }
-
-  // -------------------------
-  // Currency Format
-  // -------------------------
-
- const formatCurrency = (amount) =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
-
-const formatCompactCurrency = (amount) => {
+function formatCurrency(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "₹0";
   if (Math.abs(amount) >= 100000) {
-    return (
-      "₹" +
-      new Intl.NumberFormat("en-IN", {
-        notation: "compact",
-        maximumFractionDigits: 1,
-      }).format(amount)
-    );
+    return `₹${compactCurrencyFormatter.format(amount)}`;
   }
+  return currencyFormatter.format(amount);
+}
 
-  return formatCurrency(amount);
-};
-  // -------------------------
-  // Monthly Performance
-  // -------------------------
+function readNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
 
-  let monthlyChange = 0;
+function FinancialOverview({ wallet, dashboardInsights }) {
+  const balance = readNumber(wallet?.balance);
+  const totalIncome = readNumber(dashboardInsights?.totalIncome);
+  const totalExpense = readNumber(dashboardInsights?.totalExpense);
+  const netCashFlow = dashboardInsights?.netCashFlow == null
+    ? totalIncome - totalExpense
+    : readNumber(dashboardInsights.netCashFlow);
 
-  if (totalIncome > 0) {
+  // Derived from current-period backend totals; no fabricated month-over-month trend.
+  const savingsRate = totalIncome > 0
+    ? Math.max(-100, Math.min(100, (netCashFlow / totalIncome) * 100))
+    : 0;
 
-    monthlyChange = (
-      (netCashFlow / totalIncome) * 100
-    ).toFixed(1);
-
-  }
+  const cards = [
+    {
+      key: "balance",
+      label: "Total Balance",
+      value: formatCurrency(balance),
+      detail: balance > 0 ? "Available wallet balance" : "Your wallet is currently empty",
+      icon: <FaWallet aria-hidden="true" />,
+      iconClass: "nw-kpi-icon--balance",
+      tone: "neutral",
+    },
+    {
+      key: "income",
+      label: "Total Income",
+      value: formatCurrency(totalIncome),
+      detail: "Income recorded for the current period",
+      icon: <FaArrowTrendUp aria-hidden="true" />,
+      iconClass: "nw-kpi-icon--income",
+      tone: "positive",
+    },
+    {
+      key: "expenses",
+      label: "Total Expenses",
+      value: formatCurrency(totalExpense),
+      detail: "Expenses recorded for the current period",
+      icon: <FaArrowTrendDown aria-hidden="true" />,
+      iconClass: "nw-kpi-icon--expenses",
+      tone: "negative",
+    },
+    {
+      key: "savings-rate",
+      label: "Savings Rate",
+      value: `${savingsRate.toFixed(1)}%`,
+      detail: totalIncome > 0
+        ? (netCashFlow >= 0 ? "Income retained after expenses" : "Expenses exceed income")
+        : "Add income to calculate your rate",
+      icon: <FaPiggyBank aria-hidden="true" />,
+      iconClass: "nw-kpi-icon--savings",
+      tone: netCashFlow >= 0 ? "positive" : "negative",
+    },
+  ];
 
   return (
-
-    <div className="financial-overview">
-
-      {/* ================= BALANCE ================= */}
-
-      <div className="overview-card balance-card">
-
-        <div className="overview-top">
-
-          <div className="overview-icon-wrapper balance-bg">
-            <FaWallet className="overview-icon" />
+    <section className="nw-financial-overview" aria-label="Financial overview">
+      {cards.map((card) => (
+        <article className="nw-financial-kpi" key={card.key}>
+          <div className="nw-financial-kpi__main">
+            <span className={`nw-kpi-icon ${card.iconClass}`}>{card.icon}</span>
+            <div className="nw-financial-kpi__content">
+              <p className="nw-financial-kpi__label">{card.label}</p>
+              <p className={`nw-financial-kpi__value nw-financial-kpi__value--${card.tone}`} title={card.value}>
+                {card.value}
+              </p>
+            </div>
           </div>
-
-          <span className="status-badge live">
-            LIVE
-          </span>
-
-        </div>
-
-        <h4>Live Balance</h4>
-
-        <h2>
-          {formatCompactCurrency(balance)}
-        </h2>
-
-        <p className="overview-subtitle">
-           {
-balance > 0
-    ? "Available Wallet Balance"
-    : "Wallet balance is currently empty"
-}
-        </p>
-        <div className="overview-trend positive">
-
-    ▲ Wallet Active
-
-</div>
-
- </div>
-
-      {/* ================= INCOME ================= */}
-
-      <div className="overview-card income-card">
-
-        <div className="overview-top">
-
-          <div className="overview-icon-wrapper income-bg">
-            <FaArrowTrendUp className="overview-icon" />
+          <div className="nw-financial-kpi__footer">
+            <span className={`nw-kpi-status nw-kpi-status--${card.tone}`} aria-hidden="true">
+              {card.tone === "positive" ? <FaArrowTrendUp /> : card.tone === "negative" ? <FaArrowTrendDown /> : <FaWallet />}
+            </span>
+            <p>{card.detail}</p>
           </div>
-
-          <span className="status-badge success">
-            {incomeBadge}
-          </span>
-
-        </div>
-
-        <h4>Monthly Income</h4>
-
-        <h2
-          style={{
-            color:
-              totalIncome > 0
-                ? "#22c55e"
-                : "#ef4444",
-          }}
-        >
-          {formatCompactCurrency(totalIncome)}
-        </h2>
-
-        <p className="overview-subtitle">
-
-       {
-totalIncome > 0
-    ? "Money received this month"
-    : "No income received this month"
-}
-
-
-        </p>
-<div className="overview-trend positive">
-
-    ▲ {incomeTrend}
-
-</div>
-      </div>
-
-      {/* ================= EXPENSE ================= */}
-
-      <div className="overview-card expense-card">
-
-        <div className="overview-top">
-
-          <div className="overview-icon-wrapper expense-bg">
-            <FaArrowTrendDown className="overview-icon" />
-          </div>
-
-          <span className="status-badge danger">
-            {expenseBadge}
-          </span>
-
-        </div>
-
-        <h4>Monthly Expense</h4>
-
-        <h2>
-          {formatCompactCurrency(totalExpense)}
-         
-        </h2>
-
-        <p className="overview-subtitle">
-         {
-totalExpense > 0
-    ? "Total outgoing money"
-    : "No expense recorded"
-}
-        </p>
-<div className="overview-trend negative">
-
-    ▼ {expenseTrend}
-
-</div>
-      </div>
-
-      {/* ================= CASH FLOW ================= */}
-
-      <div className="overview-card savings-card">
-
-        <div className="overview-top">
-
-          <div className="overview-icon-wrapper savings-bg">
-            <FaPiggyBank className="overview-icon" />
-          </div>
-
-          <span
-            className="status-badge"
-            style={{
-              background:
-                cashFlowBadge === "Healthy"
-                  ? "#14532d"
-                  : cashFlowBadge === "Warning"
-                  ? "#7c4d00"
-                  : "#7f1d1d",
-
-              color:
-                cashFlowBadge === "Healthy"
-                  ? "#4ade80"
-                  : cashFlowBadge === "Warning"
-                  ? "#facc15"
-                  : "#f87171",
-            }}
-          >
-            {cashFlowBadge}
-          </span>
-
-        </div>
-
-        <h4>Net Cash Flow</h4>
-
-        <h2
-          style={{
-            color:
-              netCashFlow >= 0
-                ? "#22c55e"
-                : "#ef4444",
-          }}
-        >
-          {formatCompactCurrency(netCashFlow)}
-        </h2>
-
-       <p className="overview-subtitle">
-  {
-    netCashFlow > 0
-      ? "Positive cash flow"
-      : netCashFlow === 0
-      ? "Balanced cash flow"
-      : "Expenses exceed income"
-  }
-</p>
-<div
-    className={`overview-trend ${
-        netCashFlow >= 0
-            ? "positive"
-            : "negative"
-    }`}
->
-
-    {cashFlowTrend}
-
-</div>
-      </div>
-
-    </div>
-
+        </article>
+      ))}
+    </section>
   );
 }
 

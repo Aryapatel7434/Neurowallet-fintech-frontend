@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/dashboard/layout/Sidebar";
 import Navbar from "../components/dashboard/layout/Navbar";
 import api from "../api/axiosConfig";
+import "../styles/dashboard-layout.css";
 
 function DashboardLayout({ children }) {
     const [theme, setTheme] = useState("DARK");
@@ -16,21 +17,22 @@ function DashboardLayout({ children }) {
                     "/users/me/preferences"
                 );
 
-                if (active) {
-                    const savedTheme =
-                        response.data?.theme === "LIGHT"
-                            ? "LIGHT"
-                            : "DARK";
+                if (!active) return;
 
-                    setTheme(savedTheme);
-                    document.documentElement.dataset.theme =
-                        savedTheme.toLowerCase();
-                }
-            } catch (error) {
-                if (active) {
-                    setTheme("DARK");
-                    document.documentElement.dataset.theme = "dark";
-                }
+                const savedTheme =
+                    response.data?.theme === "LIGHT"
+                        ? "LIGHT"
+                        : "DARK";
+
+                setTheme(savedTheme);
+
+                document.documentElement.dataset.theme =
+                    savedTheme.toLowerCase();
+            } catch {
+                if (!active) return;
+
+                setTheme("DARK");
+                document.documentElement.dataset.theme = "dark";
             }
         };
 
@@ -43,15 +45,15 @@ function DashboardLayout({ children }) {
 
     return (
         <div
-            className="dashboard-layout"
+            className="dashboard-layout nw-dashboard-layout"
             data-theme={theme.toLowerCase()}
         >
             <Sidebar />
 
-            <div className="dashboard-content">
+            <div className="dashboard-content nw-dashboard-content">
                 <Navbar />
 
-                <main className="dashboard-page-content">
+                <main className="dashboard-page-content nw-dashboard-main">
                     {children}
                 </main>
             </div>

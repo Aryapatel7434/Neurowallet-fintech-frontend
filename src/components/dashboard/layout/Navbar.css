@@ -1,0 +1,529 @@
+
+/* =========================================================
+   NEUROWALLET — PHASE 2
+   Navbar | Reference-matched dark navy fintech UI
+   File: src/components/dashboard/layout/Navbar.css
+   ========================================================= */
+
+/* ---------- Navbar shell ---------- */
+
+.dashboard-navbar.nw-navbar {
+  position: relative;
+  z-index: 50;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 72px;
+
+  margin: 0;
+  padding: 12px 20px;
+  box-sizing: border-box;
+
+  color: #f3f7ff;
+  background: linear-gradient(100deg, #071526, #0c1d36);
+  border: 0;
+  border-bottom: 1px solid rgb(120 158 205 / 16%);
+  border-radius: 0;
+  box-shadow: none;
+
+  font-family: Inter, Arial, sans-serif;
+}
+
+.dashboard-navbar.nw-navbar *,
+.dashboard-navbar.nw-navbar *::before,
+.dashboard-navbar.nw-navbar *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- Search ---------- */
+
+.dashboard-navbar.nw-navbar .navbar-left {
+  display: flex;
+  align-items: center;
+  flex: 1 1 480px;
+
+  width: auto;
+  min-width: 0;
+  max-width: 540px;
+
+  margin: 0;
+}
+
+.dashboard-navbar.nw-navbar .nw-navbar-search {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+
+  margin: 0;
+  padding: 0 12px;
+
+  background: #0c1c30;
+  border: 1px solid #29415f;
+  border-radius: 10px;
+
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.dashboard-navbar.nw-navbar .nw-navbar-search:focus-within {
+  border-color: #3978ff;
+  box-shadow: 0 0 0 3px rgb(57 120 255 / 12%);
+}
+
+.dashboard-navbar.nw-navbar .search-icon {
+  flex: 0 0 auto;
+  color: #9eb2ce;
+  font-size: 15px;
+}
+
+.dashboard-navbar.nw-navbar .search-box {
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  color: #eef5ff;
+  background: transparent;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.dashboard-navbar.nw-navbar .search-box::placeholder {
+  color: #a1b1c8;
+  opacity: 1;
+}
+
+.dashboard-navbar.nw-navbar .search-box:focus {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.dashboard-navbar.nw-navbar .search-box::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.dashboard-navbar.nw-navbar .nw-search-shortcut {
+  flex: 0 0 auto;
+
+  padding: 5px 7px;
+  border-radius: 5px;
+
+  color: #a8b8ce;
+  background: #14263e;
+
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* ---------- Right-side controls ---------- */
+
+.dashboard-navbar.nw-navbar .navbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+
+  margin: 0;
+}
+
+.dashboard-navbar.nw-navbar .nw-period-control {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.dashboard-navbar.nw-navbar .dashboard-filter {
+  width: 155px;
+  min-width: 120px;
+  height: 40px;
+
+  margin: 0;
+  padding: 0 12px;
+
+  color: #e6efff;
+  background-color: #0c1c30;
+  border: 1px solid #29415f;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.dashboard-navbar.nw-navbar .dashboard-filter:focus-visible {
+  outline: 2px solid #4a91ff;
+  outline-offset: 2px;
+}
+
+/* ---------- Backend status ---------- */
+
+.dashboard-navbar.nw-navbar .backend-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 14px;
+
+  color: #4adea0;
+  background: rgb(16 185 129 / 11%);
+  border: 1px solid rgb(16 185 129 / 10%);
+  border-radius: 22px;
+
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dashboard-navbar.nw-navbar .backend-dot {
+  flex: 0 0 auto;
+  color: #22c879;
+  font-size: 9px;
+}
+
+/* ---------- Notification button ---------- */
+
+.dashboard-navbar.nw-navbar .notification-btn {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+
+  margin: 0;
+  padding: 0;
+
+  color: #b4c9ee;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  font-size: 19px;
+  cursor: pointer;
+
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.dashboard-navbar.nw-navbar .notification-btn:hover {
+  color: #ffffff;
+  background: rgb(255 255 255 / 6%);
+}
+
+.dashboard-navbar.nw-navbar .notification-btn:focus-visible {
+  outline: 2px solid #4a91ff;
+  outline-offset: 2px;
+}
+
+.dashboard-navbar.nw-navbar .notification-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+
+  color: #ffffff;
+  background: #f04452;
+  border: 1px solid #0c1d36;
+  border-radius: 10px;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ---------- Profile ---------- */
+
+.dashboard-navbar.nw-navbar .nw-profile-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.dashboard-navbar.nw-navbar .profile-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+  margin: 0;
+  padding: 2px 0 2px 2px;
+
+  color: #f1f6ff;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-navbar.nw-navbar .profile-card:hover .profile-name {
+  color: #8fc7ff;
+}
+
+.dashboard-navbar.nw-navbar .profile-card:focus-visible {
+  outline: 2px solid #4a91ff;
+  outline-offset: 4px;
+}
+
+.dashboard-navbar.nw-navbar .profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #5979ed, #7b61d9);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.dashboard-navbar.nw-navbar .profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.dashboard-navbar.nw-navbar .profile-name {
+  display: block;
+
+  max-width: 130px;
+  overflow: hidden;
+
+  color: #f4f7ff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-navbar.nw-navbar .profile-role {
+  color: #8fa4c2;
+  font-size: 10px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.dashboard-navbar.nw-navbar .profile-arrow {
+  flex: 0 0 auto;
+  margin-left: 2px;
+
+  color: #9cb0cd;
+  font-size: 10px;
+
+  transition: transform 160ms ease;
+}
+
+.dashboard-navbar.nw-navbar .profile-arrow.is-open {
+  transform: rotate(180deg);
+}
+
+/* ---------- Profile dropdown ---------- */
+
+.dashboard-navbar.nw-navbar .nw-profile-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 100;
+
+  width: 200px;
+  max-width: calc(100vw - 24px);
+  padding: 12px;
+
+  color: #eef5ff;
+  background: #102039;
+  border: 1px solid #29415f;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 35%);
+}
+
+.dashboard-navbar.nw-navbar .nw-profile-menu-heading {
+  padding: 4px 5px 10px;
+
+  color: #eef5ff;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-navbar.nw-navbar .nw-profile-menu button {
+  width: 100%;
+  padding: 8px;
+
+  color: #b9c9df;
+  background: transparent;
+  border: 1px solid #29415f;
+  border-radius: 6px;
+
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-navbar.nw-navbar .nw-profile-menu button:hover {
+  color: #ffffff;
+  background: rgb(255 255 255 / 5%);
+}
+
+/* ---------- Accessible screen-reader text ---------- */
+
+.dashboard-navbar.nw-navbar .sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Laptop ---------- */
+
+@media (max-width: 1100px) {
+  .dashboard-navbar.nw-navbar {
+    gap: 12px;
+    padding-inline: 14px;
+  }
+
+  .dashboard-navbar.nw-navbar .navbar-left {
+    flex-basis: 240px;
+  }
+
+  .dashboard-navbar.nw-navbar .navbar-right {
+    gap: 9px;
+  }
+
+  .dashboard-navbar.nw-navbar .backend-status {
+    display: none;
+  }
+
+  .dashboard-navbar.nw-navbar .dashboard-filter {
+    width: 120px;
+  }
+}
+
+/* ---------- Tablet ---------- */
+
+@media (max-width: 760px) {
+  .dashboard-navbar.nw-navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .dashboard-navbar.nw-navbar .navbar-left {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-navbar.nw-navbar .navbar-right {
+    flex: 1 1 100%;
+    justify-content: space-between;
+
+    width: 100%;
+    gap: 8px;
+  }
+
+  .dashboard-navbar.nw-navbar .profile-role,
+  .dashboard-navbar.nw-navbar .nw-search-shortcut {
+    display: none;
+  }
+}
+
+/* ---------- Small mobile ---------- */
+
+@media (max-width: 430px) {
+  .dashboard-navbar.nw-navbar {
+    padding: 10px;
+  }
+
+  .dashboard-navbar.nw-navbar .dashboard-filter {
+    display: none;
+  }
+
+  .dashboard-navbar.nw-navbar .profile-info {
+    display: none;
+  }
+
+  .dashboard-navbar.nw-navbar .navbar-right {
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .dashboard-navbar.nw-navbar .nw-navbar-search {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .dashboard-navbar.nw-navbar .search-box::placeholder {
+    color: #a1b1c8;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-navbar.nw-navbar *,
+  .dashboard-navbar.nw-navbar *::before,
+  .dashboard-navbar.nw-navbar *::after {
+    transition: none !important;
+  }
+}

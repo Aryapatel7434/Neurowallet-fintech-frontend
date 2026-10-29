@@ -1,0 +1,116 @@
+
+/* NeuroWallet dashboard: main application layout */
+
+:root {
+    --nw-sidebar-width: 220px;
+    --nw-page-bg: #050d19;
+    --nw-panel-bg: #0a1929;
+    --nw-panel-border: #18334d;
+    --nw-text: #f2f6ff;
+    --nw-muted: #9aacc5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: var(--nw-sidebar-width) minmax(0, 1fr);
+    width: 100%;
+    min-height: 100vh;
+    background: var(--nw-page-bg);
+    color: var(--nw-text);
+}
+
+.dashboard-layout > .sidebar {
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    align-self: stretch;
+}
+
+.dashboard-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    overflow-x: clip;
+    background: var(--nw-page-bg);
+}
+
+.dashboard-content > .dashboard-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+}
+
+.dashboard-page-content {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    padding: 20px;
+    overflow: visible;
+}
+
+/* Prevent child cards, charts, and grids from expanding the page */
+.dashboard-page-content > *,
+.dashboard-page-content section,
+.dashboard-page-content article {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.dashboard-page-content img,
+.dashboard-page-content canvas,
+.dashboard-page-content svg {
+    max-width: 100%;
+}
+
+/* Use the available width on medium screens */
+@media (max-width: 1100px) {
+    :root {
+        --nw-sidebar-width: 200px;
+    }
+
+    .dashboard-page-content {
+        padding: 16px;
+    }
+}
+
+/* Mobile layout */
+@media (max-width: 760px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-layout > .sidebar {
+        min-height: auto;
+        width: 100%;
+    }
+
+    .dashboard-page-content {
+        padding: 12px;
+    }
+
+    .dashboard-content > .dashboard-navbar {
+        position: relative;
+    }
+}

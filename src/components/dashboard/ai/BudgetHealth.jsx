@@ -1,237 +1,136 @@
+
 import "./BudgetHealth.css";
 import { FaChartLine, FaCircleCheck } from "react-icons/fa6";
 
-function BudgetHealth({
-    wallet,
-    budgetHealth,
-    loading
-}) {
+function BudgetHealth({ wallet, budgetHealth, loading }) {
+    const formatCurrency = (amount) => {
+        const value = Number(amount);
 
-    const formatCurrency = (amount) =>
-        new Intl.NumberFormat("en-IN", {
+        if (amount == null || amount === "" || !Number.isFinite(value)) {
+            return "—";
+        }
+
+        return new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: "INR",
             maximumFractionDigits: 0,
-        }).format(amount || 0);
+        }).format(value);
+    };
 
     if (loading) {
         return (
-            <div className="budget-card">
+            <div className="budget-card" aria-busy="true">
                 <div className="budget-header">
                     <h2>
-                        <FaChartLine />
-                        Budget Health
+                        <FaChartLine /> Budget Health
                     </h2>
-
-                    <span className="budget-live">
-                        Loading...
-                    </span>
+                    <span className="budget-live">Loading...</span>
                 </div>
 
-                <div
-                    style={{
-                        padding: "40px",
-                        textAlign: "center",
-                        fontWeight: "600",
-                    }}
-                >
+                <div style={{ padding: "24px", textAlign: "center" }}>
                     Fetching AI Budget Analysis...
                 </div>
             </div>
         );
     }
-const rawPercentage =
-    budgetHealth?.healthPercentage ?? 0;
 
-const displayPercentage =
-    rawPercentage <= 0
-        ? 5
-        : Math.min(100, rawPercentage);
+    const rawPercentage = Number(budgetHealth?.healthPercentage);
+    const hasPercentage =
+        budgetHealth?.healthPercentage != null &&
+        budgetHealth.healthPercentage !== "" &&
+        Number.isFinite(rawPercentage);
 
-const percentage =
-    rawPercentage <= 0
-        ? 0
-        : Math.min(100, rawPercentage);
+    const percentage = hasPercentage
+        ? Math.min(100, Math.max(0, rawPercentage))
+        : null;
 
-    const remaining =
-        budgetHealth?.remainingBudget ?? 0;
+    const status = budgetHealth?.status ?? "Unavailable";
+    const income = budgetHealth?.totalIncome;
+    const expense = budgetHealth?.totalExpense;
+    const remaining = budgetHealth?.remainingBudget;
 
-    const status =
-        budgetHealth?.status ??
-        "Unknown";
+    // Income is displayed as the reported total, not assumed to be
+    // a user-defined budget.
+    let recommendation = "Budget information is currently unavailable.";
 
-const income =
-    budgetHealth?.totalIncome ?? 0;
-
-const expense =
-    budgetHealth?.totalExpense ?? 0;
-
-const totalBudget = income;
-
-const spent = expense;
-
-    let recommendation;
-
-switch (status) {
-
-    case "Excellent":
+    if (status === "Excellent") {
         recommendation =
             "Excellent budgeting! Continue your current financial discipline.";
-        break;
-
-    case "Healthy":
+    } else if (status === "Healthy") {
         recommendation =
-            "Your budget is healthy. Try increasing your monthly savings.";
-        break;
-
-    case "Average":
+            "Your budget is healthy. Consider increasing your savings if it fits your goals.";
+    } else if (status === "Average") {
         recommendation =
-            "Monitor your expenses and reduce unnecessary spending.";
-        break;
-
-    default:
+            "Monitor your expenses and review unnecessary spending.";
+    } else if (status === "Critical") {
         recommendation =
-            "Critical budget alert! Focus on reducing spending immediately.";
-}
+            "Your budget is marked critical. Review your recorded expenses.";
+    }
+
+    const hasBudgetData = budgetHealth != null;
 
     return (
-
         <div className="budget-card">
-
-            {/* Header */}
-
             <div className="budget-header">
-
                 <h2>
-
-                    <FaChartLine />
-
-                    Budget Health
-
+                    <FaChartLine /> Budget Health
                 </h2>
-
                 <span className="budget-live">
-
-                    LIVE AI
-
+                    {hasBudgetData ? "LIVE AI" : "DATA UNAVAILABLE"}
                 </span>
-
             </div>
 
-            {/* Progress */}
-
-            <div className="budget-progress">
-
+            <div
+                className="budget-progress"
+                role="progressbar"
+                aria-label="Budget health percentage"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percentage ?? 0}
+            >
                 <div
                     className="budget-fill"
-                    style={{
-                        width: `${percentage}%`,
-                        
-                    }}
+                    style={{ width: `${percentage ?? 0}%` }}
                 />
-
             </div>
-
-            {/* Score */}
 
             <div className="budget-score">
-
-                <h3>
-
-                    {percentage.toFixed(0)}%
-
-                </h3>
-
-                <p>
-
-                    {status}
-
-                </p>
-
+                <h3>{percentage == null ? "—" : `${percentage}%`}</h3>
+                <p>{status}</p>
             </div>
-
-            {/* Metrics */}
 
             <div className="budget-metrics">
-
                 <div>
-
-                    <span>
-
-                        Spent
-
-                    </span>
-
+                    <span>Spent</span>
                     <strong className="money-value">
-
-                        {formatCurrency(spent)}
-
+                        {formatCurrency(expense)}
                     </strong>
-
                 </div>
 
                 <div>
-
-                    <span>
-
-                        Remaining
-
-                    </span>
-
+                    <span>Remaining</span>
                     <strong className="money-value">
-
                         {formatCurrency(remaining)}
-
                     </strong>
-
                 </div>
 
                 <div>
-
-                    <span>
-
-                        Budget
-
-                    </span>
-
+                    <span>Income</span>
                     <strong className="money-value">
-
-                        {formatCurrency(totalBudget)}
-
+                        {formatCurrency(income)}
                     </strong>
-
                 </div>
-
             </div>
-
-            {/* Recommendation */}
 
             <div className="budget-recommendation">
-
                 <FaCircleCheck />
-
                 <div>
-
-                    <h4>
-
-                        AI Recommendation
-
-                    </h4>
-
-                    <p>
-
-                        {recommendation}
-
-                    </p>
-
+                    <h4>AI Recommendation</h4>
+                    <p>{recommendation}</p>
                 </div>
-
             </div>
-
         </div>
-
     );
-
 }
 
 export default BudgetHealth;

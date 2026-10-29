@@ -1,217 +1,105 @@
+
 import "./GoalRecommendation.css";
 
 import {
     FaLightbulb,
     FaBullseye,
     FaCircleCheck,
-    FaArrowTrendUp
+    FaArrowTrendUp,
 } from "react-icons/fa6";
 
-function GoalRecommendation({
-    goalRecommendation,
-    loading
-}) {
+function GoalRecommendation({ goalRecommendation, loading }) {
+    const formatCurrency = (amount) => {
+        if (amount == null || amount === "") return "—";
 
-    const formatCurrency = (amount) =>
-        new Intl.NumberFormat("en-IN", {
+        const value = Number(amount);
+        if (!Number.isFinite(value)) return "—";
+
+        return new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: "INR",
             maximumFractionDigits: 0,
-        }).format(amount || 0);
+        }).format(value);
+    };
 
     if (loading) {
-
         return (
-
-            <div className="recommend-card">
-
+            <div className="recommend-card" aria-busy="true">
                 <div className="recommend-header">
-
                     <h2>
-
-                        <FaLightbulb />
-
-                        Goal Recommendation
-
+                        <FaLightbulb /> AI Recommendation
                     </h2>
-
-                    <span className="recommend-live">
-
-                        Loading...
-
-                    </span>
-
+                    <span className="recommend-live">Loading...</span>
                 </div>
-
-                <div
-                    style={{
-                        padding: "40px",
-                        textAlign: "center",
-                        fontWeight: "600"
-                    }}
-                >
-                    Generating AI Recommendation...
-                </div>
-
+                <p>Generating your financial recommendation...</p>
             </div>
-
         );
-
     }
 
-    const goalName =
-        goalRecommendation?.goalName ??
-        "Emergency Fund";
+    const hasGoal = goalRecommendation != null;
 
-    const targetAmount =
-        goalRecommendation?.targetAmount ?? 0;
-
-    const currentAmount =
-        goalRecommendation?.currentAmount ?? 0;
+    const goalName = goalRecommendation?.goalName;
+    const targetAmount = goalRecommendation?.targetAmount;
+    const currentAmount = goalRecommendation?.currentAmount;
+    const rawProgress = Number(goalRecommendation?.progressPercentage);
 
     const progress =
-        goalRecommendation?.progressPercentage ?? 0;
+        goalRecommendation?.progressPercentage != null &&
+        goalRecommendation.progressPercentage !== "" &&
+        Number.isFinite(rawProgress)
+            ? Math.min(100, Math.max(0, rawProgress))
+            : null;
 
-    const recommendation =
-        goalRecommendation?.recommendation ??
-        "Continue saving regularly.";
+    const recommendation = goalRecommendation?.recommendation;
 
     return (
-
         <div className="recommend-card">
-
-            {/* Header */}
-
             <div className="recommend-header">
-
                 <h2>
-
-                    <FaLightbulb />
-
-                    Goal Recommendation
-
+                    <FaLightbulb /> AI Recommendation
                 </h2>
-
                 <span className="recommend-live">
-
-                    LIVE AI
-
+                    {hasGoal ? "LIVE AI" : "UNAVAILABLE"}
                 </span>
-
             </div>
-
-            {/* Progress */}
 
             <div className="recommend-confidence">
-
                 <div>
-
-                    <span>
-
-                        Goal Progress
-
-                    </span>
-
-                    <h1>
-
-                        {progress}%
-
-                    </h1>
-
+                    <span>Goal Progress</span>
+                    <h1>{progress == null ? "—" : `${Math.round(progress)}%`}</h1>
                 </div>
-
                 <div className="recommend-priority">
-
-                    Active Goal
-
+                    {hasGoal ? "Active Goal" : "No goal data"}
                 </div>
-
             </div>
-
-            {/* Goal */}
 
             <div className="recommend-box">
-
                 <FaBullseye />
-
                 <div>
-
-                    <h4>
-
-                        {goalName}
-
-                    </h4>
-
+                    <h4>{goalName ?? "Goal unavailable"}</h4>
                     <p>
-
-                        Target:
-
-                        <strong>
-
-                            {" "}
-                            {formatCurrency(targetAmount)}
-
-                        </strong>
-
+                        Target: <strong>{formatCurrency(targetAmount)}</strong>
                     </p>
-
                     <p>
-
-                        Current:
-
-                        <strong>
-
-                            {" "}
-                            {formatCurrency(currentAmount)}
-
-                        </strong>
-
+                        Current: <strong>{formatCurrency(currentAmount)}</strong>
                     </p>
-
                 </div>
-
             </div>
-
-            {/* Recommendation */}
 
             <div className="recommend-impact">
-
-                <span>
-
-                    AI Recommendation
-
-                </span>
-
+                <span>AI Recommendation</span>
                 <strong>
-
                     <FaArrowTrendUp />
-
-                    {" "}
-
-                    {recommendation}
-
+                    {recommendation ?? "No recommendation is available yet."}
                 </strong>
-
             </div>
-
-            {/* Footer */}
 
             <div className="recommend-footer">
-
                 <FaCircleCheck />
-
-                <span>
-
-                    Generated by NeuroWallet AI
-
-                </span>
-
+                <span>Generated by NeuroWallet AI</span>
             </div>
-
         </div>
-
     );
-
 }
 
 export default GoalRecommendation;

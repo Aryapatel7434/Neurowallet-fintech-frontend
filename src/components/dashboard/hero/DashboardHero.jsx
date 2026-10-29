@@ -1,105 +1,120 @@
-import "./DashboardHero.css";
-import { FaWallet } from "react-icons/fa6";
 
-function DashboardHero({
-    wallet,
-    dashboardInsights
-}) {
- const {
-user
-}
-=
-useContext(AuthContext);
+import { useContext, useEffect, useState } from "react";
+import { FaRobot, FaShieldHalved } from "react-icons/fa6";
+import { AuthContext } from "../../../context/AuthContext";
 
-const balance =
-    wallet?.balance || 0;
+const getGreeting = () => {
+  const hour = new Date().getHours();
 
-const totalIncome =
-    dashboardInsights?.totalIncome || 0;
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+};
 
-const totalExpense =
-    dashboardInsights?.totalExpense || 0;
+const formatDate = (date) =>
+  new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
 
-const netCashFlow =
-    dashboardInsights?.netCashFlow || 0;
+const formatTime = (date) =>
+  new Intl.DateTimeFormat("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(date);
 
+const getDisplayName = (user) => {
+  if (!user) return "there";
 
-    const hour = new Date().getHours();
+  const name =
+    user.name ??
+    user.fullName ??
+    user.username ??
+    user.firstName ??
+    user.email?.split("@")[0];
 
-let greeting = "Good Evening";
+  if (typeof name !== "string" || !name.trim()) {
+    return "there";
+  }
 
-if (hour < 12) {
+  return name.trim().split(/\s+/)[0];
+};
 
-    greeting = "Good Morning";
+export default function DashboardHero() {
+  const { user } = useContext(AuthContext);
+  const [now, setNow] = useState(() => new Date());
 
-} else if (hour < 18) {
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setNow(new Date());
+    }, 1000);
 
-    greeting = "Good Afternoon";
+    return () => window.clearInterval(timerId);
+  }, []);
 
-}
+  const displayName = getDisplayName(user);
+
   return (
-    <section className="hero-section">
+    <section className="dashboard-hero" aria-labelledby="dashboard-hero-title">
+      <div className="hero-header">
+        <div className="hero-left">
+          <p className="hero-eyebrow">YOUR FINANCIAL COMMAND CENTER</p>
 
-      <div className="hero-banner">
+          <h1 className="hero-title" id="dashboard-hero-title">
+            {getGreeting()},{" "}
+            <span className="hero-name">{displayName}</span>
+            <span className="hero-wave" aria-hidden="true">
+              {" "}
+              👋
+            </span>
+          </h1>
 
-        <div className="hero-content">
-          <span className="hero-badge">
-            NeuroWallet AI
-          </span>
+          <p className="hero-subtitle">
+            Your money, your insights, your next move. Here’s your financial
+            overview.
+          </p>
 
-         <h1>
+          <div className="hero-status-row" aria-label="Platform status">
+            <span className="hero-chip backend">
+              <span className="chip-dot" aria-hidden="true" />
+              Dashboard
+            </span>
 
-    {greeting},
+            <span className="hero-chip wallet">
+              <span className="chip-dot" aria-hidden="true" />
+              Wallet
+            </span>
 
-    {" "}
+            <span className="hero-chip ai">
+              <FaRobot aria-hidden="true" />
+              AI insights
+            </span>
 
-    {user?.name || "User"}
-
-    👋
-
-</h1>
-
-<p>
-
-    Welcome back to NeuroWallet AI.
-
-    Monitor your wallet, transactions,
-
-    analytics and financial insights
-
-    from one secure dashboard.
-
-</p>
+            <span className="hero-chip secure">
+              <FaShieldHalved aria-hidden="true" />
+              Secure access
+            </span>
+          </div>
         </div>
 
         <div className="hero-right">
+          <div className="hero-time-card" aria-label="Current local date and time">
+            <span className="hero-day">{now.toLocaleDateString("en-IN", {
+              weekday: "long",
+            })}</span>
 
-          <div className="hero-status">
-            ● AI Monitoring Active
+            <time className="hero-clock" dateTime={now.toISOString()}>
+              {formatTime(now)}
+            </time>
+
+            <span className="hero-date">{formatDate(now)}</span>
           </div>
-
-          <div className="hero-balance-card">
-
-            <FaWallet className="hero-wallet-icon" />
-
-            <div>
-              <span>Total Balance</span>
-
-              <h2>
-
-₹{Number(balance).toLocaleString("en-IN")}
-
-</h2>
-            </div>
-
-          </div>
-
         </div>
-
       </div>
-
     </section>
   );
 }
-
-export default DashboardHero;

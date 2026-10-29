@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+
+import { useCallback, useEffect, useState } from "react";
+
 import {
     getAIInsights,
     getFinancialScore,
     getBudgetHealth,
-    getGoalRecommendation
+    getGoalRecommendation,
 } from "../services/aiService";
 
 const useAI = () => {
-
     const [insights, setInsights] = useState(null);
     const [financialScore, setFinancialScore] = useState(null);
     const [budgetHealth, setBudgetHealth] = useState(null);
@@ -16,45 +17,65 @@ const useAI = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
+    const fetchAIData = useCallback(async () => {
+        setLoading(true);
+        setError("");
 
-        const fetchAIData = async () => {
+        const requests = [
+            {
+                name: "AI insights",
+                request: getAIInsights,
+                setter: setInsights,
+            },
+            {
+                name: "Financial score",
+                request: getFinancialScore,
+                setter: setFinancialScore,
+            },
+            {
+                name: "Budget health",
+                request: getBudgetHealth,
+                setter: setBudgetHealth,
+            },
+            {
+                name: "Goal recommendation",
+                request: getGoalRecommendation,
+                setter: setGoalRecommendation,
+            },
+        ];
 
-            try {
+        const results = await Promise.allSettled(
+            requests.map(({ request }) => request())
+        );
 
-                const [
-                    insightsRes,
-                    scoreRes,
-                    budgetRes,
-                    goalRes
-                ] = await Promise.all([
-                    getAIInsights(),
-                    getFinancialScore(),
-                    getBudgetHealth(),
-                    getGoalRecommendation()
-                ]);
+        const failures = [];
 
-              setInsights(insightsRes);
-setFinancialScore(scoreRes);
-setBudgetHealth(budgetRes);
-setGoalRecommendation(goalRes);
+        results.forEach((result, index) => {
+            const { name, setter } = requests[index];
 
-            } catch (err) {
-
-                console.error(err);
-                setError("Failed to load AI data.");
-
-            } finally {
-
-                setLoading(false);
-
+            if (result.status === "fulfilled") {
+                setter(result.value);
+            } else {
+                failures.push(name);
+                console.error(
+                    `Failed to load ${name}:`,
+                    result.reason
+                );
             }
+        });
 
-        };
+        if (failures.length > 0) {
+            setError(
+                `Some AI data could not be loaded: ${failures.join(", ")}.`
+            );
+        }
 
-        fetchAIData();
-
+        setLoading(false);
     }, []);
+
+    useEffect(() => {
+        fetchAIData();
+    }, [fetchAIData]);
 
     return {
         insights,
@@ -62,9 +83,9 @@ setGoalRecommendation(goalRes);
         budgetHealth,
         goalRecommendation,
         loading,
-        error
+        error,
+        refreshAIData: fetchAIData,
     };
-
 };
 
 export default useAI;
