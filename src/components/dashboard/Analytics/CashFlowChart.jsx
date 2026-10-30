@@ -16,7 +16,7 @@ import {
   FaArrowUpRightFromSquare,
 } from "react-icons/fa6";
 
-import "./Analytics.css";
+import "./CashFlowChart.css";
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",

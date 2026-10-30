@@ -1,113 +1,197 @@
 
-/* BudgetHealth.css */
+/* =========================================================
+   NEUROWALLET — BUDGET HEALTH
+   Enterprise Financial Dashboard
+========================================================= */
+
+.budget-card,
+.budget-card * {
+    box-sizing: border-box;
+}
 
 .budget-card {
     position: relative;
+
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    min-width: 0;
+    justify-content: flex-start;
+    gap: 19px;
+
+    width: 100%;
     height: 100%;
-    padding: 20px;
+    min-width: 0;
+
+    padding: 22px;
+
     color: #f1f5f9;
-    background: linear-gradient(145deg, #14243b, #0b1929);
+
+    background: linear-gradient(
+        145deg,
+        #14243b 0%,
+        #0b1929 100%
+    );
+
     border: 1px solid #203955;
     border-top: 3px solid #3b82f6;
     border-radius: 18px;
+
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .budget-card:hover {
     border-color: #35547a;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
+
+/* =========================================================
+   1. HEADER
+========================================================= */
 
 .budget-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
+
+    min-width: 0;
 }
 
 .budget-header h2 {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
+
+    min-width: 0;
     margin: 0;
+
     color: #f8fafc;
-    font-size: 17px;
-    line-height: 1.35;
-    font-weight: 700;
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.4;
 }
 
 .budget-header h2 svg {
-    flex-shrink: 0;
+    flex: 0 0 auto;
+
     color: #60a5fa;
-    font-size: 17px;
+    font-size: 19px;
 }
 
 .budget-live {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    padding: 6px 9px;
-    border-radius: 999px;
-    background: rgba(34, 197, 94, 0.12);
+    justify-content: center;
+    gap: 7px;
+
+    flex: 0 0 auto;
+
+    padding: 7px 11px;
+
     color: #4ade80;
+    background: rgba(34, 197, 94, 0.12);
+
+    border: 1px solid rgba(34, 197, 94, 0.12);
+    border-radius: 999px;
+
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 750;
+    white-space: nowrap;
 }
 
 .budget-live::before {
     content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+
     background: #22c55e;
+    border-radius: 50%;
 }
 
+/* =========================================================
+   2. BUDGET PROGRESS
+========================================================= */
+
 .budget-progress {
+    position: relative;
+
     width: 100%;
-    height: 7px;
+    height: 9px;
+    min-width: 0;
+
     overflow: hidden;
+
+    background: #263a54;
     border-radius: 999px;
-    background: #23334b;
 }
 
 .budget-fill {
     height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        #22c55e 0%,
+        #14b8a6 50%,
+        #3b82f6 100%
+    );
+
     border-radius: inherit;
-    background: linear-gradient(90deg, #22c55e, #3b82f6);
+
     transition: width 0.5s ease;
 }
 
+/* =========================================================
+   3. MAIN BUDGET SCORE
+========================================================= */
+
 .budget-score {
     display: flex;
-    flex-direction: row;
     align-items: baseline;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 13px;
+
+    min-width: 0;
 }
 
 .budget-score h3 {
     margin: 0;
+
     color: #f8fafc;
-    font-size: clamp(36px, 4vw, 46px);
-    line-height: 1;
-    font-weight: 800;
+
+    font-size: clamp(40px, 4vw, 50px);
+    font-weight: 850;
+    line-height: 1.1;
+
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
 }
 
 .budget-score p {
     margin: 0;
-    color: #86efac;
-    font-size: 13px;
-    font-weight: 600;
+
+    color: #4ade80;
+
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.4;
 }
+
+/* =========================================================
+   4. FINANCIAL METRICS
+========================================================= */
 
 .budget-metrics {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
 }
 
 .budget-metrics div {
@@ -115,82 +199,383 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 10px;
+
     min-width: 0;
-    padding: 12px 6px;
-    background: #15263d;
-    border: 1px solid rgba(148, 163, 184, 0.10);
-    border-radius: 12px;
+    min-height: 88px;
+
+    padding: 13px 5px;
+
+    background: #172a42;
+
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 13px;
+
     text-align: center;
-    transition: background 0.2s ease;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .budget-metrics div:hover {
     background: #1b304b;
+    border-color: rgba(96, 165, 250, 0.25);
 }
 
 .budget-metrics span {
-    margin-bottom: 7px;
     color: #94a3b8;
+
     font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
 }
 
 .budget-metrics strong,
 .budget-metrics .money-value {
     display: block;
+
     max-width: 100%;
-    overflow-wrap: anywhere;
+
     color: #f8fafc;
-    font-size: 12px;
-    font-weight: 700;
+
+    font-size: clamp(10px, 0.85vw, 13px);
+    font-weight: 750;
     line-height: 1.4;
+
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
+
+/* =========================================================
+   5. AI RECOMMENDATION
+========================================================= */
 
 .budget-recommendation {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 13px;
+    gap: 12px;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: auto;
+    padding: 16px;
+
+    background: linear-gradient(
+        120deg,
+        rgba(34, 197, 94, 0.13),
+        rgba(20, 184, 166, 0.09)
+    );
+
+    border: 1px solid rgba(34, 197, 94, 0.12);
     border-left: 3px solid #22c55e;
-    border-radius: 12px;
-    background: rgba(34, 197, 94, 0.09);
+    border-radius: 13px;
 }
 
 .budget-recommendation > svg {
-    flex-shrink: 0;
+    flex: 0 0 auto;
+
     margin-top: 2px;
+
     color: #4ade80;
-    font-size: 16px;
+    font-size: 18px;
+}
+
+.budget-recommendation > div {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .budget-recommendation h4 {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
+
     color: #4ade80;
+
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+.budget-recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    width: 100%;
+    min-width: 0;
+
+    /* Remove artificial bottom positioning */
+    margin-top: 0;
+
+    padding: 16px;
+
+    background: linear-gradient(
+        120deg,
+        rgba(34, 197, 94, 0.13),
+        rgba(20, 184, 166, 0.09)
+    );
+
+    border: 1px solid rgba(34, 197, 94, 0.12);
+    border-left: 3px solid #22c55e;
+    border-radius: 13px;
+}
+
+/* =========================================================
+   6. LOADING STATE
+========================================================= */
+
+.budget-card[aria-busy="true"] > div:last-child {
+    color: #94a3b8;
     font-size: 13px;
-    font-weight: 700;
+    line-height: 1.7;
 }
 
-.budget-recommendation p {
-    margin: 0;
-    color: #d1dbea;
-    font-size: 12px;
-    line-height: 1.6;
-}
+/* =========================================================
+   7. LAPTOP RESPONSIVENESS
+========================================================= */
 
-@media (max-width: 480px) {
+@media (max-width: 1200px) {
     .budget-card {
-        padding: 15px;
+        padding: 18px;
+        gap: 16px;
+    }
+
+    .budget-header h2 {
+        font-size: 17px;
+    }
+
+    .budget-metrics {
+        gap: 7px;
+    }
+
+    .budget-metrics div {
+        min-height: 80px;
+        padding: 11px 4px;
+    }
+
+    .budget-recommendation {
+        padding: 13px;
+    }
+}
+
+/* =========================================================
+   8. MOBILE RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 560px) {
+    .budget-card {
+        padding: 16px;
+        gap: 15px;
+        border-radius: 15px;
     }
 
     .budget-header h2 {
         font-size: 15px;
     }
 
+    .budget-score h3 {
+        font-size: 36px;
+    }
+
+    .budget-score p {
+        font-size: 12px;
+    }
+
     .budget-metrics {
-        gap: 5px;
+        gap: 6px;
+    }
+
+    .budget-metrics div {
+        min-height: 74px;
+        padding: 10px 3px;
+    }
+
+    .budget-metrics span {
+        font-size: 10px;
     }
 
     .budget-metrics strong,
     .budget-metrics .money-value {
         font-size: 10px;
+    }
+
+    .budget-recommendation {
+        padding: 12px;
+    }
+
+    .budget-recommendation p {
+        font-size: 11px;
+    }
+}
+
+/* =========================================================
+   9. ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .budget-card,
+    .budget-card * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+/* =========================================
+   INCOME ALLOCATION
+========================================= */
+
+.budget-allocation {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: auto;
+    padding: 17px;
+
+    background: linear-gradient(
+        145deg,
+        rgba(20, 38, 61, 0.95),
+        rgba(12, 29, 47, 0.95)
+    );
+
+    border: 1px solid #263f5b;
+    border-radius: 14px;
+}
+
+.budget-allocation-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.budget-allocation-header h4 {
+    margin: 0 0 5px;
+    color: #f1f5f9;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.budget-allocation-header p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.budget-allocation-period {
+    padding: 6px 9px;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.budget-allocation-bar {
+    display: flex;
+    width: 100%;
+    height: 11px;
+    overflow: hidden;
+    background: #26374e;
+    border-radius: 999px;
+}
+
+.budget-allocation-expense {
+    height: 100%;
+    background: linear-gradient(90deg, #f97373, #ef4444);
+    transition: width 0.4s ease;
+}
+
+.budget-allocation-retained {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 0.4s ease;
+}
+
+.budget-allocation-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.budget-allocation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    min-width: 0;
+}
+
+.budget-allocation-dot {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+}
+
+.expense-dot {
+    background: #f87171;
+}
+
+.retained-dot {
+    background: #34d399;
+}
+
+.budget-allocation-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.budget-allocation-item span:not(.budget-allocation-dot) {
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.budget-allocation-item strong {
+    color: #f8fafc;
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.budget-allocation-item small {
+    color: #8298b5;
+    font-size: 10px;
+}
+
+.budget-allocation-note,
+.budget-allocation-empty {
+    margin: 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .budget-allocation {
+        padding: 13px;
+        gap: 12px;
+    }
+
+    .budget-allocation-legend {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .budget-allocation-expense,
+    .budget-allocation-retained {
+        transition: none;
     }
 }

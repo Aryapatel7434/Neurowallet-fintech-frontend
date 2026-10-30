@@ -1,4 +1,5 @@
 import { FaShieldHeart } from "react-icons/fa6";
+import "./FinancialHealth.css";
 function FinancialHealth({
     wallet,
     transactions = [],
@@ -124,7 +125,10 @@ function FinancialHealth({
 
     <div className="score-section">
 
-    <div className="score-circle">
+  <div
+    className="score-circle"
+    style={{ "--health-progress": `${progress}%` }}
+>
 
         <span className="health-score-label">
             HEALTH SCORE
@@ -211,11 +215,9 @@ function FinancialHealth({
 <div className="health-summary">
 
     <h4>
-
-        🤖 AI Health Summary
-
-    </h4>
-
+    <FaShieldHeart />
+    Financial Health Summary
+</h4>
     <ul>
 
         <li>
@@ -260,7 +262,7 @@ function FinancialHealth({
 
     <span>
 
-        Updated using live backend analytics
+       Calculated from wallet balance and transaction activity
 
     </span>
 

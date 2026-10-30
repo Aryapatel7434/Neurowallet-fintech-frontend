@@ -1,0 +1,294 @@
+
+/* =====================================================
+   NEUROWALLET — CASH FLOW ANALYSIS
+   Professional dark fintech dashboard
+   ===================================================== */
+
+.cashflow-card,
+.cashflow-card * {
+    box-sizing: border-box;
+}
+
+.cashflow-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    padding: 20px;
+    color: #f1f5f9;
+    background: linear-gradient(145deg, #0d2035, #081727);
+    border: 1px solid #1d3853;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s ease;
+}
+
+.cashflow-card:hover {
+    border-color: #315578;
+}
+
+/* Header */
+
+.cashflow-card .chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cashflow-card .chart-card-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.cashflow-card .chart-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    font-size: 18px;
+}
+
+.cashflow-card .chart-card-title h3 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.cashflow-card .chart-card-title p {
+    margin: 4px 0 0;
+    color: #91a8c5;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Growth indicator */
+
+.cashflow-card .growth-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 29px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.cashflow-card .growth-badge.positive {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.12);
+}
+
+.cashflow-card .growth-badge.negative {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.12);
+}
+
+/* Main cash flow value */
+
+.cashflow-card .analytics-main-value {
+    margin-top: 3px;
+    color: #f8fafc;
+    font-size: clamp(27px, 2.2vw, 36px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.cashflow-card .analytics-main-subtitle {
+    margin: -9px 0 0;
+    color: #91a8c5;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Income and expense summary */
+
+.cashflow-card .cashflow-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+}
+
+.cashflow-card .cashflow-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 13px;
+    background: #132940;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 12px;
+}
+
+.cashflow-card .cashflow-dot {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.cashflow-card .income-dot {
+    background: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.cashflow-card .expense-dot {
+    background: #f87171;
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.3);
+}
+
+.cashflow-card .cashflow-summary-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.cashflow-card .cashflow-summary-label {
+    color: #91a8c5;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.cashflow-card .cashflow-summary-item strong {
+    color: #f8fafc;
+    font-size: clamp(11px, 1vw, 14px);
+    font-weight: 750;
+    line-height: 1.4;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Chart area */
+
+.cashflow-card .cashflow-chart {
+    width: 100%;
+    min-width: 0;
+    min-height: 220px;
+    margin-top: 2px;
+    padding: 12px 5px 4px;
+    background: rgba(5, 17, 30, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.09);
+    border-radius: 12px;
+}
+
+.cashflow-card .cashflow-chart .recharts-responsive-container {
+    min-width: 0;
+}
+
+.cashflow-card .cashflow-chart .recharts-cartesian-axis-tick-value {
+    fill: #91a8c5;
+    font-size: 10px;
+}
+
+.cashflow-card .cashflow-chart .recharts-legend-item-text {
+    color: #bdcce0 !important;
+}
+
+.cashflow-card .cashflow-chart .recharts-tooltip-wrapper {
+    outline: none;
+}
+
+/* Footer */
+
+.cashflow-card .analytics-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.cashflow-card .analytics-footer-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #91a8c5;
+    font-size: 10px;
+}
+
+.cashflow-card .analytics-footer-left svg {
+    color: #60a5fa;
+}
+
+.cashflow-card .analytics-updated {
+    color: #7187a3;
+    font-size: 10px;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+    .cashflow-card {
+        padding: 16px;
+        gap: 13px;
+    }
+
+    .cashflow-card .cashflow-chart {
+        min-height: 210px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 560px) {
+    .cashflow-card {
+        padding: 14px;
+        border-radius: 13px;
+    }
+
+    .cashflow-card .chart-card-title h3 {
+        font-size: 15px;
+    }
+
+    .cashflow-card .cashflow-summary {
+        gap: 7px;
+    }
+
+    .cashflow-card .cashflow-summary-item {
+        padding: 10px 8px;
+        gap: 7px;
+    }
+
+    .cashflow-card .cashflow-summary-item strong {
+        font-size: 10px;
+    }
+
+    .cashflow-card .cashflow-chart {
+        min-height: 200px;
+        padding: 8px 0;
+    }
+
+    .cashflow-card .analytics-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cashflow-card {
+        transition: none;
+    }
+}

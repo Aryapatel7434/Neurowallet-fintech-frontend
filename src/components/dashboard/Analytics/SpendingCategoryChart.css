@@ -1,51 +1,62 @@
 
-/* NeuroWallet — Spending Categories */
+/* =========================================================
+   NEUROWALLET — SPENDING CATEGORIES
+   Dark fintech dashboard | Donut chart and category legend
+   ========================================================= */
 
 .nw-spending-categories,
-.nw-spending-categories * {
+.nw-spending-categories *,
+.nw-spending-categories *::before,
+.nw-spending-categories *::after {
   box-sizing: border-box;
 }
 
+/* Main card */
 .nw-spending-categories {
   display: flex;
   flex-direction: column;
-  min-width: 0;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
   height: 100%;
   padding: 16px;
   color: #f3f7ff;
-  background: linear-gradient(145deg, #0e1d30, #091827);
+  background: linear-gradient(145deg, #0e1d30 0%, #091827 100%);
   border: 1px solid #1d3550;
   border-radius: 14px;
 }
+
+/* ---------------- Header ---------------- */
 
 .nw-spending-categories__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .nw-spending-categories__title-wrap {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .nw-spending-categories__icon {
   display: inline-flex;
-  flex: 0 0 32px;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
   color: #60a5fa;
   background: rgba(59, 130, 246, 0.14);
-  border-radius: 9px;
-  font-size: 15px;
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: 10px;
+  font-size: 16px;
 }
 
 .nw-spending-categories__heading {
@@ -53,12 +64,11 @@
 }
 
 .nw-spending-categories__heading h2 {
-  margin: 0 0 3px;
+  margin: 0 0 4px;
   color: #f4f8ff;
   font-size: 14px;
   font-weight: 700;
-  line-height: 1.35;
-  white-space: nowrap;
+  line-height: 1.4;
   overflow-wrap: normal;
   word-break: normal;
 }
@@ -66,37 +76,53 @@
 .nw-spending-categories__heading p {
   margin: 0;
   color: #91a8c5;
-  font-size: 10px;
-  line-height: 1.35;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .nw-spending-categories__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  padding: 5px 7px;
+  padding: 6px 9px;
   color: #b8d5ff;
   background: #122840;
   border: 1px solid #29425e;
-  border-radius: 7px;
-  font-size: 9px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.4;
   white-space: nowrap;
 }
 
+/* ---------------- Donut + legend layout ---------------- */
+
 .nw-spending-categories__body {
   display: grid;
-  grid-template-columns: minmax(118px, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
+  min-height: 0;
+  padding: 4px 0;
 }
 
+/* Donut container must have a real height for Recharts. */
 .nw-spending-categories__donut {
   position: relative;
   width: 100%;
-  height: 190px;
+  height: 200px;
+  min-width: 0;
+  min-height: 180px;
+}
+
+.nw-spending-categories__donut > div {
   min-width: 0;
 }
 
+/* Center label */
 .nw-spending-categories__center {
   position: absolute;
   inset: 0;
@@ -104,7 +130,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
+  min-width: 0;
+  padding: 0 4px;
   pointer-events: none;
   text-align: center;
 }
@@ -113,36 +141,42 @@
   max-width: 100%;
   color: #f4f8ff;
   font-size: clamp(11px, 0.95vw, 15px);
-  line-height: 1.2;
   font-weight: 800;
-  white-space: nowrap;
+  line-height: 1.25;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .nw-spending-categories__center span {
   color: #91a8c5;
   font-size: 10px;
+  line-height: 1.4;
 }
+
+/* ---------------- Category legend ---------------- */
 
 .nw-spending-categories__list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   min-width: 0;
+  padding: 4px 0;
 }
 
 .nw-spending-categories__row {
   display: grid;
-  grid-template-columns: 7px minmax(0, 1fr) auto;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 6px;
-  row-gap: 3px;
+  column-gap: 7px;
+  row-gap: 4px;
   min-width: 0;
 }
 
 .nw-spending-categories__dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
   border-radius: 50%;
 }
 
@@ -150,98 +184,181 @@
   min-width: 0;
   color: #c6d6ea;
   font-size: 10px;
-  line-height: 1.3;
+  line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
 .nw-spending-categories__percent {
   color: #91a8c5;
-  font-size: 9px;
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: right;
   white-space: nowrap;
 }
 
 .nw-spending-categories__amount {
   grid-column: 2 / 4;
   justify-self: end;
+  max-width: 100%;
   color: #eaf2ff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
+  line-height: 1.35;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
+
+/* ---------------- Empty state ---------------- */
 
 .nw-spending-categories__empty {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  flex: 1 1 auto;
-  min-height: 160px;
-  padding: 16px;
+  min-width: 0;
+  min-height: 180px;
+  padding: 20px;
   color: #91a8c5;
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.6;
   text-align: center;
 }
 
+/* ---------------- Footer ---------------- */
+
 .nw-spending-categories__footer {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 9px;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid rgba(41, 66, 94, 0.65);
   color: #8298b5;
-  font-size: 9px;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
+/* ---------------- Tablet ---------------- */
+
 @media (max-width: 1100px) {
+  .nw-spending-categories {
+    padding: 14px;
+  }
+
   .nw-spending-categories__body {
-    grid-template-columns: minmax(105px, 0.8fr) minmax(0, 1.2fr);
-    gap: 6px;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px;
   }
 
   .nw-spending-categories__donut {
-    height: 175px;
+    height: 185px;
+    min-height: 175px;
   }
 
   .nw-spending-categories__list {
-    gap: 8px;
+    gap: 10px;
+  }
+
+  .nw-spending-categories__amount {
+    font-size: 10px;
   }
 }
 
-@media (max-width: 850px) {
+/* ---------------- Narrow dashboard / mobile ---------------- */
+
+@media (max-width: 760px) {
   .nw-spending-categories__body {
-    grid-template-columns: minmax(130px, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
 
   .nw-spending-categories__donut {
-    height: 200px;
+    width: 100%;
+    max-width: 300px;
+    height: 210px;
+    min-height: 200px;
+    justify-self: center;
+  }
+
+  .nw-spending-categories__list {
+    gap: 12px;
+    padding: 4px 0 8px;
+  }
+
+  .nw-spending-categories__row {
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+    column-gap: 9px;
+  }
+
+  .nw-spending-categories__name {
+    font-size: 11px;
+  }
+
+  .nw-spending-categories__percent {
+    font-size: 10px;
+  }
+
+  .nw-spending-categories__amount {
+    font-size: 11px;
   }
 }
 
+/* ---------------- Small mobile ---------------- */
+
 @media (max-width: 460px) {
+  .nw-spending-categories {
+    padding: 13px;
+    border-radius: 12px;
+  }
+
   .nw-spending-categories__header {
     align-items: flex-start;
+    gap: 8px;
+  }
+
+  .nw-spending-categories__title-wrap {
+    gap: 8px;
+  }
+
+  .nw-spending-categories__icon {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
   }
 
   .nw-spending-categories__heading h2 {
-    white-space: normal;
+    font-size: 13px;
   }
 
-  .nw-spending-categories__body {
-    grid-template-columns: minmax(0, 1fr);
+  .nw-spending-categories__heading p {
+    font-size: 10px;
+  }
+
+  .nw-spending-categories__count {
+    padding: 5px 7px;
+    font-size: 9px;
   }
 
   .nw-spending-categories__donut {
-    height: 190px;
+    height: 195px;
+    min-height: 190px;
+  }
+
+  .nw-spending-categories__footer {
+    font-size: 9px;
   }
 }
 
+/* ---------------- Accessibility ---------------- */
+
 @media (prefers-reduced-motion: reduce) {
-  .nw-spending-categories * {
+  .nw-spending-categories *,
+  .nw-spending-categories *::before,
+  .nw-spending-categories *::after {
     animation: none !important;
     transition: none !important;
   }

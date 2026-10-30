@@ -213,7 +213,6 @@
   .nw-dashboard-top-grid { grid-template-columns: minmax(0,1fr) 300px; }
   .nw-dashboard-overview .overview-grid { gap: 8px; }
   .nw-dashboard-overview .overview-card { padding: 10px; }
-  .nw-dashboard-health-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 1050px) {
   .nw-dashboard-top-grid { grid-template-columns: minmax(0,1fr); }
@@ -232,7 +231,7 @@
   .nw-dashboard-overview .overview-card { min-height: 112px; }
   .nw-dashboard-overview .overview-amount { font-size: 16px; }
   .nw-dashboard-content-area .nw-reference-chart-plot { flex-basis: 245px; height: 245px; min-height: 245px; }
-  .nw-dashboard-health-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+
 }
 @media (max-width: 560px) {
   .nw-dashboard-greeting .hero-title { font-size: 24px; }
@@ -242,15 +241,12 @@
   .nw-dashboard-content-area .nw-analytics-summary,
   .nw-dashboard-content-area .cashflow-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .nw-dashboard-content-area .nw-reference-chart-plot { flex-basis: 225px; height: 225px; min-height: 225px; }
-  .nw-dashboard-health-grid { gap: 10px; }
-  .nw-dashboard-health-card { padding: 12px; }
   .nw-dashboard-assistant > .ai-panel,
   .nw-dashboard-assistant > .nw-ai-assistant,
   .nw-dashboard-assistant .nw-ai-assistant { padding: 13px; }
 }
 @media (max-width: 380px) {
   .nw-dashboard-overview .overview-grid,
-  .nw-dashboard-health-grid { grid-template-columns: minmax(0,1fr); }
   .nw-dashboard-content-area .nw-analytics-summary,
   .nw-dashboard-content-area .cashflow-summary { grid-template-columns: minmax(0,1fr); }
   .nw-dashboard-greeting .hero-title { font-size: 22px; }
@@ -489,3 +485,18 @@
     font-size: 12px;
   }
 }
+/* Budget Health — prevent unnecessary vertical stretching */
+
+.nw-dashboard-health-grid {
+    align-items: start;
+}
+
+.nw-dashboard-health-card:nth-child(2) {
+    align-self: start;
+}
+
+.nw-dashboard-health-card:nth-child(2) > .budget-card {
+    height: auto;
+    min-height: 0;
+}
+

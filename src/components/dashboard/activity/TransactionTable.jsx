@@ -1,5 +1,6 @@
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 import {
     FaMagnifyingGlass,
     FaArrowDown,
@@ -7,14 +8,17 @@ import {
     FaEllipsisVertical,
     FaDownload,
     FaArrowRight,
-} from "react-icons/fa6";
-import {
+    FaArrowLeft,
     FaCircleCheck,
     FaCircleXmark,
     FaClock,
+    FaCopy,
+    FaFileCsv,
 } from "react-icons/fa6";
 
 import "./TransactionTable.css";
+
+const PAGE_SIZE = 5;
 
 function getCurrentUser() {
     try {
@@ -28,8 +32,12 @@ function TransactionTable({ transactions = [] }) {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [sortBy, setSortBy] = useState("NEWEST");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const [actionMessage, setActionMessage] = useState("");
 
     const tableRef = useRef(null);
+    const menuRef = useRef(null);
     const user = useMemo(() => getCurrentUser(), []);
 
     const formatCurrency = (amount) =>
@@ -45,6 +53,9 @@ function TransactionTable({ transactions = [] }) {
 
         return Number.isFinite(timestamp) ? timestamp : 0;
     };
+
+    const getTransactionKey = (tx, index) =>
+        String(tx.transactionId ?? `${getTimestamp(tx)}-${index}`);
 
     const filteredTransactions = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -88,7 +99,67 @@ function TransactionTable({ transactions = [] }) {
         });
     }, [transactions, search, statusFilter, sortBy]);
 
-    const exportCSV = () => {
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredTransactions.length / PAGE_SIZE)
+    );
+
+    const safePage = Math.min(currentPage, totalPages);
+
+    const paginatedTransactions = useMemo(() => {
+        const startIndex = (safePage - 1) * PAGE_SIZE;
+
+        return filteredTransactions.slice(
+            startIndex,
+            startIndex + PAGE_SIZE
+        );
+    }, [filteredTransactions, safePage]);
+
+    const firstRecord =
+        filteredTransactions.length === 0
+            ? 0
+            : (safePage - 1) * PAGE_SIZE + 1;
+
+    const lastRecord = Math.min(
+        safePage * PAGE_SIZE,
+        filteredTransactions.length
+    );
+
+    useEffect(() => {
+        setCurrentPage(1);
+        setOpenMenuId(null);
+        setActionMessage("");
+    }, [search, statusFilter, sortBy]);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target)
+            ) {
+                setOpenMenuId(null);
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === "Escape") {
+                setOpenMenuId(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleOutsideClick);
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, []);
+
+    const escapeCSV = (value) =>
+        `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+    const downloadCSV = (rows, filename) => {
         const headers = [
             "Transaction ID",
             "Sender",
@@ -98,10 +169,7 @@ function TransactionTable({ transactions = [] }) {
             "Date",
         ];
 
-        const escapeCSV = (value) =>
-            `"${String(value ?? "").replace(/"/g, '""')}"`;
-
-        const rows = filteredTransactions.map((tx) => [
+        const csvRows = rows.map((tx) => [
             tx.transactionId,
             tx.senderEmail,
             tx.receiverEmail,
@@ -112,7 +180,7 @@ function TransactionTable({ transactions = [] }) {
                 : "",
         ]);
 
-        const csv = [headers, ...rows]
+        const csv = [headers, ...csvRows]
             .map((row) => row.map(escapeCSV).join(","))
             .join("\r\n");
 
@@ -124,20 +192,69 @@ function TransactionTable({ transactions = [] }) {
         const link = document.createElement("a");
 
         link.href = url;
-        link.download = `NeuroWallet_Transactions_${
-            new Date().toISOString().split("T")[0]
-        }.csv`;
+        link.download = filename;
 
         document.body.appendChild(link);
         link.click();
         link.remove();
+
         URL.revokeObjectURL(url);
+    };
+
+    const exportCSV = () => {
+        downloadCSV(
+            filteredTransactions,
+            `NeuroWallet_Transactions_${new Date()
+                .toISOString()
+                .split("T")[0]}.csv`
+        );
+
+        setActionMessage("Filtered transactions exported successfully.");
+    };
+
+    const exportSingleTransaction = (tx) => {
+        downloadCSV(
+            [tx],
+            `NeuroWallet_Transaction_${tx.transactionId ?? "Details"}.csv`
+        );
+
+        setOpenMenuId(null);
+        setActionMessage("Transaction exported successfully.");
+    };
+
+    const copyText = async (value, label) => {
+        if (!value) {
+            setActionMessage(`${label} is not available.`);
+            setOpenMenuId(null);
+            return;
+        }
+
+        try {
+            await navigator.clipboard.writeText(String(value));
+            setActionMessage(`${label} copied successfully.`);
+        } catch {
+            setActionMessage(
+                "Clipboard access failed. Please copy the value manually."
+            );
+        }
+
+        setOpenMenuId(null);
+    };
+
+    const getCounterpartyEmail = (tx) => {
+        const incoming =
+            Boolean(user?.email) &&
+            tx.receiverEmail === user.email;
+
+        return incoming ? tx.senderEmail : tx.receiverEmail;
     };
 
     const handleViewAll = () => {
         setSearch("");
         setStatusFilter("ALL");
         setSortBy("NEWEST");
+        setCurrentPage(1);
+        setOpenMenuId(null);
 
         tableRef.current?.scrollIntoView({
             behavior: "smooth",
@@ -147,7 +264,6 @@ function TransactionTable({ transactions = [] }) {
 
     const getDisplayName = (email) => {
         if (!email) return "Unknown";
-
         if (email === user?.email) return "You";
 
         return email.split("@")[0];
@@ -155,7 +271,6 @@ function TransactionTable({ transactions = [] }) {
 
     const getInitials = (email) => {
         if (!email) return "?";
-
         if (email === user?.email) return "YO";
 
         return email.slice(0, 2).toUpperCase();
@@ -187,6 +302,11 @@ function TransactionTable({ transactions = [] }) {
         }
     };
 
+    const goToPage = (page) => {
+        setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+        setOpenMenuId(null);
+    };
+
     return (
         <section className="transaction-card nw-transaction-reference">
             <header className="transaction-header">
@@ -202,6 +322,7 @@ function TransactionTable({ transactions = [] }) {
                         type="button"
                         className="export-btn"
                         onClick={exportCSV}
+                        disabled={filteredTransactions.length === 0}
                     >
                         <FaDownload aria-hidden="true" />
                         Export CSV
@@ -268,12 +389,25 @@ function TransactionTable({ transactions = [] }) {
                 <div className="toolbar-right">
                     <div className="record-count" aria-live="polite">
                         <span>Showing</span>
-                        <strong>{filteredTransactions.length}</strong>
+                        <strong>{firstRecord}-{lastRecord}</strong>
                         <span>of</span>
-                        <strong>{transactions.length}</strong>
+                        <strong>{filteredTransactions.length}</strong>
                     </div>
                 </div>
             </div>
+
+            {actionMessage && (
+                <div className="transaction-feedback" role="status">
+                    <span>{actionMessage}</span>
+                    <button
+                        type="button"
+                        onClick={() => setActionMessage("")}
+                        aria-label="Dismiss message"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
 
             <div className="table-wrapper" ref={tableRef}>
                 <table className="transaction-table">
@@ -291,7 +425,7 @@ function TransactionTable({ transactions = [] }) {
                     </thead>
 
                     <tbody>
-                        {filteredTransactions.length === 0 ? (
+                        {paginatedTransactions.length === 0 ? (
                             <tr>
                                 <td colSpan={6}>
                                     <div className="empty-state">
@@ -302,7 +436,7 @@ function TransactionTable({ transactions = [] }) {
                                 </td>
                             </tr>
                         ) : (
-                            filteredTransactions.map((tx, index) => {
+                            paginatedTransactions.map((tx, index) => {
                                 const incoming =
                                     Boolean(user?.email) &&
                                     tx.receiverEmail === user.email;
@@ -312,13 +446,12 @@ function TransactionTable({ transactions = [] }) {
                                     tx.status || "UNKNOWN"
                                 ).toUpperCase();
 
+                                const rowKey = getTransactionKey(tx, index);
+                                const counterpartyEmail =
+                                    getCounterpartyEmail(tx);
+
                                 return (
-                                    <tr
-                                        key={
-                                            tx.transactionId ??
-                                            `${timestamp}-${index}`
-                                        }
-                                    >
+                                    <tr key={rowKey}>
                                         <td>
                                             <div className="nw-tx-id">
                                                 <span className="nw-tx-icon">
@@ -363,18 +496,13 @@ function TransactionTable({ transactions = [] }) {
                                                 <div className="user-info">
                                                     <span className="user-name">
                                                         {getDisplayName(
-                                                            incoming
-                                                                ? tx.senderEmail
-                                                                : tx.receiverEmail
+                                                            counterpartyEmail
                                                         )}
                                                     </span>
 
                                                     <span className="user-email">
-                                                        {incoming
-                                                            ? tx.senderEmail ||
-                                                              "Sender unavailable"
-                                                            : tx.receiverEmail ||
-                                                              "Recipient unavailable"}
+                                                        {counterpartyEmail ||
+                                                            "Contact unavailable"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -440,18 +568,84 @@ function TransactionTable({ transactions = [] }) {
                                         </td>
 
                                         <td>
-                                            <button
-                                                type="button"
-                                                className="action-btn"
-                                                aria-label={`Actions for transaction ${
-                                                    tx.transactionId ?? ""
-                                                }`}
-                                                title="Transaction actions"
+                                            <div
+                                                className="transaction-action-menu"
+                                                ref={
+                                                    openMenuId === rowKey
+                                                        ? menuRef
+                                                        : null
+                                                }
                                             >
-                                                <FaEllipsisVertical
-                                                    aria-hidden="true"
-                                                />
-                                            </button>
+                                                <button
+                                                    type="button"
+                                                    className="action-btn"
+                                                    aria-label={`Actions for transaction ${
+                                                        tx.transactionId ?? ""
+                                                    }`}
+                                                    aria-expanded={
+                                                        openMenuId === rowKey
+                                                    }
+                                                    aria-haspopup="menu"
+                                                    title="Transaction actions"
+                                                    onClick={() => {
+                                                        setOpenMenuId(
+                                                            openMenuId === rowKey
+                                                                ? null
+                                                                : rowKey
+                                                        );
+                                                    }}
+                                                >
+                                                    <FaEllipsisVertical aria-hidden="true" />
+                                                </button>
+
+                                                {openMenuId === rowKey && (
+                                                    <div
+                                                        className="transaction-action-dropdown"
+                                                        role="menu"
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            role="menuitem"
+                                                            onClick={() =>
+                                                                copyText(
+                                                                    tx.transactionId,
+                                                                    "Transaction ID"
+                                                                )
+                                                            }
+                                                        >
+                                                            <FaCopy />
+                                                            Copy transaction ID
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            role="menuitem"
+                                                            onClick={() =>
+                                                                copyText(
+                                                                    counterpartyEmail,
+                                                                    "Recipient / sender email"
+                                                                )
+                                                            }
+                                                        >
+                                                            <FaCopy />
+                                                            Copy email
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            role="menuitem"
+                                                            onClick={() =>
+                                                                exportSingleTransaction(
+                                                                    tx
+                                                                )
+                                                            }
+                                                        >
+                                                            <FaFileCsv />
+                                                            Export transaction
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -460,6 +654,39 @@ function TransactionTable({ transactions = [] }) {
                     </tbody>
                 </table>
             </div>
+
+            <footer className="transaction-pagination">
+                <span className="pagination-info">
+                    Page <strong>{safePage}</strong> of{" "}
+                    <strong>{totalPages}</strong>
+                </span>
+
+                <div className="pagination-controls">
+                    <button
+                        type="button"
+                        className="pagination-btn"
+                        disabled={safePage === 1}
+                        onClick={() => goToPage(safePage - 1)}
+                    >
+                        <FaArrowLeft />
+                        Previous
+                    </button>
+
+                    <span className="pagination-current">
+                        {safePage}
+                    </span>
+
+                    <button
+                        type="button"
+                        className="pagination-btn"
+                        disabled={safePage === totalPages}
+                        onClick={() => goToPage(safePage + 1)}
+                    >
+                        Next
+                        <FaArrowRight />
+                    </button>
+                </div>
+            </footer>
         </section>
     );
 }
