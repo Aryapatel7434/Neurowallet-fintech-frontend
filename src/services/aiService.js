@@ -1,5 +1,12 @@
+
 import api from "../api/axiosConfig";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
+
+// =========================================================
+// AI REQUEST CONFIGURATION
+// =========================================================
+
+const AI_TIMEOUT = 90000;
 
 // =========================================================
 // AI FINANCIAL INSIGHTS
@@ -8,7 +15,10 @@ import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 export const getAIInsights = async () => {
     const response = await api.get(
-        API_ENDPOINTS.AI_INSIGHTS
+        API_ENDPOINTS.AI_INSIGHTS,
+        {
+            timeout: AI_TIMEOUT,
+        }
     );
 
     return response.data;
@@ -63,6 +73,7 @@ export const getGoalRecommendation = async () => {
 // =========================================================
 
 export const askAIAssistant = async (question) => {
+
     const normalizedQuestion =
         typeof question === "string"
             ? question.trim()
@@ -85,6 +96,9 @@ export const askAIAssistant = async (question) => {
         API_ENDPOINTS.AI_ASSISTANT,
         {
             question: normalizedQuestion,
+        },
+        {
+            timeout: AI_TIMEOUT,
         }
     );
 
