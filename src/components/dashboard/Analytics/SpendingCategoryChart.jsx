@@ -1,4 +1,3 @@
-
 import {
   Cell,
   Pie,
@@ -6,14 +5,18 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+
 import { FaChartPie } from "react-icons/fa6";
+
 import { CATEGORY_COLORS } from "../../../constants/categoryColors";
 import { CATEGORY_LABELS } from "../../../constants/categoryLabels";
+
 import "./SpendingCategoryChart.css";
 
 const getUserEmail = () => {
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+
     return typeof user?.email === "string"
       ? user.email.trim().toLowerCase()
       : "";
@@ -32,6 +35,7 @@ const money = (value) =>
 function SpendingCategoryChart({ transactions = [] }) {
   const email = getUserEmail();
 
+  // Only count successful outgoing transactions for the signed-in user.
   const expenses = Array.isArray(transactions)
     ? transactions.filter((tx) => {
         const sender = String(tx?.senderEmail ?? "")
@@ -45,7 +49,7 @@ function SpendingCategoryChart({ transactions = [] }) {
         const amount = Number(tx?.amount);
 
         return (
-          email &&
+          Boolean(email) &&
           sender === email &&
           (status === "SUCCESS" || status === "COMPLETED") &&
           Number.isFinite(amount) &&
@@ -54,15 +58,21 @@ function SpendingCategoryChart({ transactions = [] }) {
       })
     : [];
 
+  // Aggregate expense amounts by transaction category.
   const totals = expenses.reduce((result, tx) => {
-    const category = tx?.category || "OTHER";
-    result[category] =
-      (result[category] || 0) + Number(tx.amount);
+    const category = String(tx?.category || "OTHER").trim().toUpperCase();
+    const amount = Number(tx?.amount);
+
+    result[category] = (result[category] || 0) + amount;
+
     return result;
   }, {});
 
   const chartData = Object.entries(totals)
-    .map(([name, value]) => ({ name, value }))
+    .map(([name, value]) => ({
+      name,
+      value,
+    }))
     .sort((a, b) => b.value - a.value);
 
   const totalExpense = chartData.reduce(
@@ -70,11 +80,14 @@ function SpendingCategoryChart({ transactions = [] }) {
     0
   );
 
+  const categoryCount = chartData.length;
+
   return (
     <section
       className="nw-spending-categories"
       aria-labelledby="nw-spending-categories-title"
     >
+      {/* Header */}
       <header className="nw-spending-categories__header">
         <div className="nw-spending-categories__title-wrap">
           <span
@@ -88,17 +101,19 @@ function SpendingCategoryChart({ transactions = [] }) {
             <h2 id="nw-spending-categories-title">
               Spending Categories
             </h2>
+
             <p>Expense distribution</p>
           </div>
         </div>
 
         <span className="nw-spending-categories__count">
-          {chartData.length}{" "}
-          {chartData.length === 1 ? "category" : "categories"}
+          {categoryCount}{" "}
+          {categoryCount === 1 ? "category" : "categories"}
         </span>
       </header>
 
-      {chartData.length === 0 ? (
+      {/* Chart and category legend */}
+      {categoryCount === 0 ? (
         <div
           className="nw-spending-categories__empty"
           role="status"
@@ -109,6 +124,7 @@ function SpendingCategoryChart({ transactions = [] }) {
         </div>
       ) : (
         <div className="nw-spending-categories__body">
+          {/* Donut chart */}
           <div className="nw-spending-categories__donut">
             <ResponsiveContainer
               width="100%"
@@ -123,8 +139,8 @@ function SpendingCategoryChart({ transactions = [] }) {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius="62%"
-                  outerRadius="88%"
+                  innerRadius="64%"
+                  outerRadius="90%"
                   paddingAngle={3}
                   stroke="none"
                   isAnimationActive={false}
@@ -151,17 +167,23 @@ function SpendingCategoryChart({ transactions = [] }) {
                     border: "1px solid #29425e",
                     borderRadius: 10,
                     color: "#f3f7ff",
+                    fontSize: 12,
+                  }}
+                  itemStyle={{
+                    color: "#f3f7ff",
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
 
+            {/* Center amount */}
             <div className="nw-spending-categories__center">
               <strong>{money(totalExpense)}</strong>
               <span>Total spent</span>
             </div>
           </div>
 
+          {/* Category breakdown */}
           <div className="nw-spending-categories__list">
             {chartData.map((item) => {
               const percent = totalExpense
@@ -177,10 +199,14 @@ function SpendingCategoryChart({ transactions = [] }) {
                 <div
                   className="nw-spending-categories__row"
                   key={item.name}
+                  title={`${CATEGORY_LABELS[item.name] || item.name}: ${money(
+                    item.value
+                  )}`}
                 >
                   <span
                     className="nw-spending-categories__dot"
                     style={{ backgroundColor: color }}
+                    aria-hidden="true"
                   />
 
                   <span className="nw-spending-categories__name">
@@ -201,8 +227,13 @@ function SpendingCategoryChart({ transactions = [] }) {
         </div>
       )}
 
+      {/* Footer */}
       <footer className="nw-spending-categories__footer">
-        <span>{chartData.length} categories</span>
+        <span>
+          {categoryCount}{" "}
+          {categoryCount === 1 ? "category" : "categories"}
+        </span>
+
         <span>Successful transactions only</span>
       </footer>
     </section>

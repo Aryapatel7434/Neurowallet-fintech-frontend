@@ -1,7 +1,7 @@
 
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
-
+import "./DashboardHero.css";
 const getGreeting = () => {
     const hour = new Date().getHours();
 

@@ -1,459 +1,492 @@
-/* ==========================================================
-   NeuroWallet AI Advisor - Production CSS
-========================================================== */
 
-.ai-advisor-card{
+/* =====================================================
+   NEUROWALLET — DASHBOARD AI ADVISOR
+   Compact enterprise fintech insight panel
+===================================================== */
 
-    position:relative;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:24px;
-
-    padding:30px;
-
-    background:linear-gradient(
-        180deg,
-        #162340 0%,
-        #10192d 100%
-    );
-
-    border:1px solid rgba(93,138,255,.22);
-
-    border-top:4px solid #6d5efc;
-
-    border-radius:26px;
-
-    box-shadow:
-        0 18px 45px rgba(0,0,0,.40),
-        inset 0 1px rgba(255,255,255,.05);
-
-    overflow:hidden;
-
-    transition:all .35s ease;
+.nw-ai-advisor,
+.nw-ai-advisor * {
+  box-sizing: border-box;
 }
 
-.ai-advisor-card::before{
+.nw-ai-advisor {
+  display: flex;
+  flex-direction: column;
 
-    content:"";
+  width: 100%;
+  min-width: 0;
+  height: 100%;
 
-    position:absolute;
+  overflow: hidden;
 
-    inset:0;
+  color: #f3f7ff;
 
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(79,140,255,.08),
-            transparent 60%
-        );
+  background: linear-gradient(
+    155deg,
+    #091b30 0%,
+    #071629 100%
+  );
 
-    pointer-events:none;
+  border: 1px solid #19436b;
+  border-radius: 14px;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
-.ai-advisor-card:hover{
+/* Header */
 
-    transform:translateY(-8px);
+.nw-ai-advisor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
 
-    border-color:#4f8cff;
+  min-width: 0;
+  padding: 13px;
 
-    box-shadow:
-        0 28px 60px rgba(0,0,0,.45),
-        0 0 28px rgba(79,140,255,.18);
+  background: rgba(15, 36, 61, 0.65);
+  border-bottom: 1px solid rgba(79, 129, 181, 0.2);
 }
 
-/* ==========================================================
-   Header
-========================================================== */
+.nw-ai-advisor__identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-.advisor-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    gap:20px;
+  min-width: 0;
 }
 
-.advisor-title{
+.nw-ai-advisor__icon {
+  display: flex;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
 
-    display:flex;
+  width: 40px;
+  height: 40px;
 
-    align-items:center;
+  color: #fff;
+  font-size: 17px;
 
-    gap:18px;
+  background: linear-gradient(
+    135deg,
+    #5755f7,
+    #2679ff
+  );
+
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(65, 100, 255, 0.25);
 }
 
-.advisor-icon{
-
-    width:64px;
-
-    height:64px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #60a5fa
-    );
-
-    color:white;
-
-    font-size:28px;
-
-    box-shadow:
-        0 18px 35px rgba(37,99,235,.30);
+.nw-ai-advisor__heading {
+  min-width: 0;
 }
 
-.advisor-title h2{
+.nw-ai-advisor__heading h2 {
+  margin: 0;
 
-    margin:0;
-
-    color:#fff;
-
-    font-size:2rem;
-
-    font-weight:800;
+  color: #f5f8ff;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
-.advisor-title p{
+.nw-ai-advisor__heading p {
+  margin: 3px 0 0;
 
-    margin-top:6px;
-
-    color:#94a3b8;
-
-    font-size:15px;
+  color: #91a9c7;
+  font-size: 10px;
+  line-height: 1.4;
 }
 
-/* ==========================================================
-   Live Badge
-========================================================== */
+/* Status */
 
-.advisor-badge{
+.nw-ai-advisor__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 
-    display:flex;
+  flex: 0 0 auto;
 
-    align-items:center;
-
-    gap:8px;
-
-    padding:10px 18px;
-
-    border-radius:999px;
-
-    background:rgba(34,197,94,.14);
-
-    color:#22c55e;
-
-    font-size:13px;
-
-    font-weight:700;
+  color: #43e5ad;
+  font-size: 10px;
+  font-weight: 700;
 }
 
-.live-dot{
+.nw-ai-advisor__status-dot {
+  width: 7px;
+  height: 7px;
 
-    width:8px;
-
-    height:8px;
-
-    border-radius:50%;
-
-    background:#22c55e;
-
-    box-shadow:0 0 10px #22c55e;
-
-    animation:pulse 1.5s infinite;
+  background: #16d99a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(22, 217, 154, 0.5);
 }
 
-@keyframes pulse{
+/* Body */
 
-0%{
+.nw-ai-advisor__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 11px;
 
-transform:scale(.9);
-
-opacity:.6;
-
+  min-width: 0;
+  padding: 12px;
 }
 
-50%{
+/* Section heading */
 
-transform:scale(1.25);
-
-opacity:1;
-
+.nw-ai-advisor__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-100%{
+.nw-ai-advisor__section-heading h3 {
+  margin: 0;
 
-transform:scale(.9);
-
-opacity:.6;
-
+  color: #f0f5ff;
+  font-size: 12px;
+  font-weight: 750;
 }
 
+.nw-ai-advisor__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  color: #43baff;
+  font-size: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-/* ==========================================================
-   Confidence
-========================================================== */
-
-.advisor-confidence{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:rgba(255,255,255,.04);
-
-    border:1px solid rgba(255,255,255,.06);
-
-    border-radius:18px;
-
-    padding:22px;
+.nw-ai-advisor__view-all:hover {
+  color: #91d9ff;
 }
 
-.confidence-label{
+/* Insight list */
 
-    color:#94a3b8;
+.nw-ai-advisor__insights {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
-    font-size:14px;
+  width: 100%;
+  min-width: 0;
 }
 
-.advisor-confidence h1{
+.nw-ai-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
 
-    margin-top:8px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
 
-    color:#fff;
+  border: 1px solid rgba(74, 119, 163, 0.19);
+  border-radius: 11px;
 
-    font-size:58px;
+  background: rgba(9, 29, 49, 0.85);
 
-    font-weight:800;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
 }
 
-.confidence-status{
-
-    padding:10px 18px;
-
-    border-radius:999px;
-
-    background:#123b2a;
-
-    color:#22c55e;
-
-    font-weight:700;
+.nw-ai-insight:hover {
+  background: rgba(17, 43, 69, 0.95);
+  border-color: rgba(91, 151, 211, 0.38);
 }
 
-/* ==========================================================
-   Recommendation Cards
-========================================================== */
+/* Insight icon */
 
-.advisor-item{
+.nw-ai-insight__icon {
+  display: flex;
+  flex: 0 0 33px;
+  align-items: center;
+  justify-content: center;
 
-    padding:20px;
+  width: 33px;
+  height: 33px;
 
-    border-radius:18px;
-
-    border-left:5px solid transparent;
-
-    transition:.3s;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
-.advisor-item:hover{
-
-    transform:translateX(6px);
+.nw-ai-insight--positive .nw-ai-insight__icon {
+  color: #35e4a6;
+  background: rgba(16, 185, 129, 0.16);
 }
 
-.advisor-item-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:14px;
+.nw-ai-insight--warning .nw-ai-insight__icon {
+  color: #ffbf58;
+  background: rgba(245, 158, 11, 0.16);
 }
 
-.advisor-item h4{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    margin:0;
-
-    color:#fff;
-
-    font-size:18px;
+.nw-ai-insight--information .nw-ai-insight__icon {
+  color: #65baff;
+  background: rgba(59, 130, 246, 0.17);
 }
 
-.advisor-item p{
+/* Insight content */
 
-    margin:0;
-
-    color:#d6deea;
-
-    line-height:1.8;
-
-    font-size:15px;
+.nw-ai-insight__content {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.advisor-item strong{
+.nw-ai-insight__content h4 {
+  margin: 0 0 4px;
 
-    color:#fff;
+  color: #f2f6ff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
-.advisor-score{
-
-    padding:6px 12px;
-
-    border-radius:999px;
-
-    font-size:12px;
-
-    font-weight:700;
-
-    background:rgba(255,255,255,.08);
-
-    color:#fff;
+.nw-ai-insight--warning .nw-ai-insight__content h4 {
+  color: #ffc16b;
 }
 
-.positive{
+.nw-ai-insight__content p {
+  display: -webkit-box;
 
-    background:rgba(34,197,94,.10);
+  margin: 0;
+  overflow: hidden;
 
-    border-left-color:#22c55e;
+  color: #9fb3cc;
+  font-size: 10px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
-.warning{
+/* Financial risk */
 
-    background:rgba(245,158,11,.10);
+.nw-ai-advisor__risk {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 
-    border-left-color:#f59e0b;
+  min-width: 0;
+  padding: 9px 2px;
+
+  border-top: 1px solid rgba(92, 130, 166, 0.18);
 }
 
-.success{
+.nw-ai-advisor__risk-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
 
-    background:rgba(59,130,246,.10);
-
-    border-left-color:#3b82f6;
+  color: #b6c8df;
+  font-size: 10px;
+  font-weight: 600;
 }
 
-/* ==========================================================
-   Risk
-========================================================== */
-
-.advisor-risk{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding-top:18px;
-
-    border-top:1px solid rgba(255,255,255,.08);
+.nw-ai-advisor__risk-label svg {
+  color: #78b8ff;
 }
 
-.advisor-risk div{
+.nw-ai-risk {
+  padding: 5px 9px;
 
-    display:flex;
+  border-radius: 999px;
 
-    align-items:center;
-
-    gap:10px;
-
-    color:#d6deea;
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: capitalize;
 }
 
-.risk-low{
-
-    padding:8px 18px;
-
-    border-radius:999px;
-
-    background:#123b2a;
-
-    color:#22c55e;
-
-    font-weight:700;
+.nw-ai-risk--low {
+  color: #43e5a3;
+  background: rgba(34, 197, 94, 0.13);
 }
 
-/* ==========================================================
-   Footer
-========================================================== */
-
-.advisor-footer{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding-top:18px;
-
-    border-top:1px solid rgba(255,255,255,.08);
-
-    color:#94a3b8;
-
-    font-size:13px;
+.nw-ai-risk--medium {
+  color: #ffc36a;
+  background: rgba(245, 158, 11, 0.13);
 }
 
-.advisor-footer div{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
+.nw-ai-risk--high {
+  color: #ff8b9c;
+  background: rgba(239, 68, 68, 0.13);
 }
 
-/* ==========================================================
-   Responsive
-========================================================== */
+.nw-ai-risk--unknown {
+  color: #a9bed6;
+  background: rgba(148, 163, 184, 0.12);
+}
 
-@media(max-width:900px){
+/* Ask Neuro AI button */
 
-    .advisor-header{
+.nw-ai-advisor__ask-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
 
-        flex-direction:column;
+  width: 100%;
+  min-height: 41px;
+  padding: 10px 12px;
 
-        align-items:flex-start;
-    }
+  color: #fff;
+  background: linear-gradient(
+    110deg,
+    #5548f5,
+    #2528b8
+  );
 
-    .advisor-confidence{
+  border: 1px solid rgba(130, 130, 255, 0.25);
+  border-radius: 11px;
 
-        flex-direction:column;
+  font-size: 11px;
+  font-weight: 750;
+  text-decoration: none;
 
-        align-items:flex-start;
+  box-shadow: 0 5px 14px rgba(55, 63, 220, 0.2);
 
-        gap:18px;
-    }
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease;
+}
 
-    .advisor-footer{
+.nw-ai-advisor__ask-button:hover {
+  color: #fff;
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(55, 63, 220, 0.3);
+}
 
-        flex-direction:column;
+.nw-ai-advisor__ask-arrow {
+  margin-left: auto;
+  font-size: 10px;
+}
 
-        align-items:flex-start;
+/* Loading and unavailable states */
 
-        gap:10px;
-    }
+.nw-ai-advisor__loading,
+.nw-ai-advisor__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
 
+  min-height: 130px;
+  padding: 15px;
+
+  color: #9fb3cc;
+  font-size: 11px;
+  text-align: center;
+}
+
+.nw-ai-advisor__spinner {
+  width: 17px;
+  height: 17px;
+
+  border: 2px solid rgba(96, 165, 250, 0.2);
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+
+  animation: nw-ai-spin 0.8s linear infinite;
+}
+
+.nw-ai-advisor__empty {
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nw-ai-advisor__empty svg {
+  color: #60a5fa;
+  font-size: 22px;
+}
+
+.nw-ai-advisor__empty p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+@keyframes nw-ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Narrow desktop */
+
+@media (max-width: 1250px) {
+  .nw-ai-advisor__header {
+    padding: 11px;
+  }
+
+  .nw-ai-advisor__body {
+    padding: 10px;
+    gap: 9px;
+  }
+
+  .nw-ai-advisor__icon {
+    flex-basis: 35px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .nw-ai-advisor__heading h2 {
+    font-size: 12px;
+  }
+
+  .nw-ai-insight {
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .nw-ai-insight__icon {
+    flex-basis: 29px;
+    width: 29px;
+    height: 29px;
+    font-size: 11px;
+  }
+
+  .nw-ai-insight__content p {
+    font-size: 9px;
+  }
+}
+
+/* Tablet and mobile */
+
+@media (max-width: 1050px) {
+  .nw-ai-advisor__header {
+    padding: 13px;
+  }
+
+  .nw-ai-advisor__body {
+    padding: 12px;
+  }
+
+  .nw-ai-advisor__heading h2 {
+    font-size: 14px;
+  }
+
+  .nw-ai-insight__content p {
+    font-size: 10px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .nw-ai-advisor *,
+  .nw-ai-advisor *::before,
+  .nw-ai-advisor *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

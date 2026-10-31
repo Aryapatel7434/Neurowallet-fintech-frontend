@@ -1,4 +1,9 @@
-/* NeuroWallet — reference-matched financial KPI cards */
+
+/* =====================================================
+   NEUROWALLET — FINANCIAL OVERVIEW
+   Four aligned enterprise fintech KPI cards
+===================================================== */
+
 .nw-financial-overview,
 .nw-financial-overview * {
   box-sizing: border-box;
@@ -7,7 +12,9 @@
 .nw-financial-overview {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
   gap: 12px;
+
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -17,118 +24,249 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 16px;
+  gap: 13px;
+
+  width: 100%;
   min-width: 0;
-  min-height: 128px;
-  padding: 16px;
+  min-height: 112px;
+  padding: 13px 14px;
+
   overflow: hidden;
+
+  background: linear-gradient(
+    145deg,
+    #10243a 0%,
+    #091a2b 100%
+  );
+
   border: 1px solid #193653;
   border-radius: 13px;
-  background: linear-gradient(145deg, #0d2136 0%, #091a2b 100%);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
-  transition: border-color 160ms ease, transform 160ms ease;
+
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .nw-financial-kpi:hover {
-  border-color: #2c5b86;
-  transform: translateY(-1px);
+  border-color: #326b9e;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
+
+/* Main content */
 
 .nw-financial-kpi__main {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
+
+  width: 100%;
   min-width: 0;
 }
 
+/* Icon */
+
 .nw-kpi-icon {
   display: inline-flex;
-  flex: 0 0 48px;
+  flex: 0 0 44px;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  font-size: 20px;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 12px;
+  font-size: 19px;
 }
 
-.nw-kpi-icon--balance { color: #73b6ff; background: rgba(39, 126, 255, 0.2); }
-.nw-kpi-icon--income { color: #35dfb0; background: rgba(22, 190, 145, 0.17); }
-.nw-kpi-icon--expenses { color: #ff7d9a; background: rgba(239, 73, 120, 0.17); }
-.nw-kpi-icon--savings { color: #3ce0b4; background: rgba(22, 190, 145, 0.17); }
+.nw-kpi-icon--balance {
+  color: #73b6ff;
+  background: rgba(39, 126, 255, 0.2);
+}
 
-.nw-financial-kpi__content { flex: 1 1 auto; min-width: 0; }
+.nw-kpi-icon--income {
+  color: #35dfb0;
+  background: rgba(22, 190, 145, 0.17);
+}
+
+.nw-kpi-icon--expenses {
+  color: #ff7d9a;
+  background: rgba(239, 73, 120, 0.17);
+}
+
+.nw-kpi-icon--savings {
+  color: #a78bfa;
+  background: rgba(139, 92, 246, 0.18);
+}
+
+/* Text */
+
+.nw-financial-kpi__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .nw-financial-kpi__label {
-  margin: 0 0 7px;
+  margin: 0 0 5px;
+
   color: #a9bed6;
   font-size: 12px;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .nw-financial-kpi__value {
+  max-width: 100%;
   margin: 0;
+
   color: #f4f8ff;
-  font-size: clamp(17px, 1.35vw, 23px);
+
+  font-size: clamp(16px, 1.35vw, 21px);
   font-weight: 750;
-  line-height: 1.25;
-  letter-spacing: -0.45px;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.nw-financial-kpi__value--positive { color: #f4f8ff; }
-.nw-financial-kpi__value--negative { color: #f4f8ff; }
+
+.nw-financial-kpi__value--positive,
+.nw-financial-kpi__value--negative {
+  color: #f4f8ff;
+}
+
+.nw-financial-kpi__value--neutral {
+  color: #f4f8ff;
+}
+
+/* Footer */
+
 .nw-financial-kpi__footer {
   display: flex;
   align-items: center;
   gap: 9px;
+
+  width: 100%;
   min-width: 0;
-  padding-top: 10px;
+  padding-top: 9px;
+
   border-top: 1px solid rgba(91, 125, 161, 0.18);
 }
+
 .nw-kpi-status {
   display: inline-flex;
-  flex: 0 0 26px;
+  flex: 0 0 25px;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
+
+  width: 25px;
+  height: 25px;
+
+  border-radius: 50%;
   font-size: 11px;
 }
-.nw-kpi-status--neutral { color: #8abfff; background: rgba(59, 130, 246, 0.15); }
-.nw-kpi-status--positive { color: #43e5b4; background: rgba(16, 185, 129, 0.14); }
-.nw-kpi-status--negative { color: #ff8ba0; background: rgba(239, 68, 68, 0.14); }
+
+.nw-kpi-status--neutral {
+  color: #8abfff;
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.nw-kpi-status--positive {
+  color: #43e5b4;
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.nw-kpi-status--negative {
+  color: #ff8ba0;
+  background: rgba(239, 68, 68, 0.14);
+}
+
 .nw-financial-kpi__footer p {
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
+
   color: #829bb7;
   font-size: 10px;
   line-height: 1.45;
 }
 
+/* Smaller desktop */
+
 @media (max-width: 1250px) {
-  .nw-financial-overview { gap: 9px; }
-  .nw-financial-kpi { padding: 13px; }
-  .nw-kpi-icon { flex-basis: 40px; width: 40px; height: 40px; font-size: 17px; }
-  .nw-financial-kpi__main { gap: 9px; }
-  .nw-financial-kpi__value { font-size: clamp(15px, 1.45vw, 20px); }
+  .nw-financial-overview {
+    gap: 9px;
+  }
+
+  .nw-financial-kpi {
+    padding: 11px;
+  }
+
+  .nw-financial-kpi__main {
+    gap: 8px;
+  }
+
+  .nw-kpi-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .nw-financial-kpi__value {
+    font-size: clamp(15px, 1.45vw, 19px);
+  }
 }
 
-@media (max-width: 760px) {
-  .nw-financial-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .nw-financial-kpi { min-height: 120px; padding: 13px; }
-  .nw-financial-kpi__value { font-size: clamp(16px, 2.6vw, 21px); }
+/* Tablet */
+
+@media (max-width: 900px) {
+  .nw-financial-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .nw-financial-kpi {
+    min-height: 108px;
+    padding: 12px;
+  }
+
+  .nw-financial-kpi__value {
+    font-size: 19px;
+  }
 }
 
-@media (max-width: 420px) {
-  .nw-financial-overview { grid-template-columns: minmax(0, 1fr); }
-  .nw-financial-kpi { min-height: 110px; }
+/* Mobile */
+
+@media (max-width: 480px) {
+  .nw-financial-overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .nw-financial-kpi {
+    min-height: 100px;
+    padding: 12px;
+  }
+
+  .nw-financial-kpi__value {
+    font-size: 19px;
+  }
 }
+
+/* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
-  .nw-financial-kpi { transition: none; }
-  .nw-financial-kpi:hover { transform: none; }
+  .nw-financial-kpi {
+    transition: none;
+  }
+
+  .nw-financial-kpi:hover {
+    transform: none;
+  }
 }

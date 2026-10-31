@@ -1,34 +1,43 @@
 
 /* =========================================================
-   NEUROWALLET — DASHBOARD LAYOUT
-   Reference: dark navy AI fintech dashboard
+   NEUROWALLET — MAIN DASHBOARD STYLESHEET
+   Target: Approved dark fintech dashboard reference
+   Scope: DashboardPage.jsx and its layout wrappers
+   Component-specific styles remain in their own CSS files.
    ========================================================= */
+
+/* ---------------------------------------------------------
+   1. DESIGN TOKENS
+--------------------------------------------------------- */
 
 :root {
     --nw-page-bg: #050d19;
-    --nw-panel-bg: #091727;
-    --nw-panel-bg-soft: #0c1d30;
-    --nw-panel-border: #19334d;
-    --nw-panel-border-hover: #2a4f72;
+    --nw-panel-bg: #091a2c;
+    --nw-panel-bg-soft: #0d2035;
+    --nw-panel-border: #193956;
+    --nw-panel-hover: #2b5b83;
 
     --nw-text: #f3f7ff;
-    --nw-text-secondary: #b5c5dc;
-    --nw-text-muted: #8298b4;
+    --nw-text-secondary: #b5c6dd;
+    --nw-text-muted: #8298b5;
 
     --nw-blue: #3978ff;
     --nw-blue-bright: #4a91ff;
     --nw-green: #13d6a0;
     --nw-red: #ff657b;
+    --nw-purple: #9465ff;
 
-    --nw-sidebar-width: 220px;
-    --nw-navbar-height: 72px;
-
-    --nw-card-radius: 13px;
-    --nw-card-padding: 16px;
+    --nw-card-radius: 14px;
+    --nw-card-padding: 14px;
     --nw-layout-gap: 14px;
+
+    --nw-dashboard-sidebar-width: 234px;
+    --nw-dashboard-ai-width: 280px;
 }
 
-/* ---------- Global layout safety ---------- */
+/* ---------------------------------------------------------
+   2. GLOBAL DASHBOARD SAFETY
+--------------------------------------------------------- */
 
 *,
 *::before,
@@ -36,40 +45,33 @@
     box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-}
-
-body {
-    overflow-x: hidden;
-    background: var(--nw-page-bg);
-    color: var(--nw-text);
-}
-
-#root {
-    min-width: 320px;
-}
-
 .nw-dashboard-content-area {
     display: flex;
     flex-direction: column;
     gap: var(--nw-layout-gap);
+
     width: 100%;
     max-width: 100%;
     min-width: 0;
+
     margin: 0;
     padding: 0;
+
     color: var(--nw-text);
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
 }
 
-.nw-dashboard-content-area *,
-.nw-dashboard-content-area *::before,
-.nw-dashboard-content-area *::after {
+.nw-dashboard-content-area > *,
+.nw-dashboard-content-area section,
+.nw-dashboard-content-area article,
+.nw-dashboard-content-area aside {
     min-width: 0;
+    max-width: 100%;
 }
 
 .nw-dashboard-content-area h1,
@@ -77,7 +79,8 @@ body {
 .nw-dashboard-content-area h3,
 .nw-dashboard-content-area h4,
 .nw-dashboard-content-area p {
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .nw-dashboard-content-area button,
@@ -86,780 +89,1260 @@ body {
     font: inherit;
 }
 
-/* ---------- Shared dashboard cards ---------- */
-
-.nw-dashboard-content-area .nw-reference-chart-card,
-.nw-dashboard-content-area .nw-dashboard-health-card,
-.nw-dashboard-content-area .nw-dashboard-transactions,
-.nw-dashboard-content-area .nw-dashboard-cashflow,
-.nw-dashboard-content-area .nw-dashboard-assistant {
-    min-width: 0;
-    background:
-        linear-gradient(
-            145deg,
-            rgba(13, 30, 49, 0.97),
-            rgba(6, 19, 33, 0.98)
-        );
-    border: 1px solid var(--nw-panel-border);
-    border-radius: var(--nw-card-radius);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-.nw-dashboard-content-area .nw-reference-chart-card,
-.nw-dashboard-content-area .nw-dashboard-transactions,
-.nw-dashboard-content-area .nw-dashboard-cashflow {
-    padding: var(--nw-card-padding);
-}
-
-.nw-dashboard-content-area .nw-reference-chart-card,
-.nw-dashboard-content-area .nw-dashboard-health-card,
-.nw-dashboard-content-area .nw-dashboard-transactions,
-.nw-dashboard-content-area .nw-dashboard-cashflow {
-    transition:
-        border-color 160ms ease,
-        background-color 160ms ease;
-}
-
-.nw-dashboard-content-area .nw-reference-chart-card:hover,
-.nw-dashboard-content-area .nw-dashboard-health-card:hover,
-.nw-dashboard-content-area .nw-dashboard-transactions:hover,
-.nw-dashboard-content-area .nw-dashboard-cashflow:hover {
-    border-color: var(--nw-panel-border-hover);
-}
-
-/* ---------- Top row: overview + AI assistant ---------- */
-
-.nw-dashboard-top-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 2.65fr) minmax(280px, 1fr);
-    align-items: stretch;
-    gap: var(--nw-layout-gap);
-    width: 100%;
-    min-width: 0;
-}
-
-.nw-dashboard-primary {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    min-width: 0;
-}
-
-.nw-dashboard-greeting {
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.nw-dashboard-greeting > * {
-    max-width: 100%;
-}
-
-.nw-dashboard-overview {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--nw-layout-gap);
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-/* FinancialOverview may render its own four-card grid. */
-.nw-dashboard-overview > *,
-.nw-dashboard-primary > * {
-    min-width: 0;
-    max-width: 100%;
-}
-
-/* AI assistant occupies the full height of the top row. */
-.nw-dashboard-assistant {
-    display: flex;
-    flex-direction: column;
-    align-self: stretch;
-    min-height: 0;
-    padding: var(--nw-card-padding);
-}
-
-.nw-dashboard-assistant > * {
-    width: 100%;
-    min-width: 0;
-}
-
-/* ---------- Analytics: two charts ---------- */
-
-.nw-dashboard-chart-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
-    align-items: stretch;
-    gap: var(--nw-layout-gap);
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.nw-dashboard-chart-grid > * {
-    min-width: 0;
-    max-width: 100%;
-}
-
-.nw-dashboard-income-chart,
-.nw-dashboard-category-chart {
-    min-height: 250px;
-    overflow: hidden;
-}
-
-.nw-dashboard-income-chart > *,
-.nw-dashboard-category-chart > * {
-    max-width: 100%;
-}
-
-/* Responsive chart containers such as Recharts. */
-.nw-dashboard-content-area .recharts-responsive-container {
-    max-width: 100%;
-}
-
-/* ---------- Health and goal cards ---------- */
-
-.nw-dashboard-health-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: stretch;
-    gap: var(--nw-layout-gap);
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.nw-dashboard-health-card {
-    display: flex;
-    flex-direction: column;
-    min-height: 142px;
-    padding: 14px;
-    overflow: hidden;
-}
-
-.nw-dashboard-health-card > * {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-}
-
-.nw-dashboard-health-card h1,
-.nw-dashboard-health-card h2,
-.nw-dashboard-health-card h3,
-.nw-dashboard-health-card h4 {
-    margin-top: 0;
-}
-
-.nw-dashboard-health-card p {
-    color: var(--nw-text-secondary);
-    line-height: 1.5;
-}
-
-/* ---------- Bottom row: transactions + cash flow ---------- */
-
-.nw-dashboard-bottom-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.1fr);
-    align-items: stretch;
-    gap: var(--nw-layout-gap);
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-.nw-dashboard-transactions,
-.nw-dashboard-cashflow {
-    min-height: 240px;
-    overflow: hidden;
-}
-
-.nw-dashboard-transactions > *,
-.nw-dashboard-cashflow > * {
-    max-width: 100%;
-}
-
-/* Prevent wide transaction tables from stretching the page. */
-.nw-dashboard-transactions {
-    overflow-x: auto;
-}
-
-.nw-dashboard-transactions table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.nw-dashboard-transactions th,
-.nw-dashboard-transactions td {
-    padding: 10px 8px;
-    text-align: left;
-    vertical-align: middle;
-}
-
-/* ---------- Tables and chart elements ---------- */
-
-.nw-dashboard-content-area table {
-    color: var(--nw-text-secondary);
-}
-
-.nw-dashboard-content-area th {
-    color: var(--nw-text);
-    font-weight: 600;
-}
-
+.nw-dashboard-content-area img,
+.nw-dashboard-content-area canvas,
 .nw-dashboard-content-area svg {
     max-width: 100%;
 }
 
-.nw-dashboard-content-area img,
-.nw-dashboard-content-area canvas {
+.nw-dashboard-content-area .recharts-responsive-container {
+    width: 100% !important;
     max-width: 100%;
 }
 
-/* ---------- Loading and error states ---------- */
+/* ---------------------------------------------------------
+   3. SHARED DASHBOARD PANELS
+--------------------------------------------------------- */
 
-.dashboard-error-state {
+.nw-dashboard-panel {
+    position: relative;
+
     width: 100%;
-    max-width: 620px;
-    margin: 40px auto;
-    padding: 24px;
-    color: var(--nw-text);
-    background: var(--nw-panel-bg);
+    min-width: 0;
+    max-width: 100%;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(13, 30, 49, 0.98),
+            rgba(6, 19, 33, 0.99)
+        );
+
     border: 1px solid var(--nw-panel-border);
     border-radius: var(--nw-card-radius);
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease;
 }
 
-.dashboard-error-state p {
+.nw-dashboard-panel:hover {
+    border-color: var(--nw-panel-hover);
+}
+
+/* ---------------------------------------------------------
+   4. HERO SECTION
+--------------------------------------------------------- */
+
+.nw-dashboard-hero-section {
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-hero-section > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Keep the hero component's own background and artwork.
+   This wrapper only controls its position and dimensions. */
+
+.nw-dashboard-hero-section .dashboard-hero {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* ---------------------------------------------------------
+   5. FINANCIAL OVERVIEW — FOUR KPI CARDS
+--------------------------------------------------------- */
+
+.nw-dashboard-overview-section {
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-overview-section > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-overview-section .financial-overview {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.nw-dashboard-overview-section .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+
+    gap: 12px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-overview-section .overview-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 96px;
+    height: 100%;
+
+    margin: 0;
+    padding: 13px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--nw-panel-border);
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #10243a,
+            #091929
+        );
+
+    box-shadow: none;
+
+    transition:
+        border-color 160ms ease,
+        transform 160ms ease;
+}
+
+.nw-dashboard-overview-section .overview-card:hover {
+    border-color: var(--nw-panel-hover);
+    transform: translateY(-2px);
+}
+
+.nw-dashboard-overview-section .overview-card-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.nw-dashboard-overview-section .overview-icon,
+.nw-dashboard-overview-section .overview-icon-wrapper {
+    display: inline-flex;
+    flex: 0 0 38px;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    margin: 0;
+    border-radius: 11px;
+}
+
+.nw-dashboard-overview-section .overview-card-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nw-dashboard-overview-section .overview-title,
+.nw-dashboard-overview-section .overview-subtitle,
+.nw-dashboard-overview-section .overview-card h4 {
+    margin: 0 0 5px;
+
+    color: var(--nw-text-secondary);
+
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.nw-dashboard-overview-section .overview-amount,
+.nw-dashboard-overview-section .overview-value,
+.nw-dashboard-overview-section .overview-card h2 {
+    max-width: 100%;
+    margin: 0;
+
+    color: var(--nw-text);
+
+    font-size: clamp(15px, 1.25vw, 21px);
+    font-weight: 750;
+    line-height: 1.3;
+
+    letter-spacing: -0.35px;
+    font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nw-dashboard-overview-section .overview-card-footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    min-width: 0;
+    margin-top: 8px;
+}
+
+.nw-dashboard-overview-section .overview-description {
+    margin: 0;
+
+    color: var(--nw-text-muted);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+/* ---------------------------------------------------------
+   6. MAIN DASHBOARD GRID
+   Left: analytics + financial cards + activity
+   Right: AI Advisor
+--------------------------------------------------------- */
+
+.nw-dashboard-main-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(260px, var(--nw-dashboard-ai-width));
+
+    align-items: stretch;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-main-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+}
+
+/* ---------------------------------------------------------
+   7. ANALYTICS GRID
+   Income vs Expenses + Spending Categories
+--------------------------------------------------------- */
+
+.nw-dashboard-analytics-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.55fr)
+        minmax(0, 1fr);
+
+    align-items: stretch;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-income-panel,
+.nw-dashboard-category-panel {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 250px;
+
+    overflow: hidden;
+}
+
+.nw-dashboard-income-panel > *,
+.nw-dashboard-category-panel > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Chart containers */
+
+.nw-dashboard-income-panel .recharts-responsive-container,
+.nw-dashboard-category-panel .recharts-responsive-container {
+    max-width: 100%;
+}
+
+/* ---------------------------------------------------------
+   8. FINANCIAL HEALTH / BUDGET / GOALS
+   Three equal-width cards
+--------------------------------------------------------- */
+
+.nw-dashboard-financial-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    align-items: stretch;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-financial-card {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 245px;
+
+    padding: 13px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0c1d30,
+            #071525
+        );
+
+    border: 1px solid var(--nw-panel-border);
+    border-radius: var(--nw-card-radius);
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+
+    transition: border-color 180ms ease;
+}
+
+.nw-dashboard-financial-card:hover {
+    border-color: var(--nw-panel-hover);
+}
+
+.nw-dashboard-financial-card > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-financial-card h2,
+.nw-dashboard-financial-card h3,
+.nw-dashboard-financial-card h4 {
+    color: var(--nw-text);
+    overflow-wrap: break-word;
+}
+
+.nw-dashboard-financial-card p {
+    color: var(--nw-text-secondary);
+    line-height: 1.5;
+}
+
+/* Keep numbers and currency values readable */
+
+.nw-dashboard-financial-card strong {
+    font-variant-numeric: tabular-nums;
+    word-break: normal;
+}
+
+.nw-dashboard-financial-card .budget-metrics strong,
+.nw-dashboard-financial-card .goal-metrics strong,
+.nw-dashboard-financial-card .recommend-goal-metrics strong {
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+
+/* ---------------------------------------------------------
+   9. RECENT TRANSACTIONS + CASH FLOW
+--------------------------------------------------------- */
+
+.nw-dashboard-activity-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.5fr)
+        minmax(0, 1fr);
+
+    align-items: stretch;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+}
+
+.nw-dashboard-transactions-panel,
+.nw-dashboard-cashflow-panel {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 230px;
+
+    overflow: hidden;
+}
+
+.nw-dashboard-transactions-panel > *,
+.nw-dashboard-cashflow-panel > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Transaction table */
+
+.nw-dashboard-transactions-panel {
+    overflow-x: auto;
+}
+
+.nw-dashboard-transactions-panel .transaction-card {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.nw-dashboard-transactions-panel table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nw-dashboard-transactions-panel th,
+.nw-dashboard-transactions-panel td {
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 11px;
+}
+
+.nw-dashboard-transactions-panel th {
+    color: var(--nw-text-muted);
+    font-weight: 600;
+}
+
+.nw-dashboard-transactions-panel td {
+    color: var(--nw-text-secondary);
+}
+
+.nw-dashboard-transactions-panel .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+/* ---------------------------------------------------------
+   10. RIGHT COLUMN — COMPACT NEURO AI SIDEBAR
+--------------------------------------------------------- */
+
+.nw-dashboard-ai-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    align-items: stretch;
+    gap: var(--nw-layout-gap);
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: fit-content;
+}
+
+.nw-dashboard-ai-panel,
+.nw-dashboard-activity-summary {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+
+    padding: 0;
+    overflow: hidden;
+
+    background: linear-gradient(
+        155deg,
+        #0b1c30,
+        #061424
+    );
+
+    border: 1px solid #194b78;
+    border-radius: 15px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.nw-dashboard-ai-panel > *,
+.nw-dashboard-activity-summary > * {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* AI header */
+
+.nw-dashboard-sidebar-heading,
+.nw-dashboard-summary-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 14px;
+
+    border-bottom: 1px solid rgba(87, 132, 178, 0.18);
+}
+
+.nw-dashboard-sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.nw-dashboard-sidebar-icon,
+.nw-dashboard-summary-icon {
+    display: inline-flex;
+    flex: 0 0 38px;
+    align-items: center;
+    justify-content: center;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+    font-size: 17px;
+}
+
+.nw-sidebar-icon-ai {
+    color: #dceaff;
+    background: linear-gradient(135deg, #2865f5, #654cf5);
+}
+
+.nw-dashboard-sidebar-title h2,
+.nw-dashboard-summary-heading h2 {
+    margin: 0;
+    color: var(--nw-text);
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.nw-dashboard-sidebar-title p,
+.nw-dashboard-summary-heading p {
+    margin: 3px 0 0;
+    color: var(--nw-text-muted);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.nw-dashboard-ai-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+
+    color: #35dfad;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.nw-dashboard-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #18d69d;
+    box-shadow: 0 0 8px rgba(24, 214, 157, 0.45);
+}
+
+/* AI content */
+
+.nw-dashboard-ai-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+}
+
+/* Confidence */
+
+.nw-dashboard-confidence-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 11px 12px;
+
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(112, 148, 190, 0.14);
+    border-radius: 11px;
+}
+
+.nw-dashboard-confidence-row > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.nw-dashboard-mini-label {
+    color: var(--nw-text-muted);
+    font-size: 11px;
+}
+
+.nw-dashboard-confidence-row strong {
+    color: #42e4b2;
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.nw-dashboard-confidence-track {
+    display: block;
+    width: 100%;
+    height: 6px;
+
+    overflow: hidden;
+    border-radius: 99px;
+    background: #1c3550;
+}
+
+.nw-dashboard-confidence-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #08c98e, #398aff);
+    transition: width 250ms ease;
+}
+
+/* Insight items */
+
+.nw-dashboard-insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    min-width: 0;
+    padding: 11px;
+
+    border: 1px solid rgba(112, 148, 190, 0.14);
+    border-left: 3px solid transparent;
+    border-radius: 11px;
+
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.nw-insight-positive {
+    border-left-color: #16c995;
+    background: rgba(16, 185, 129, 0.065);
+}
+
+.nw-insight-warning {
+    border-left-color: #f3a72e;
+    background: rgba(245, 158, 11, 0.055);
+}
+
+.nw-insight-investment {
+    border-left-color: #5798ff;
+    background: rgba(59, 130, 246, 0.055);
+}
+
+.nw-dashboard-insight-icon {
+    display: inline-flex;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 9px;
+    font-size: 14px;
+}
+
+.nw-insight-positive .nw-dashboard-insight-icon {
+    color: #32e0aa;
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.nw-insight-warning .nw-dashboard-insight-icon {
+    color: #ffc15c;
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.nw-insight-investment .nw-dashboard-insight-icon {
+    color: #7eb5ff;
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.nw-dashboard-insight-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.nw-dashboard-insight-copy h3 {
+    margin: 0 0 4px;
+    color: var(--nw-text);
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.nw-dashboard-insight-copy p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+
+    margin: 0;
+    overflow: hidden;
+
+    color: var(--nw-text-secondary);
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+/* Risk row */
+/* Financial Risk — Full-width aligned layout */
+
+.nw-dashboard-risk-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+    padding: 13px 4px;
+
+    border-top: 1px solid rgba(112, 148, 190, 0.15);
+}
+
+.nw-dashboard-risk-row > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    width: 100%;
+
+    color: #a9c1df;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.nw-dashboard-risk-row > span svg {
+    flex-shrink: 0;
+    color: #8dbaff;
+}
+
+.nw-dashboard-risk-row strong {
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+
+    color: #d4e2f5;
+    font-size: 12px;
+    font-weight: 450;
+    line-height: 1.7;
+
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+/* AI action */
+
+.nw-dashboard-ai-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    width: 100%;
+    min-height: 40px;
+    margin-top: 2px;
+    padding: 10px 12px;
+
+    color: #fff;
+    background: linear-gradient(100deg, #315ff2, #4936c9);
+
+    border: 1px solid rgba(117, 137, 255, 0.35);
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+
+    transition:
+        transform 160ms ease,
+        filter 160ms ease;
+}
+
+.nw-dashboard-ai-action svg:last-child {
+    margin-left: auto;
+}
+
+.nw-dashboard-ai-action:hover {
+    color: #fff;
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+/* Recent activity summary */
+
+.nw-dashboard-activity-summary {
+    padding: 0;
+}
+
+.nw-dashboard-summary-heading {
+    border-bottom: 0;
+}
+
+.nw-dashboard-summary-icon {
+    color: #8fc2ff;
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.nw-dashboard-activity-total {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+
+    margin: 0 13px;
+    padding: 11px 12px;
+
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(112, 148, 190, 0.14);
+    border-radius: 10px;
+}
+
+.nw-dashboard-activity-total strong {
+    color: var(--nw-text);
+    font-size: 25px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.nw-dashboard-activity-total span {
+    color: var(--nw-text-muted);
+    font-size: 11px;
+}
+
+.nw-dashboard-activity-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+
+    padding: 11px 13px 8px;
+}
+
+.nw-activity-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+
+    min-width: 0;
+    padding: 9px 8px;
+
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(112, 148, 190, 0.12);
+    border-radius: 9px;
+}
+
+.nw-activity-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+    border-radius: 7px;
+    font-size: 11px;
+}
+
+.nw-activity-stat-icon.is-success {
+    color: #36dfaa;
+    background: rgba(16, 185, 129, 0.13);
+}
+
+.nw-activity-stat-icon.is-pending {
+    color: #ffc15c;
+    background: rgba(245, 158, 11, 0.13);
+}
+
+.nw-activity-stat-icon.is-failed {
+    color: #ff8295;
+    background: rgba(239, 68, 68, 0.13);
+}
+
+.nw-activity-stat > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.nw-activity-stat strong {
+    color: var(--nw-text);
+    font-size: 15px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.nw-activity-stat span:last-child {
+    color: var(--nw-text-muted);
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+.nw-dashboard-activity-note {
+    margin: 0;
+    padding: 0 13px 12px;
+
+    color: var(--nw-text-muted);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+/* ---------------------------------------------------------
+   17. COMPACT SIDEBAR RESPONSIVE FIXES
+--------------------------------------------------------- */
+
+@media (max-width: 1450px) {
+    .nw-dashboard-ai-content {
+        gap: 9px;
+        padding: 10px;
+    }
+
+    .nw-dashboard-sidebar-heading,
+    .nw-dashboard-summary-heading {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 1050px) {
+    .nw-dashboard-ai-sidebar {
+        align-self: stretch;
+        height: auto;
+    }
+
+    .nw-dashboard-ai-panel,
+    .nw-dashboard-activity-summary {
+        min-height: 0;
+        height: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .nw-dashboard-activity-stats {
+        gap: 6px;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .nw-activity-stat {
+        padding: 8px 6px;
+    }
+
+    .nw-dashboard-insight-copy p {
+        -webkit-line-clamp: 4;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nw-dashboard-ai-action,
+    .nw-dashboard-confidence-track span {
+        transition: none;
+    }
+}
+/* ---------------------------------------------------------
+   11. PARTIAL API FAILURE NOTICE
+--------------------------------------------------------- */
+
+.nw-dashboard-partial-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    width: 100%;
+    padding: 12px 16px;
+
+    color: #ffd78a;
+
+    background: rgba(160, 105, 20, 0.12);
+    border: 1px solid rgba(255, 185, 70, 0.25);
+    border-radius: 10px;
+
+    font-size: 13px;
+}
+
+.nw-dashboard-partial-error button {
+    padding: 7px 13px;
+
+    color: #fff;
+    background: #174b86;
+
+    border: 1px solid #2866a5;
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+.nw-dashboard-partial-error button:hover {
+    background: #205d9f;
+}
+
+/* ---------------------------------------------------------
+   12. DASHBOARD ERROR STATE
+--------------------------------------------------------- */
+
+.nw-dashboard-error {
+    display: grid;
+    place-items: center;
+
+    width: 100%;
+    min-height: 300px;
+    padding: 24px;
+}
+
+.nw-dashboard-error-content {
+    width: 100%;
+    max-width: 500px;
+
+    padding: 28px;
+
+    color: var(--nw-text);
+    background: var(--nw-panel-bg);
+
+    border: 1px solid #23415e;
+    border-radius: 14px;
+}
+
+.nw-dashboard-error-content p {
     color: var(--nw-text-secondary);
     line-height: 1.6;
 }
 
-.dashboard-error-state .retry-btn {
+.nw-dashboard-retry-btn {
     padding: 10px 18px;
+
+
     color: #fff;
-    background: var(--nw-blue);
+    background: #245bea;
+
     border: 0;
-    border-radius: 9px;
+    border-radius: 8px;
+
     cursor: pointer;
 }
 
-.dashboard-error-state .retry-btn:hover {
+.nw-dashboard-retry-btn:hover {
     background: var(--nw-blue-bright);
 }
 
-.dashboard-error-state .retry-btn:disabled {
+.nw-dashboard-retry-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-/* ---------- Medium desktop / small laptop ---------- */
+/* ---------------------------------------------------------
+   13. RESPONSIVE — LAPTOP
+--------------------------------------------------------- */
 
-@media (max-width: 1250px) {
+@media (max-width: 1450px) {
     :root {
         --nw-layout-gap: 12px;
-        --nw-card-padding: 14px;
     }
 
-    .nw-dashboard-top-grid {
-        grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
+    .nw-dashboard-main-grid {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(250px, 270px);
     }
 
-    .nw-dashboard-health-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .nw-dashboard-bottom-grid {
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    .nw-dashboard-financial-card {
+        padding: 11px;
     }
 }
 
-/* ---------- Tablet ---------- */
+@media (max-width: 1250px) {
+    .nw-dashboard-overview-section .overview-grid {
+        gap: 9px;
+    }
 
-@media (max-width: 900px) {
-    .nw-dashboard-top-grid {
+    .nw-dashboard-overview-section .overview-card {
+        padding: 10px;
+    }
+
+    .nw-dashboard-overview-section .overview-icon,
+    .nw-dashboard-overview-section .overview-icon-wrapper {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .nw-dashboard-overview-section .overview-amount,
+    .nw-dashboard-overview-section .overview-value {
+        font-size: 15px;
+    }
+
+    .nw-dashboard-financial-card {
+        padding: 10px;
+    }
+}
+
+/* ---------------------------------------------------------
+   14. RESPONSIVE — TABLET
+--------------------------------------------------------- */
+
+@media (max-width: 1050px) {
+    .nw-dashboard-main-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .nw-dashboard-assistant {
-        min-height: auto;
+    .nw-dashboard-ai-sidebar {
+        height: auto;
     }
 
-    .nw-dashboard-chart-grid {
-        grid-template-columns: minmax(0, 1fr);
+    .nw-dashboard-ai-panel {
+        min-height: 0;
+        height: auto;
     }
 
-    .nw-dashboard-income-chart,
-    .nw-dashboard-category-chart {
-        min-height: 230px;
+    .nw-dashboard-analytics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
 
-    .nw-dashboard-bottom-grid {
+    .nw-dashboard-activity-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 }
 
-/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+    .nw-dashboard-overview-section .overview-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .nw-dashboard-financial-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .nw-dashboard-analytics-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-income-panel,
+    .nw-dashboard-category-panel {
+        min-height: 220px;
+    }
+}
+
+/* ---------------------------------------------------------
+   15. RESPONSIVE — MOBILE
+--------------------------------------------------------- */
 
 @media (max-width: 560px) {
     :root {
-        --nw-layout-gap: 10px;
-        --nw-card-padding: 12px;
+        --nw-layout-gap: 11px;
     }
 
     .nw-dashboard-content-area {
         gap: 12px;
     }
 
-    .nw-dashboard-primary {
-        gap: 14px;
+    .nw-dashboard-main-left {
+        gap: 12px;
     }
 
-    .nw-dashboard-health-grid {
+    .nw-dashboard-overview-section .overview-grid,
+    .nw-dashboard-financial-grid,
+    .nw-dashboard-analytics-grid,
+    .nw-dashboard-activity-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .nw-dashboard-health-card {
-        min-height: 120px;
+    .nw-dashboard-financial-card {
+        min-height: 150px;
+        padding: 14px;
     }
 
-    .nw-dashboard-income-chart,
-    .nw-dashboard-category-chart {
+    .nw-dashboard-income-panel,
+    .nw-dashboard-category-panel {
         min-height: 210px;
     }
 
-    .nw-dashboard-transactions,
-    .nw-dashboard-cashflow {
+    .nw-dashboard-transactions-panel,
+    .nw-dashboard-cashflow-panel {
         min-height: 0;
     }
 
-    .nw-dashboard-transactions th,
-    .nw-dashboard-transactions td {
-        padding: 8px 6px;
-        white-space: nowrap;
+    .nw-dashboard-overview-section .overview-card {
+        min-height: 105px;
+        padding: 12px;
+    }
+
+    .nw-dashboard-overview-section .overview-amount {
+        font-size: 18px;
+    }
+
+    .nw-dashboard-partial-error {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 
-/* =====================================================
-   NEUROWALLET — DASHBOARD REFERENCE LAYOUT FINAL FIX
-   Append at the END of dashboard-reference.css
-===================================================== */
+/* ---------------------------------------------------------
+   16. ACCESSIBILITY
+--------------------------------------------------------- */
 
-.nw-dashboard-content-area,
-.nw-dashboard-content-area * {
-  box-sizing: border-box;
+@media (prefers-reduced-motion: reduce) {
+    .nw-dashboard-panel,
+    .nw-dashboard-overview-section .overview-card {
+        transition: none;
+    }
+
+    .nw-dashboard-overview-section .overview-card:hover {
+        transform: none;
+    }
+}
+.dashboard-financial-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+    min-width: 0;
 }
 
-.nw-dashboard-content-area {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  color: #f1f5f9;
+.dashboard-financial-cards > * {
+    min-width: 0;
 }
 
-.nw-dashboard-content-area > section {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  margin: 0;
+@media (max-width: 1100px) {
+    .dashboard-financial-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
-/* Top: greeting / KPI area + AI assistant */
-.nw-dashboard-top-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(270px, 320px);
-  align-items: stretch;
-  gap: 18px;
-  width: 100%;
-  min-width: 0;
-}
-
-.nw-dashboard-primary {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  min-width: 0;
-}
-
-.nw-dashboard-greeting,
-.nw-dashboard-overview,
-.nw-dashboard-assistant {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  margin: 0;
-}
-
-/* Greeting */
-.nw-dashboard-greeting .dashboard-hero {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 24px;
-  border-radius: 20px;
-}
-
-.nw-dashboard-greeting .hero-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.nw-dashboard-greeting .hero-title {
-  margin: 0 0 12px;
-  font-size: clamp(26px, 2.2vw, 38px);
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-
-.nw-dashboard-greeting .hero-subtitle {
-  margin: 0 0 16px;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.nw-dashboard-greeting .hero-status-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.nw-dashboard-greeting .hero-chip {
-  padding: 7px 10px;
-  font-size: 11px;
-}
-
-.nw-dashboard-greeting .hero-right {
-  width: auto;
-  min-width: 130px;
-  flex: 0 0 auto;
-  text-align: right;
-}
-
-.nw-dashboard-greeting .hero-time-card {
-  gap: 7px;
-}
-
-.nw-dashboard-greeting .hero-clock {
-  font-size: clamp(22px, 1.8vw, 30px);
-  line-height: 1.2;
-}
-
-/* Financial overview: section title above the four KPI cards */
-.nw-dashboard-overview .financial-overview {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.nw-dashboard-overview .section-heading {
-  width: 100%;
-  min-width: 0;
-  margin: 0;
-}
-
-.nw-dashboard-overview .overview-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.nw-dashboard-overview .overview-card {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  min-height: 145px;
-  height: auto;
-  margin: 0;
-  padding: 14px;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.nw-dashboard-overview .overview-icon,
-.nw-dashboard-overview .overview-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  margin-bottom: 10px;
-  border-radius: 11px;
-  font-size: 16px;
-}
-
-.nw-dashboard-overview .overview-title,
-.nw-dashboard-overview .overview-card h4 {
-  margin-bottom: 8px;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.nw-dashboard-overview .overview-amount,
-.nw-dashboard-overview .overview-value,
-.nw-dashboard-overview .overview-card h2 {
-  max-width: 100%;
-  margin-bottom: 8px;
-  font-size: clamp(16px, 1.3vw, 22px);
-  line-height: 1.25;
-  letter-spacing: -0.4px;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  white-space: normal;
-}
-
-.nw-dashboard-overview .overview-description,
-.nw-dashboard-overview .overview-subtitle {
-  font-size: 11px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-/* AI assistant: compact and aligned with the top grid */
-.nw-dashboard-assistant {
-  display: flex;
-  align-items: stretch;
-  min-width: 0;
-}
-
-.nw-dashboard-assistant > *,
-.nw-dashboard-assistant .nw-ai-assistant,
-.nw-dashboard-assistant .ai-panel {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  min-height: 0;
-  height: auto;
-  margin: 0;
-  padding: 20px;
-  border-radius: 18px;
-  box-sizing: border-box;
-}
-
-.nw-dashboard-assistant h1,
-.nw-dashboard-assistant h2 {
-  font-size: clamp(20px, 1.7vw, 27px);
-  line-height: 1.3;
-  overflow-wrap: anywhere;
-}
-
-.nw-dashboard-assistant h3 {
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.nw-dashboard-assistant p,
-.nw-dashboard-assistant li {
-  font-size: 13px;
-  line-height: 1.65;
-  overflow-wrap: anywhere;
-}
-
-/* Analytics */
-.nw-dashboard-chart-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  align-items: stretch;
-  gap: 18px;
-  width: 100%;
-  min-width: 0;
-}
-
-.nw-dashboard-chart-grid > *,
-.nw-dashboard-chart-grid .nw-reference-chart-card,
-.nw-dashboard-chart-grid .chart-card {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-.nw-dashboard-chart-grid .chart-card {
-  padding: 20px;
-  border-radius: 18px;
-}
-
-.nw-dashboard-chart-grid .recharts-responsive-container,
-.nw-dashboard-cashflow .recharts-responsive-container {
-  max-width: 100%;
-}
-
-/* Health, budget and goals */
-.nw-dashboard-health-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 14px;
-  width: 100%;
-  min-width: 0;
-}
-
-.nw-dashboard-health-card {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.nw-dashboard-health-card > * {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 18px;
-  border-radius: 18px;
-  box-sizing: border-box;
-}
-
-.nw-dashboard-health-card h1 {
-  font-size: clamp(28px, 2.5vw, 44px);
-}
-
-.nw-dashboard-health-card h2,
-.nw-dashboard-health-card h3 {
-  font-size: clamp(16px, 1.3vw, 21px);
-  line-height: 1.4;
-}
-
-/* Transactions and cash flow */
-.nw-dashboard-bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  align-items: stretch;
-  gap: 18px;
-  width: 100%;
-  min-width: 0;
-}
-
-.nw-dashboard-transactions,
-.nw-dashboard-cashflow {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.nw-dashboard-transactions > *,
-.nw-dashboard-cashflow > * {
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.nw-dashboard-transactions .transaction-card {
-  margin: 0;
-  padding: 20px;
-  border-radius: 18px;
-}
-
-.nw-dashboard-transactions .transaction-header h2 {
-  font-size: 20px;
-}
-
-.nw-dashboard-transactions .transaction-table {
-  width: 100%;
-}
-
-.nw-dashboard-transactions .transaction-table th,
-.nw-dashboard-transactions .transaction-table td {
-  padding: 13px 12px;
-  font-size: 12px;
-}
-
-/* Laptop and tablet */
-@media (max-width: 1450px) {
-  .nw-dashboard-top-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 290px);
-    gap: 14px;
-  }
-
-  .nw-dashboard-overview .overview-grid,
-  .nw-dashboard-health-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .nw-dashboard-overview .overview-card {
-    min-height: 130px;
-  }
-}
-
-@media (max-width: 1050px) {
-  .nw-dashboard-top-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .nw-dashboard-chart-grid,
-  .nw-dashboard-bottom-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .nw-dashboard-assistant {
-    align-self: auto;
-  }
-
-  .nw-dashboard-greeting .hero-title {
-    font-size: clamp(25px, 4vw, 34px);
-  }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .nw-dashboard-content-area {
-    gap: 14px;
-  }
-
-  .nw-dashboard-top-grid,
-  .nw-dashboard-chart-grid,
-  .nw-dashboard-bottom-grid {
-    gap: 14px;
-  }
-
-  .nw-dashboard-overview .overview-grid,
-  .nw-dashboard-health-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .nw-dashboard-greeting .dashboard-hero {
-    padding: 18px;
-  }
-
-  .nw-dashboard-greeting .hero-header {
-    flex-direction: column;
-  }
-
-  .nw-dashboard-greeting .hero-right {
-    width: 100%;
-    text-align: left;
-  }
-
-  .nw-dashboard-greeting .hero-time-card {
-    align-items: flex-start;
-  }
-
-  .nw-dashboard-assistant > *,
-  .nw-dashboard-assistant .nw-ai-assistant,
-  .nw-dashboard-assistant .ai-panel {
-    padding: 16px;
-  }
-
-  .nw-dashboard-health-card > * {
-    padding: 16px;
-  }
+@media (max-width: 700px) {
+    .dashboard-financial-cards {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }

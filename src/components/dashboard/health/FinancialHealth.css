@@ -1,8 +1,11 @@
 
 /* =========================================================
-   NEUROWALLET — FINANCIAL HEALTH
-   Enterprise Dashboard Component
+   NEUROWALLET — FINANCIAL HEALTH CARD
+   Enterprise FinTech Dashboard
+   Theme: Deep Navy | Blue | Emerald
 ========================================================= */
+
+/* ---------------- Base ---------------- */
 
 .health-card,
 .health-card * {
@@ -10,460 +13,612 @@
 }
 
 .health-card {
+    container-type: inline-size;
+
     display: flex;
     flex-direction: column;
-    gap: 19px;
+    gap: 13px;
 
     width: 100%;
     height: 100%;
     min-width: 0;
+    min-height: 245px;
 
-    padding: 22px;
+    padding: 14px;
 
-    color: #f1f5f9;
+    color: #f3f7ff;
 
-    background: linear-gradient(
-        145deg,
-        #14243b 0%,
-        #0b1929 100%
-    );
+    background:
+        linear-gradient(145deg, #0d2136 0%, #091a2b 100%);
 
-    border: 1px solid #203955;
-    border-top: 3px solid #3b82f6;
-    border-radius: 18px;
+    border: 1px solid #193653;
+    border-radius: 14px;
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color 180ms ease,
+        box-shadow 180ms ease;
 }
 
 .health-card:hover {
-    border-color: #35547a;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+    border-color: #32618c;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
 }
 
-/* HEADER */
+/* ---------------- Header ---------------- */
 
 .health-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 14px;
-
-    min-width: 0;
-}
-
-.health-header > div:first-child {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.health-title {
     display: flex;
     align-items: center;
     gap: 10px;
 
-    margin: 0 0 9px;
-
-    color: #f8fafc;
-    font-size: 19px;
-    font-weight: 750;
-    line-height: 1.35;
+    width: 100%;
+    min-width: 0;
 }
 
-.health-title-icon {
-    flex: 0 0 auto;
-    color: #60a5fa;
-    font-size: 19px;
-}
-
-.health-header p {
-    max-width: 440px;
-    margin: 0;
-
-    color: #91a8c5;
-    font-size: 13px;
-    line-height: 1.65;
-}
-
-.health-percent {
+.health-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    flex: 0 0 auto;
-    min-width: 72px;
-    padding: 11px 13px;
+    flex: 0 0 36px;
 
-    color: #4ade80;
-    background: rgba(34, 197, 94, 0.12);
+    width: 36px;
+    height: 36px;
 
-    border: 1px solid rgba(34, 197, 94, 0.18);
-    border-radius: 12px;
+    color: #79bdff;
 
-    font-size: 18px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
+    background: rgba(45, 130, 255, 0.17);
+    border: 1px solid rgba(59, 130, 246, 0.16);
+    border-radius: 10px;
+
+    font-size: 16px;
 }
 
-/* PROGRESS */
-
-.progress-wrapper {
-    width: 100%;
+.health-heading {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
-.progress-bar {
-    width: 100%;
-    height: 9px;
+.health-heading h2 {
+    margin: 0 0 3px;
+
+    color: #f4f8ff;
+
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.health-heading p {
+    margin: 0;
+
+    color: #91a8c5;
+
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* ---------------- Status Badge ---------------- */
+
+.health-badge {
+    flex: 0 0 auto;
+
+    max-width: 90px;
+    padding: 5px 8px;
 
     overflow: hidden;
 
-    background: #23334b;
-    border-radius: 999px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    font-size: 9px;
+    font-weight: 750;
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.progress-fill {
-    height: 100%;
-
-    background: linear-gradient(
-        90deg,
-        #22c55e,
-        #14b8a6,
-        #3b82f6
-    );
-
-    border-radius: inherit;
-
-    transition: width 0.5s ease;
+.health-badge--excellent,
+.health-badge--good {
+    color: #34e6a0;
+    background: rgba(16, 185, 129, 0.13);
+    border-color: rgba(16, 185, 129, 0.14);
 }
 
-/* SCORE AREA */
-
-.score-section {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    align-items: center;
-    gap: 22px;
-
-    min-width: 0;
-    padding: 4px 0;
-}
-
-.score-circle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    width: 150px;
-    height: 150px;
-    min-width: 0;
-
-    background:
-        radial-gradient(
-            circle,
-            #102239 0 62%,
-            transparent 63%
-        ),
-        conic-gradient(
-            #22c55e var(--health-progress),
-            #263c56 var(--health-progress)
-        );
-
-    border-radius: 50%;
-}
-.health-score-label {
-    color: #94a3b8;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-align: center;
-}
-
-.health-score {
-    margin: 3px 0;
-
-    color: #f8fafc;
-    font-size: 38px;
-    font-weight: 800;
-    line-height: 1.1;
-    font-variant-numeric: tabular-nums;
-}
-
-.health-status {
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.health-status.excellent,
-.health-status.good {
-    color: #4ade80;
-}
-
-.health-status.average {
+.health-badge--average {
     color: #fbbf24;
+    background: rgba(245, 158, 11, 0.13);
+    border-color: rgba(245, 158, 11, 0.14);
 }
 
-.health-status.poor {
+.health-badge--needs-improvement {
     color: #fb7185;
+    background: rgba(244, 63, 94, 0.12);
+    border-color: rgba(244, 63, 94, 0.14);
 }
 
-.health-message {
-    max-width: 300px;
-    margin: 0;
-
-    color: #c6d6ea;
-    font-size: 14px;
-    line-height: 1.7;
+.health-badge--unavailable {
+    color: #a3b3c7;
+    background: rgba(148, 163, 184, 0.1);
 }
 
-/* METRICS */
+/* ---------------- Main Content ---------------- */
 
-.health-metrics {
+.health-main {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+
+    grid-template-columns: 94px minmax(0, 1fr);
+
+    align-items: center;
+    gap: 12px;
 
     width: 100%;
     min-width: 0;
+
+    flex: 1 1 auto;
 }
 
-.metric-box {
+/* ---------------- Circular Health Gauge ---------------- */
+
+.health-gauge {
+    display: grid;
+    place-items: center;
+
+    width: 94px;
+    height: 94px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: conic-gradient(
+        #12d69a var(--health-value),
+        #263c55 0
+    );
+
+    box-shadow: 0 0 18px rgba(18, 214, 154, 0.06);
+}
+
+.health-gauge.is-empty {
+    background: #263c55;
+}
+
+.health-gauge-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 9px;
 
-    min-width: 0;
-    min-height: 82px;
-    padding: 12px 7px;
+    width: 78px;
+    height: 78px;
 
-    background: #15263d;
+    background: #0b2035;
 
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 12px;
-
-    text-align: center;
+    border: 1px solid rgba(91, 125, 161, 0.13);
+    border-radius: 50%;
 }
 
-.metric-box label {
-    color: #94a3b8;
-    font-size: 11px;
-    line-height: 1.35;
-}
+.health-gauge-inner strong {
+    color: #f8fbff;
 
-.metric-box strong {
-    color: #f8fafc;
-    font-size: 13px;
-    font-weight: 750;
-    line-height: 1.35;
+    font-size: 27px;
+    font-weight: 800;
+    line-height: 1;
+
     font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
 }
 
-/* FINANCIAL SUMMARY */
+.health-gauge-inner > span {
+    margin-top: 4px;
 
-.health-summary {
+    color: #8fa8c5;
+
+    font-size: 9px;
+}
+
+.health-gauge-inner small {
+    margin-top: 5px;
+
+    color: #20d99b;
+
+    font-size: 9px;
+    font-weight: 750;
+}
+
+/* ---------------- Supporting Details ---------------- */
+
+.health-details {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 3px 9px;
+
+    background: rgba(12, 35, 57, 0.65);
+
+    border: 1px solid rgba(73, 115, 157, 0.16);
+    border-radius: 10px;
+}
+
+.health-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 7px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 9px 0;
+
+    border-bottom: 1px solid rgba(120, 155, 190, 0.13);
+}
+
+.health-detail-row:last-child {
+    border-bottom: 0;
+}
+
+.health-detail-row span {
     flex: 1 1 auto;
     min-width: 0;
 
-    padding: 16px;
+    color: #91a8c5;
 
-    background: rgba(59, 130, 246, 0.09);
+    font-size: 9px;
+    line-height: 1.4;
 
-    border: 1px solid rgba(59, 130, 246, 0.18);
-    border-left: 3px solid #3b82f6;
-    border-radius: 13px;
+    overflow-wrap: normal;
 }
 
-.health-summary h4 {
+.health-detail-row strong {
+    flex: 0 1 auto;
+
+    max-width: 55%;
+    min-width: 0;
+
+    color: #f1f6ff;
+
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.4;
+
+    text-align: right;
+
+    font-variant-numeric: tabular-nums;
+
+    overflow-wrap: anywhere;
+}
+
+/* Risk indicators */
+
+.risk-low {
+    color: #20d99b !important;
+}
+
+.risk-medium {
+    color: #fbbf24 !important;
+}
+
+.risk-high {
+    color: #fb7185 !important;
+}
+
+.risk-unknown,
+.health-neutral {
+    color: #a8bdd5 !important;
+}
+
+/* ---------------- Financial Insight ---------------- */
+
+.health-insight {
     display: flex;
+    align-items: flex-start;
+
+    gap: 9px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 10px;
+
+    background: rgba(18, 72, 105, 0.35);
+
+    border: 1px solid rgba(52, 132, 194, 0.22);
+    border-radius: 10px;
+}
+
+.health-insight-icon {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
 
-    margin: 0 0 13px;
+    flex: 0 0 28px;
 
-    color: #93c5fd;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+
+    color: #65baff;
+
+    background: rgba(37, 130, 255, 0.18);
+    border-radius: 8px;
+
+    font-size: 12px;
+}
+
+.health-insight > div {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.health-insight strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #8bcaff;
+
+    font-size: 10px;
     font-weight: 750;
     line-height: 1.4;
 }
 
-.health-summary ul {
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-
+.health-insight p {
     margin: 0;
-    padding: 0;
 
-    list-style: none;
-}
+    color: #c4d7eb;
 
-.health-summary li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-
-    min-width: 0;
-
-    color: #a9bfd9;
-    font-size: 12px;
+    font-size: 10px;
     line-height: 1.5;
-}
 
-.health-summary li strong {
-    color: #f8fafc;
-    font-weight: 700;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
 }
 
-/* FOOTER */
+/* ---------------- Footer ---------------- */
 
 .health-footer {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 7px;
 
+    width: 100%;
     min-width: 0;
-    padding-top: 13px;
 
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    padding-top: 8px;
 
-    color: #8298b5;
-    font-size: 11px;
-    line-height: 1.5;
+    border-top: 1px solid rgba(120, 155, 190, 0.13);
+
+    color: #829bb7;
+
+    font-size: 9px;
+    line-height: 1.4;
 }
 
 .health-footer svg {
     flex: 0 0 auto;
-    color: #60a5fa;
+    color: #62adf7;
 }
 
-/* TABLET */
+/* ---------------- Loading ---------------- */
 
-@media (max-width: 1100px) {
+.health-loading {
+    display: flex;
+    flex: 1 1 auto;
+
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    min-height: 120px;
+
+    color: #9bb1ca;
+
+    font-size: 11px;
+}
+
+.health-spinner {
+    width: 22px;
+    height: 22px;
+
+    flex: 0 0 22px;
+
+    border: 3px solid #29435f;
+    border-top-color: #3b9bff;
+
+    border-radius: 50%;
+
+    animation: health-spin 0.8s linear infinite;
+}
+
+@keyframes health-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — CARD WIDTH ADAPTATION
+========================================================= */
+
+/* Compact three-column dashboard cards */
+
+@container (max-width: 330px) {
     .health-card {
-        padding: 18px;
-        gap: 16px;
+        gap: 11px;
+        padding: 11px;
     }
 
-    .score-section {
-        grid-template-columns: 125px minmax(0, 1fr);
-        gap: 16px;
-    }
-
-    .score-circle {
-        width: 125px;
-        height: 125px;
-        border-width: 8px;
-    }
-
-    .health-score {
-        font-size: 34px;
-    }
-
-    .health-metrics {
+    .health-header {
         gap: 7px;
     }
 
-    .metric-box {
-        padding: 11px 5px;
+    .health-icon {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .health-heading h2 {
+        font-size: 12px;
+    }
+
+    .health-heading p {
+        font-size: 9px;
+    }
+
+    .health-badge {
+        max-width: 72px;
+        padding: 4px 6px;
+        font-size: 8px;
+    }
+
+    .health-main {
+        grid-template-columns: 78px minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .health-gauge {
+        width: 78px;
+        height: 78px;
+    }
+
+    .health-gauge-inner {
+        width: 65px;
+        height: 65px;
+    }
+
+    .health-gauge-inner strong {
+        font-size: 23px;
+    }
+
+    .health-gauge-inner > span,
+    .health-gauge-inner small {
+        font-size: 8px;
+    }
+
+    .health-details {
+        padding: 2px 7px;
+    }
+
+    .health-detail-row {
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .health-detail-row span {
+        font-size: 8px;
+    }
+
+    .health-detail-row strong {
+        font-size: 9px;
+    }
+
+    .health-insight {
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .health-insight-icon {
+        flex-basis: 25px;
+        width: 25px;
+        height: 25px;
+    }
+
+    .health-insight strong,
+    .health-insight p {
+        font-size: 9px;
     }
 }
 
-/* MOBILE */
+/* Very narrow cards: stack gauge above metrics */
+
+@container (max-width: 255px) {
+    .health-main {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: 11px;
+    }
+
+    .health-gauge {
+        width: 88px;
+        height: 88px;
+    }
+
+    .health-gauge-inner {
+        width: 73px;
+        height: 73px;
+    }
+
+    .health-details {
+        width: 100%;
+    }
+}
+
+/* Tablet and smaller screens */
+
+@media (max-width: 1100px) {
+    .health-card {
+        padding: 12px;
+        gap: 11px;
+    }
+
+    .health-main {
+        grid-template-columns: 86px minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .health-gauge {
+        width: 86px;
+        height: 86px;
+    }
+
+    .health-gauge-inner {
+        width: 71px;
+        height: 71px;
+    }
+
+    .health-gauge-inner strong {
+        font-size: 24px;
+    }
+}
+
+/* Mobile */
 
 @media (max-width: 560px) {
     .health-card {
-        padding: 16px;
-        gap: 15px;
-        border-radius: 15px;
-    }
-
-    .health-title {
-        font-size: 16px;
-    }
-
-    .health-header p {
-        font-size: 12px;
-    }
-
-    .health-percent {
-        min-width: 62px;
-        padding: 9px;
-        font-size: 15px;
-    }
-
-    .score-section {
-        grid-template-columns: 110px minmax(0, 1fr);
-        gap: 13px;
-    }
-
-    .score-circle {
-        width: 110px;
-        height: 110px;
-        border-width: 7px;
-    }
-
-    .health-score {
-        font-size: 30px;
-    }
-
-    .health-message {
-        font-size: 12px;
-    }
-
-    .health-metrics {
-        gap: 6px;
-    }
-
-    .metric-box {
-        min-height: 74px;
-        padding: 9px 4px;
-    }
-
-    .metric-box label {
-        font-size: 10px;
-    }
-
-    .metric-box strong {
-        font-size: 11px;
-    }
-
-    .health-summary {
+        min-height: 235px;
         padding: 13px;
+        gap: 12px;
+    }
+
+    .health-main {
+        grid-template-columns: 94px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .health-gauge {
+        width: 94px;
+        height: 94px;
+    }
+
+    .health-gauge-inner {
+        width: 78px;
+        height: 78px;
     }
 }
 
-@media (max-width: 380px) {
-    .score-section {
-        grid-template-columns: 1fr;
-        justify-items: center;
-        text-align: center;
-    }
-
-    .health-message {
-        max-width: 100%;
-    }
-
-    .health-metrics {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ACCESSIBILITY */
+/* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
     .health-card,
-    .health-card * {
+    .health-card *,
+    .health-spinner {
         transition: none !important;
         animation: none !important;
     }

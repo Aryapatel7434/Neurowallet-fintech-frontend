@@ -1,274 +1,186 @@
-import { FaShieldHeart } from "react-icons/fa6";
+
 import "./FinancialHealth.css";
+
+import {
+    FaShieldHeart,
+    FaArrowTrendUp,
+    FaTriangleExclamation,
+    FaReceipt,
+} from "react-icons/fa6";
+
+const getHealthStatus = (score, rating) => {
+    if (typeof rating === "string" && rating.trim()) return rating.trim();
+    if (score >= 80) return "Excellent";
+    if (score >= 70) return "Good";
+    if (score >= 50) return "Average";
+    return "Needs Improvement";
+};
+
+const getStatusClass = (status = "") => {
+    const value = status.toLowerCase();
+
+    if (value.includes("excellent")) return "excellent";
+    if (value.includes("good")) return "good";
+    if (value.includes("average")) return "average";
+    if (value.includes("unavailable")) return "unavailable";
+
+    return "needs-improvement";
+};
+
+const getRiskClass = (risk = "") => {
+    const value = String(risk).toLowerCase();
+
+    if (value.includes("low")) return "low";
+    if (value.includes("medium")) return "medium";
+    if (value.includes("high")) return "high";
+
+    return "unknown";
+};
+
 function FinancialHealth({
-    wallet,
     transactions = [],
+    financialScore,
+    loading = false,
 }) {
+    const transactionCount = Array.isArray(transactions)
+        ? transactions.length
+        : 0;
 
-    const balance = wallet?.balance || 0;
+    const rawScore = financialScore?.score;
+    const parsedScore = Number(rawScore);
 
-    const totalTransactions = transactions.length;
+    const hasScore =
+        rawScore !== null &&
+        rawScore !== undefined &&
+        rawScore !== "" &&
+        Number.isFinite(parsedScore);
 
-    /* ===========================
-       Financial Health Score
-    =========================== */
+    const score = hasScore
+        ? Math.min(100, Math.max(0, parsedScore))
+        : null;
 
-    let score = 50;
+    const displayedScore = score == null
+        ? "—"
+        : Math.round(score);
 
-    // Wallet Balance Score
-    if (balance >= 100000) {
-        score += 25;
-    } else if (balance >= 50000) {
-        score += 15;
-    } else if (balance >= 10000) {
-        score += 10;
+    const status = score == null
+        ? "Unavailable"
+        : getHealthStatus(score, financialScore?.rating);
+
+    const risk = financialScore?.risk;
+    const hasRisk = typeof risk === "string" && risk.trim();
+
+    const insight =
+        typeof financialScore?.remark === "string" &&
+        financialScore.remark.trim()
+            ? financialScore.remark.trim()
+            : score == null
+                ? "Your financial health score is not available yet."
+                : score >= 80
+                    ? "Your financial position looks strong. Maintain your savings discipline."
+                    : score >= 70
+                        ? "You are building healthy financial habits. Keep improving consistency."
+                        : score >= 50
+                            ? "Review your spending and work towards stronger savings."
+                            : "Focus on managing expenses and improving financial stability.";
+
+    if (loading && score == null) {
+        return (
+            <section className="health-card" aria-busy="true">
+                <header className="health-header">
+                    <span className="health-icon"><FaShieldHeart /></span>
+                    <div className="health-heading">
+                        <h2>Financial Health</h2>
+                        <p>Evaluating your financial position</p>
+                    </div>
+                </header>
+                <div className="health-loading">
+                    <span className="health-spinner" />
+                    <span>Calculating financial score...</span>
+                </div>
+            </section>
+        );
     }
-
-    // Transaction Activity Score
-    if (totalTransactions >= 50) {
-        score += 15;
-    } else if (totalTransactions >= 20) {
-        score += 10;
-    }
-
-    score = Math.min(score, 100);
-
-    const progress = score;
-
-    /* ===========================
-       Trend
-    =========================== */
-
-    const trend =
-        score >= 90
-            ? "+12%"
-            : score >= 75
-            ? "+8%"
-            : score >= 60
-            ? "+4%"
-            : "-3%";
-
-    /* ===========================
-       Expense Status
-    =========================== */
-
-    const expenseStatus =
-        score >= 80
-            ? "Excellent"
-            : score >= 65
-            ? "Stable"
-            : "Needs Attention";
-
-    /* ===========================
-       Health Status
-    =========================== */
-
-    const healthStatus =
-        score >= 80
-            ? "Excellent"
-            : score >= 70
-            ? "Good"
-            : score >= 50
-            ? "Average"
-            : "Needs Improvement";
 
     return (
+        <section className="health-card">
+            <header className="health-header">
+                <span className="health-icon"><FaShieldHeart /></span>
 
-        <div className="health-card">
+                <div className="health-heading">
+                    <h2>Financial Health</h2>
+                    <p>Wallet and transaction health</p>
+                </div>
 
-            {/* Header */}
+                <span className={`health-badge health-badge--${getStatusClass(status)}`}>
+                    {status}
+                </span>
+            </header>
 
-            <div className="health-header">
+            <div className="health-main">
+                <div
+                    className={`health-gauge ${score == null ? "is-empty" : ""}`}
+                    style={{ "--health-value": `${score ?? 0}%` }}
+                    role="progressbar"
+                    aria-label="Financial health score"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={score ?? 0}
+                    aria-valuetext={
+                        score == null ? "Score unavailable" : `${displayedScore} out of 100`
+                    }
+                >
+                    <div className="health-gauge-inner">
+                        <strong>{displayedScore}</strong>
+                        <span>/ 100</span>
+                        <small>{status}</small>
+                    </div>
+                </div>
+
+                <div className="health-details">
+                    <div className="health-detail-row">
+                        <span>Risk level</span>
+                        <strong className={`risk-value risk-${getRiskClass(risk)}`}>
+                            {hasRisk ? risk : "Unavailable"}
+                        </strong>
+                    </div>
+
+                    <div className="health-detail-row">
+                        <span>Activity loaded</span>
+                        <strong>{transactionCount} records</strong>
+                    </div>
+
+                    <div className="health-detail-row">
+                        <span>Score trend</span>
+                        <strong className="health-neutral">
+                            {score == null ? "Unavailable" : "Current score"}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <div className="health-insight">
+                <span className="health-insight-icon">
+                    {score != null && score >= 70
+                        ? <FaArrowTrendUp />
+                        : <FaTriangleExclamation />}
+                </span>
 
                 <div>
-
-                   <h3 className="health-title">
-
-    <FaShieldHeart className="health-title-icon" />
-
-    Financial Health Score
-
-</h3>
-
-                    <p>
-                        Real-time financial health based on your wallet and transaction history.
-                    </p>
-
+                    <strong>Financial Insight</strong>
+                    <p>{insight}</p>
                 </div>
-
-                <div className="health-percent">
-
-                    {progress}%
-
-                </div>
-
             </div>
 
-            {/* Progress */}
-
-            <div className="progress-wrapper">
-
-                <div className="progress-bar">
-
-                    <div
-                        className="progress-fill"
-                        style={{
-                            width: `${progress}%`,
-                        }}
-                    ></div>
-
-                </div>
-
-            </div>
-
-            {/* Score */}
-
-    <div className="score-section">
-
-  <div
-    className="score-circle"
-    style={{ "--health-progress": `${progress}%` }}
->
-
-        <span className="health-score-label">
-            HEALTH SCORE
-        </span>
-
-        <h1 className="health-score">
-
-            {score}
-
-        </h1>
-
-        <span
-            className={`health-status ${
-                score >= 80
-                    ? "excellent"
-                    : score >= 70
-                    ? "good"
-                    : score >= 50
-                    ? "average"
-                    : "poor"
-            }`}
-        >
-
-            {
-                score >= 80
-                    ? "Excellent"
-                    : score >= 70
-                    ? "Good"
-                    : score >= 50
-                    ? "Average"
-                    : "Poor"
-            }
-
-        </span>
-
-    </div>
-
-    <p className="health-message">
-
-        {
-            score >= 80
-                ? "Outstanding financial stability."
-                : score >= 70
-                ? "Healthy financial discipline."
-                : score >= 50
-                ? "Continue improving your savings."
-                : "Reduce expenses and increase savings."
-        }
-
-    </p>
-
-</div>
-
-            {/* Metrics */}
-
-            <div className="health-metrics">
-
-    <div className="metric-box">
-
-        <label>Trend</label>
-
-        <strong>{trend}</strong>
-
-    </div>
-
-    <div className="metric-box">
-
-        <label>Expense Health</label>
-
-        <strong>{expenseStatus}</strong>
-
-    </div>
-
-    <div className="metric-box">
-
-        <label>Next Target</label>
-
-        <strong>{Math.min(score + 10,100)}</strong>
-
-    </div>
-
-</div>
-
-<div className="health-summary">
-
-    <h4>
-    <FaShieldHeart />
-    Financial Health Summary
-</h4>
-    <ul>
-
-        <li>
-
-            Wallet Balance:
-            <strong>
-
-                ₹{balance.toLocaleString("en-IN")}
-
-            </strong>
-
-        </li>
-
-        <li>
-
-            Transactions:
-            <strong>
-
-                {totalTransactions}
-
-            </strong>
-
-        </li>
-
-        <li>
-
-            Status:
-            <strong>
-
-                {expenseStatus}
-
-            </strong>
-
-        </li>
-
-    </ul>
-
-</div>
-<div className="health-footer">
-
-    <FaShieldHeart />
-
-    <span>
-
-       Calculated from wallet balance and transaction activity
-
-    </span>
-
-</div>
-        </div>
-
+            <footer className="health-footer">
+                <FaReceipt />
+                <span>
+                    {hasScore
+                        ? "Based on your backend financial score"
+                        : "Financial score currently unavailable"}
+                </span>
+            </footer>
+        </section>
     );
 }
 

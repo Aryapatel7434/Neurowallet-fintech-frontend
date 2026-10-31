@@ -1,18 +1,13 @@
 
 import "./BudgetHealth.css";
-import { FaChartLine, FaCircleCheck } from "react-icons/fa6";
+import { FaChartLine, FaCircleCheck, FaTriangleExclamation } from "react-icons/fa6";
 
 function BudgetHealth({ wallet, budgetHealth, loading }) {
     const formatCurrency = (amount) => {
-        const value = Number(amount);
+        if (amount == null || amount === "") return "—";
 
-        if (
-            amount == null ||
-            amount === "" ||
-            !Number.isFinite(value)
-        ) {
-            return "—";
-        }
+        const value = Number(amount);
+        if (!Number.isFinite(value)) return "—";
 
         return new Intl.NumberFormat("en-IN", {
             style: "currency",
@@ -21,31 +16,22 @@ function BudgetHealth({ wallet, budgetHealth, loading }) {
         }).format(value);
     };
 
-    // Loading state
-    if (loading) {
+    if (loading && !budgetHealth) {
         return (
-            <div className="budget-card" aria-busy="true">
-                <div className="budget-header">
-                    <h2>
-                        <FaChartLine /> Budget Health
-                    </h2>
-
-                    <span className="budget-live">
-                        Loading...
-                    </span>
-                </div>
-
-                <div className="budget-loading">
-                    Fetching AI Budget Analysis...
-                </div>
-            </div>
+            <section className="budget-card" aria-busy="true">
+                <header className="budget-header">
+                    <span className="budget-icon"><FaChartLine /></span>
+                    <div>
+                        <h2>Budget Health</h2>
+                        <p>Monitoring your spending</p>
+                    </div>
+                </header>
+                <div className="budget-loading">Loading budget analysis...</div>
+            </section>
         );
     }
 
-    // Budget health percentage
-    const rawPercentage = Number(
-        budgetHealth?.healthPercentage
-    );
+    const rawPercentage = Number(budgetHealth?.healthPercentage);
 
     const hasPercentage =
         budgetHealth?.healthPercentage != null &&
@@ -56,291 +42,104 @@ function BudgetHealth({ wallet, budgetHealth, loading }) {
         ? Math.min(100, Math.max(0, rawPercentage))
         : null;
 
-    // Backend budget information
     const status = budgetHealth?.status ?? "Unavailable";
-
     const income = budgetHealth?.totalIncome;
     const expense = budgetHealth?.totalExpense;
     const remaining = budgetHealth?.remainingBudget;
 
+    const statusClass = String(status).toLowerCase().replace(/\s+/g, "-");
+
+    const recommendation =
+        status === "Excellent"
+            ? "Excellent budgeting. Continue maintaining your current financial discipline."
+            : status === "Healthy"
+                ? "Your budget is healthy. Continue building your savings."
+                : status === "Average"
+                    ? "Review discretionary spending and monitor your expenses."
+                    : status === "Critical"
+                        ? "Your expenses need attention. Review your recorded spending."
+                        : "Budget recommendations are unavailable until budget data is loaded.";
+
     const hasBudgetData = budgetHealth != null;
 
-    // AI recommendation
-    let recommendation =
-        "Budget information is currently unavailable.";
-
-    if (status === "Excellent") {
-        recommendation =
-            "Excellent budgeting! Continue your current financial discipline.";
-    } else if (status === "Healthy") {
-        recommendation =
-            "Your budget is healthy. Consider increasing your savings if it fits your goals.";
-    } else if (status === "Average") {
-        recommendation =
-            "Monitor your expenses and review unnecessary spending.";
-    } else if (status === "Critical") {
-        recommendation =
-            "Your budget is marked critical. Review your recorded expenses.";
-    }
-
-    // =========================================
-    // INCOME ALLOCATION
-    // Derived from actual backend values
-    // =========================================
-
-    const numericIncome = Number(income);
-    const numericExpense = Number(expense);
-
-    const hasAllocationData =
-        income != null &&
-        income !== "" &&
-        expense != null &&
-        expense !== "" &&
-        Number.isFinite(numericIncome) &&
-        Number.isFinite(numericExpense) &&
-        numericIncome > 0 &&
-        numericExpense >= 0;
-
-    const retainedIncome = hasAllocationData
-        ? Math.max(0, numericIncome - numericExpense)
-        : 0;
-
-    const expensePercentage = hasAllocationData
-        ? Math.min(
-              100,
-              (numericExpense / numericIncome) * 100
-          )
-        : 0;
-
-    const retainedPercentage = hasAllocationData
-        ? Math.max(0, 100 - expensePercentage)
-        : 0;
-
-    const allocationMessage = !hasAllocationData
-        ? "Income allocation is unavailable."
-        : numericExpense > numericIncome
-          ? "Recorded expenses exceed recorded income."
-          : "This is the portion of recorded income remaining after expenses.";
-
     return (
-        <div className="budget-card">
+        <section className="budget-card">
+            <header className="budget-header">
+                <span className="budget-icon"><FaChartLine /></span>
 
-            {/* =================================
-                HEADER
-            ================================= */}
+                <div className="budget-heading">
+                    <h2>Budget Health</h2>
+                    <p>Your current budget status</p>
+                </div>
 
-            <div className="budget-header">
-                <h2>
-                    <FaChartLine />
-                    Budget Health
-                </h2>
+                <span className={`budget-status budget-status--${statusClass}`}>
+                    {status}
+                </span>
+            </header>
 
-                <span className="budget-live">
-                    {hasBudgetData
-                        ? "LIVE AI"
-                        : "DATA UNAVAILABLE"}
+            <div className="budget-score-row">
+                <div>
+                    <span className="budget-eyebrow">BUDGET HEALTH</span>
+                    <strong className="budget-percentage">
+                        {percentage == null ? "—" : `${Math.round(percentage)}%`}
+                    </strong>
+                    <span className="budget-score-caption">
+                        {percentage == null ? "Score unavailable" : "Financial health"}
+                    </span>
+                </div>
+
+                <span className={`budget-score-icon ${percentage != null && percentage >= 50 ? "is-healthy" : "is-warning"}`}>
+                    {percentage != null && percentage >= 50
+                        ? <FaCircleCheck />
+                        : <FaTriangleExclamation />}
                 </span>
             </div>
-
-            {/* =================================
-                HEALTH PROGRESS
-            ================================= */}
 
             <div
                 className="budget-progress"
                 role="progressbar"
-                aria-label="Budget health percentage"
+                aria-label="Budget health"
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={percentage ?? 0}
             >
                 <div
                     className="budget-fill"
-                    style={{
-                        width: `${percentage ?? 0}%`,
-                    }}
+                    style={{ width: `${percentage ?? 0}%` }}
                 />
             </div>
 
-            {/* =================================
-                HEALTH SCORE
-            ================================= */}
-
-            <div className="budget-score">
-                <h3>
-                    {percentage == null
-                        ? "—"
-                        : `${percentage}%`}
-                </h3>
-
-                <p>{status}</p>
-            </div>
-
-            {/* =================================
-                FINANCIAL METRICS
-            ================================= */}
-
             <div className="budget-metrics">
-
-                <div>
+                <div className="budget-metric">
                     <span>Spent</span>
-
-                    <strong className="money-value">
-                        {formatCurrency(expense)}
-                    </strong>
+                    <strong>{formatCurrency(expense)}</strong>
                 </div>
 
-                <div>
+                <div className="budget-metric">
                     <span>Remaining</span>
-
-                    <strong className="money-value">
-                        {formatCurrency(remaining)}
-                    </strong>
+                    <strong>{formatCurrency(remaining)}</strong>
                 </div>
 
-                <div>
+                <div className="budget-metric">
                     <span>Income</span>
-
-                    <strong className="money-value">
-                        {formatCurrency(income)}
-                    </strong>
+                    <strong>{formatCurrency(income)}</strong>
                 </div>
-
             </div>
-
-            {/* =================================
-                AI RECOMMENDATION
-            ================================= */}
 
             <div className="budget-recommendation">
-
                 <FaCircleCheck />
-
                 <div>
-                    <h4>AI Recommendation</h4>
-
+                    <strong>AI Recommendation</strong>
                     <p>{recommendation}</p>
                 </div>
-
             </div>
 
-            {/* =================================
-                INCOME ALLOCATION
-            ================================= */}
-
-            <section
-                className="budget-allocation"
-                aria-label="Income allocation"
-            >
-
-                <div className="budget-allocation-header">
-
-                    <div>
-                        <h4>Income Allocation</h4>
-
-                        <p>
-                            How your recorded income is distributed
-                        </p>
-                    </div>
-
-                    <span className="budget-allocation-period">
-                        Financial Overview
-                    </span>
-
-                </div>
-
-                {hasAllocationData ? (
-                    <>
-
-                        {/* Allocation progress bar */}
-
-                        <div
-                            className="budget-allocation-bar"
-                            role="img"
-                            aria-label={
-                                `Expenses ${expensePercentage.toFixed(1)} percent, ` +
-                                `retained income ${retainedPercentage.toFixed(1)} percent`
-                            }
-                        >
-
-                            <div
-                                className="budget-allocation-expense"
-                                style={{
-                                    width: `${expensePercentage}%`,
-                                }}
-                            />
-
-                            <div
-                                className="budget-allocation-retained"
-                                style={{
-                                    width: `${retainedPercentage}%`,
-                                }}
-                            />
-
-                        </div>
-
-                        {/* Allocation breakdown */}
-
-                        <div className="budget-allocation-legend">
-
-                            <div className="budget-allocation-item">
-
-                                <span className="budget-allocation-dot expense-dot" />
-
-                                <div>
-                                    <span>
-                                        Recorded Expenses
-                                    </span>
-
-                                    <strong>
-                                        {formatCurrency(numericExpense)}
-                                    </strong>
-
-                                    <small>
-                                        {expensePercentage.toFixed(1)}% of income
-                                    </small>
-                                </div>
-
-                            </div>
-
-                            <div className="budget-allocation-item">
-
-                                <span className="budget-allocation-dot retained-dot" />
-
-                                <div>
-                                    <span>
-                                        Retained Income
-                                    </span>
-
-                                    <strong>
-                                        {formatCurrency(retainedIncome)}
-                                    </strong>
-
-                                    <small>
-                                        {retainedPercentage.toFixed(1)}% of income
-                                    </small>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </>
-                ) : (
-                    <p className="budget-allocation-empty">
-                        {allocationMessage}
-                    </p>
-                )}
-
-                {hasAllocationData && (
-                    <p className="budget-allocation-note">
-                        {allocationMessage}
-                    </p>
-                )}
-
-            </section>
-
-        </div>
+            <footer className="budget-footer">
+                {hasBudgetData
+                    ? "Based on your recorded financial activity"
+                    : "Backend budget information unavailable"}
+            </footer>
+        </section>
     );
 }
 
