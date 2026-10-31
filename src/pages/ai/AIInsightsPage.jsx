@@ -1,1382 +1,1211 @@
+
 import React, {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 
 import {
-    FaArrowRight,
-    FaBolt,
-    FaBullseye,
-    FaChartLine,
-    FaCheck,
-    FaClipboard,
-    FaCoins,
-    FaLightbulb,
-    FaLock,
-    FaPaperPlane,
-    FaWallet,
-} from "react-icons/fa";
+  FiActivity,
+  FiArrowUpRight,
+  FiBarChart2,
+  FiCheck,
+  FiCreditCard,
+  FiEdit2,
+  FiFileText,
+  FiMessageCircle,
+  FiMoreHorizontal,
+  FiPlus,
+  FiRefreshCw,
+  FiSearch,
+  FiSend,
+  FiShield,
+  FiSliders,
+  FiTarget,
+  FiTrash2,
+  FiTrendingUp,
+  FiX,
+  FiZap,
+} from "react-icons/fi";
 
 import {
-    FaArrowUpRightFromSquare,
-    FaShieldHalved,
-    FaRotate,
-    FaTrashCan,
-    FaCircleExclamation,
-} from "react-icons/fa6";
-
-import {
-    getAIInsights,
-    getFinancialScore,
-    getBudgetHealth,
-    getGoalRecommendation,
-    askAIAssistant,
+  getAIInsights,
+  getFinancialScore,
+  getBudgetHealth,
+  getGoalRecommendation,
+  askAIAssistant,
 } from "../../services/aiService";
 
+import api from "../../api/axiosConfig";
 import "./aiInsightsPage.css";
 
-const MAX_QUESTION_LENGTH = 500;
-
-const resources = [
-    {
-        key: "insights",
-        title: "AI Financial Insights",
-        description: "Personalized financial intelligence",
-        load: getAIInsights,
-    },
-    {
-        key: "score",
-        title: "Financial Health",
-        description: "Backend-calculated health assessment",
-        load: getFinancialScore,
-    },
-    {
-        key: "budget",
-        title: "Budget Health",
-        description: "Income, expenses and remaining budget",
-        load: getBudgetHealth,
-    },
-    {
-        key: "goals",
-        title: "Goal Recommendation",
-        description: "Your current recommended savings goal",
-        load: getGoalRecommendation,
-    },
+// These are the real endpoints exposed by AIController.
+// axiosConfig supplies the backend base URL and authentication headers.
+const RESOURCE_LOADERS = [
+  ["insights", getAIInsights],
+  ["score", getFinancialScore],
+  ["budget", getBudgetHealth],
+  ["goals", getGoalRecommendation],
+  [
+    "analytics",
+    () => api.get("/ai/transaction-analytics").then((response) => response.data),
+  ],
 ];
 
-const suggestedQuestions = [
-    {
-        icon: <FaChartLine />,
-        label: "Analyze my spending",
-        detail: "Find patterns and categories to review",
-        question:
-            "Analyze my spending patterns and identify where I can reduce unnecessary expenses.",
-    },
-    {
-        icon: <FaCoins />,
-        label: "Improve my savings",
-        detail: "Build a practical savings plan",
-        question:
-            "Based on my financial data, how can I improve my monthly savings?",
-    },
-    {
-        icon: <FaArrowUpRightFromSquare />,
-        label: "Reach my goals faster",
-        detail: "Review your current goal progress",
-        question:
-            "Give me a practical plan to achieve my financial goals faster based on my current financial data.",
-    },
-    {
-        icon: <FaShieldHalved />,
-        label: "Check my financial health",
-        detail: "Understand strengths and risks",
-        question:
-            "Evaluate my financial health and explain the most important areas I should improve.",
-    },
+const QUICK_PROMPTS = [
+  {
+    icon: FiBarChart2,
+    title: "Analyze my spending",
+    prompt:
+      "Analyze my spending patterns and identify the categories where I can reduce unnecessary expenses.",
+  },
+  {
+    icon: FiTrendingUp,
+    title: "Improve my savings",
+    prompt:
+      "Based on my financial data, how can I improve my monthly savings? Give me a practical plan.",
+  },
+  {
+    icon: FiTarget,
+    title: "Reach my goals faster",
+    prompt:
+      "Recommend a realistic monthly savings plan to help me reach my financial goals faster.",
+  },
+  {
+    icon: FiShield,
+    title: "Financial health check",
+    prompt:
+      "Evaluate my financial health and explain the most important areas I should improve.",
+  },
 ];
 
-function unwrapResponse(response) {
-    let value = response;
+const createConversation = () => ({
+  id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  title: "New conversation",
+  updatedAt: new Date().toISOString(),
+  messages: [],
+});
 
-    for (let depth = 0; depth < 2; depth += 1) {
-        if (
-            value &&
-            typeof value === "object" &&
-            !Array.isArray(value) &&
-            Object.prototype.hasOwnProperty.call(value, "data")
-        ) {
-            value = value.data;
-        } else {
-            break;
-        }
-    }
+function unwrap(value) {
+  if (
+    value &&
+    typeof value === "object" &&
+    "data" in value &&
+    Object.keys(value).length <= 3
+  ) {
+    return value.data;
+  }
 
-    return value;
+  return value;
 }
 
-function normalizeAssistantResponse(response) {
-    if (typeof response === "string") {
-        const answer = response.trim();
+function firstDefined(source, keys, fallback = null) {
+  if (!source || typeof source !== "object") {
+    return fallback;
+  }
 
-        if (!answer) {
-            throw new Error("The AI returned an empty response.");
-        }
-
-        return {
-            answer,
-            intent: null,
-            category: null,
-            amount: null,
-            recommendations: [],
-        };
+  for (const key of keys) {
+    if (source[key] !== undefined && source[key] !== null) {
+      return source[key];
     }
+  }
 
-    if (!response || typeof response !== "object") {
-        throw new Error("The AI returned an invalid response.");
-    }
-
-    const answer = response.answer;
-
-    if (typeof answer !== "string" || !answer.trim()) {
-        throw new Error(
-            "The AI response did not contain a valid answer."
-        );
-    }
-
-    return {
-        answer: answer.trim(),
-        intent: response.intent ?? null,
-        category: response.category ?? null,
-        amount: response.amount ?? null,
-        recommendations: Array.isArray(response.recommendations)
-            ? response.recommendations
-                .filter(
-                    (item) =>
-                        typeof item === "string" && item.trim()
-                )
-                .slice(0, 5)
-            : [],
-    };
+  return fallback;
 }
 
-function formatLabel(value) {
-    return String(value)
-        .replace(/([a-z])([A-Z])/g, "$1 $2")
-        .replace(/[_-]/g, " ")
-        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+function money(value) {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "—";
+  }
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(number);
 }
 
-function formatCurrency(value) {
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-        return "—";
-    }
+function percentage(value) {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
 
-    const numeric = Number(value);
+  const number = Number(value);
 
-    if (!Number.isFinite(numeric)) {
-        return String(value);
-    }
-
-    return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 2,
-    }).format(numeric);
+  return Number.isFinite(number) ? `${number.toFixed(2)}%` : "—";
 }
 
-function formatValue(value, key = "") {
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-        return "Not provided";
-    }
+function scoreValue(data) {
+  const value = firstDefined(data, ["score"]);
 
-    if (typeof value === "boolean") {
-        return value ? "Yes" : "No";
-    }
+  if (value === null) {
+    return null;
+  }
 
-    if (typeof value === "number") {
-        const currencyLike =
-            /amount|income|expense|saving|budget|balance|spend|target|transactionvalue/i.test(
-                key
-            );
+  const number = Number(value);
 
-        return currencyLike
-            ? formatCurrency(value)
-            : value.toLocaleString("en-IN", {
-                maximumFractionDigits: 2,
-            });
-    }
-
-    if (Array.isArray(value)) {
-        return value.length
-            ? `${value.length} item${value.length === 1 ? "" : "s"}`
-            : "None reported";
-    }
-
-    if (typeof value === "object") {
-        return "Details available";
-    }
-
-    return String(value);
+  return Number.isFinite(number)
+    ? Math.max(0, Math.min(100, number))
+    : null;
 }
 
-function getErrorMessage(error) {
-    return (
-        error?.data?.message ||
-        error?.response?.data?.message ||
-        error?.message ||
-        "Unable to complete the request. Please try again."
+function assistantText(data) {
+  if (typeof data === "string") {
+    return data;
+  }
+
+  return firstDefined(
+    data,
+    ["answer", "response", "message", "content"],
+    "The AI service returned no answer."
+  );
+}
+
+function formatTime(value) {
+  if (!value) {
+    return "Just now";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Recently";
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function errorMessage(error) {
+  return (
+    error?.response?.data?.message ||
+    error?.message ||
+    "The request could not be completed. Please try again."
+  );
+}
+
+function MetricCard({ icon: Icon, label, value, tone = "blue" }) {
+  return (
+    <article className={`ai-metric-card tone-${tone}`}>
+      <div className="ai-metric-top">
+        <span className="ai-metric-icon">
+          <Icon />
+        </span>
+        <span className="ai-metric-label">{label}</span>
+      </div>
+
+      <strong className="ai-metric-value">{value}</strong>
+    </article>
+  );
+}
+
+function LoadingLine() {
+  return (
+    <div className="ai-loading-line">
+      <span />
+      <span />
+      <span />
+    </div>
+  );
+}
+
+export default function AIInsightsPage() {
+  const [resources, setResources] = useState({
+    insights: null,
+    score: null,
+    budget: null,
+    goals: null,
+    analytics: null,
+  });
+
+  const [resourceState, setResourceState] = useState("loading");
+  const [resourceError, setResourceError] = useState("");
+
+  const [conversations, setConversations] = useState(() => [
+    createConversation(),
+  ]);
+
+  const [activeId, setActiveId] = useState(null);
+  const [query, setQuery] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [chatError, setChatError] = useState("");
+  const [menuId, setMenuId] = useState(null);
+  const [renameId, setRenameId] = useState(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [mobilePanel, setMobilePanel] = useState("chat");
+
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!activeId && conversations.length > 0) {
+      setActiveId(conversations[0].id);
+    }
+  }, [activeId, conversations]);
+
+  const activeConversation = useMemo(
+    () =>
+      conversations.find((item) => item.id === activeId) ||
+      conversations[0] ||
+      null,
+    [conversations, activeId]
+  );
+
+  const visibleConversations = useMemo(() => {
+    const term = query.trim().toLowerCase();
+
+    const sorted = [...conversations].sort(
+      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
     );
-}
 
-function formatTime(timestamp) {
-    const date = new Date(timestamp);
-
-    if (Number.isNaN(date.getTime())) {
-        return "";
+    if (!term) {
+      return sorted;
     }
 
-    return date.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
+    return sorted.filter(
+      (item) =>
+        item.title.toLowerCase().includes(term) ||
+        item.messages.some((entry) =>
+          entry.content.toLowerCase().includes(term)
+        )
+    );
+  }, [conversations, query]);
+
+  // Load all financial resources from the authenticated backend.
+  const loadFinancialData = useCallback(async () => {
+    setResourceState("loading");
+    setResourceError("");
+
+    const results = await Promise.allSettled(
+      RESOURCE_LOADERS.map(([, load]) => load())
+    );
+
+    const next = {};
+    let failures = 0;
+
+    results.forEach((result, index) => {
+      const key = RESOURCE_LOADERS[index][0];
+
+      if (result.status === "fulfilled") {
+        next[key] = unwrap(result.value);
+      } else {
+        next[key] = null;
+        failures += 1;
+        console.error(`NeuroWallet AI resource failed: ${key}`, result.reason);
+      }
     });
-}
 
-function DataFields({ data, depth = 0 }) {
-    if (data === null || data === undefined) {
-        return (
-            <p className="ai-empty">
-                No data was returned by this endpoint.
-            </p>
-        );
-    }
+    setResources((current) => ({
+      ...current,
+      ...next,
+    }));
 
-    if (Array.isArray(data)) {
-        if (!data.length) {
-            return (
-                <p className="ai-empty">
-                    No items reported.
-                </p>
-            );
-        }
-
-        return (
-            <div className="ai-data-list">
-                {data.map((item, index) => (
-                    <div
-                        className="ai-data-list-item"
-                        key={`${depth}-${index}`}
-                    >
-                        {item && typeof item === "object" ? (
-                            <DataFields
-                                data={item}
-                                depth={depth + 1}
-                            />
-                        ) : (
-                            <span>{formatValue(item)}</span>
-                        )}
-                    </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (typeof data !== "object") {
-        return (
-            <p className="ai-empty">
-                {formatValue(data)}
-            </p>
-        );
-    }
-
-    const entries = Object.entries(data).filter(
-        ([, value]) => value !== undefined
+    setResourceState(
+      failures === results.length ? "error" : "ready"
     );
 
-    if (!entries.length) {
-        return (
-            <p className="ai-empty">
-                No details were provided.
-            </p>
-        );
+    if (failures > 0) {
+      setResourceError(
+        `${failures} financial data source(s) could not be loaded. Available data is still displayed.`
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFinancialData();
+  }, [loadFinancialData]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [activeConversation?.messages?.length, sending]);
+
+  const handleCreateConversation = () => {
+    const item = createConversation();
+
+    setConversations((current) => [item, ...current]);
+    setActiveId(item.id);
+    setChatError("");
+    setMobilePanel("chat");
+
+    inputRef.current?.focus();
+  };
+
+  const handleDeleteConversation = (id) => {
+    setConversations((current) => {
+      const remaining = current.filter((item) => item.id !== id);
+
+      if (remaining.length === 0) {
+        const fresh = createConversation();
+        setActiveId(fresh.id);
+        return [fresh];
+      }
+
+      if (activeId === id) {
+        setActiveId(remaining[0].id);
+      }
+
+      return remaining;
+    });
+
+    setMenuId(null);
+  };
+
+  const handleBeginRename = (item) => {
+    setRenameId(item.id);
+    setRenameValue(item.title);
+    setMenuId(null);
+  };
+
+  const handleSaveRename = (id) => {
+    const title = renameValue.trim();
+
+    if (!title) {
+      return;
     }
 
-    return (
-        <div
-            className={
-                depth === 0
-                    ? "ai-data-grid"
-                    : "ai-nested-grid"
+    setConversations((current) =>
+      current.map((item) =>
+        item.id === id
+          ? { ...item, title: title.slice(0, 80) }
+          : item
+      )
+    );
+
+    setRenameId(null);
+  };
+
+  // The existing backend request accepts a question string only.
+  // It does not currently accept conversation history.
+  const sendQuestion = async (rawText = message) => {
+    const question = rawText.trim();
+
+    if (!question || sending || !activeConversation) {
+      return;
+    }
+
+    if (question.length > 500) {
+      setChatError("Please keep your question within 500 characters.");
+      return;
+    }
+
+    const conversationId = activeConversation.id;
+
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: question,
+      createdAt: new Date().toISOString(),
+    };
+
+    setConversations((current) =>
+      current.map((item) =>
+        item.id === conversationId
+          ? {
+              ...item,
+              title:
+                item.messages.length === 0
+                  ? question.slice(0, 42) +
+                    (question.length > 42 ? "…" : "")
+                  : item.title,
+              updatedAt: new Date().toISOString(),
+              messages: [...item.messages, userMessage],
             }
-        >
-            {entries.map(([key, value]) => {
-                const nested =
-                    value !== null &&
-                    typeof value === "object";
+          : item
+      )
+    );
 
-                return (
-                    <div
-                        className="ai-data-field"
-                        key={key}
-                    >
-                        <span className="ai-field-label">
-                            {formatLabel(key)}
-                        </span>
+    setMessage("");
+    setChatError("");
+    setSending(true);
 
-                        {nested ? (
-                            <div className="ai-field-nested">
-                                <DataFields
-                                    data={value}
-                                    depth={depth + 1}
-                                />
-                            </div>
-                        ) : (
-                            <strong className="ai-field-value">
-                                {formatValue(value, key)}
-                            </strong>
-                        )}
-                    </div>
-                );
-            })}
+    try {
+      const response = unwrap(await askAIAssistant(question));
+      const content = assistantText(response);
+
+      const assistantMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: String(content),
+        createdAt: new Date().toISOString(),
+        meta:
+          response && typeof response === "object"
+            ? {
+                intent: response.intent,
+                category: response.category,
+                amount: response.amount,
+                recommendations: Array.isArray(response.recommendations)
+                  ? response.recommendations
+                  : [],
+              }
+            : null,
+      };
+
+      setConversations((current) =>
+        current.map((item) =>
+          item.id === conversationId
+            ? {
+                ...item,
+                updatedAt: new Date().toISOString(),
+                messages: [...item.messages, assistantMessage],
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      setChatError(errorMessage(error));
+
+      // Remove the optimistic user message if the request failed.
+      setConversations((current) =>
+        current.map((item) =>
+          item.id === conversationId
+            ? {
+                ...item,
+                messages: item.messages.filter(
+                  (entry) => entry.id !== userMessage.id
+                ),
+              }
+            : item
+        )
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Exact field mappings from the backend response DTOs.
+  const score = scoreValue(resources.score);
+  const scoreRating = resources.score?.rating;
+  const scoreRisk = resources.score?.risk;
+  const scoreRemark = resources.score?.remark;
+
+  const budget = resources.budget || {};
+  const analytics = resources.analytics || {};
+
+  const income = budget.totalIncome;
+  const expense = budget.totalExpense;
+  const remainingBudget = budget.remainingBudget;
+  const budgetHealth = budget.healthPercentage;
+  const budgetStatus = budget.status;
+
+  const savings = analytics.savings;
+  const savingsRatio = analytics.savingsRatio;
+  const totalTransactions = analytics.totalTransactions;
+  const successfulTransactions = analytics.successfulTransactions;
+  const failedTransactions = analytics.failedTransactions;
+
+  const insightData = resources.insights || {};
+
+  const insightList = [
+    {
+      title: "Saving opportunity",
+      body: insightData.savingOpportunity,
+    },
+    {
+      title: "Budget alert",
+      body: insightData.budgetAlert,
+    },
+    {
+      title: "Investment suggestion",
+      body: insightData.investmentSuggestion,
+    },
+    {
+      title: "Financial risk",
+      body: insightData.financialRisk,
+    },
+  ].filter(
+    (item) =>
+      typeof item.body === "string" &&
+      item.body.trim().length > 0
+  );
+
+  const goal = resources.goals || {};
+
+  const hasGoal =
+    goal.goalName ||
+    goal.recommendation ||
+    goal.targetAmount !== null ||
+    goal.currentAmount !== null;
+
+  return (
+    <main className="ai-workspace-page">
+      <header className="ai-workspace-header">
+        <div className="ai-header-brand">
+          <span className="ai-brand-mark">
+            <FiZap />
+          </span>
+
+          <div>
+            <span className="ai-eyebrow">
+              NEUROWALLET INTELLIGENCE
+            </span>
+            <h1>AI Financial Workspace</h1>
+          </div>
         </div>
-    );
-}
 
+        <div className="ai-header-actions">
+          <span className="ai-model-status">
+            <i />
+            Gemini AI connected through your backend
+          </span>
 
-function readField(source, candidates) {
-    if (!source || typeof source !== "object") return undefined;
-    const entries = Object.entries(source);
-    for (const candidate of candidates) {
-        const match = entries.find(
-            ([key]) => key.toLowerCase() === candidate.toLowerCase()
-        );
-        if (match && match[1] !== null && match[1] !== undefined && match[1] !== "") {
-            return match[1];
-        }
-    }
-    return undefined;
-}
+          <button
+            className="ai-icon-button"
+            onClick={loadFinancialData}
+            title="Refresh financial data"
+            aria-label="Refresh financial data"
+            disabled={resourceState === "loading"}
+          >
+            <FiRefreshCw
+              className={
+                resourceState === "loading" ? "ai-spin" : ""
+              }
+            />
+          </button>
+        </div>
+      </header>
 
-function displayFinancialValue(value, currency = false) {
-    if (value === null || value === undefined || value === "") return "—";
-    if (currency && Number.isFinite(Number(value))) return formatCurrency(value);
-    if (typeof value === "number") return value.toLocaleString("en-IN", { maximumFractionDigits: 2 });
-    return String(value);
-}
-
-function FinancialRecordCard({ icon, title, subtitle, status, metrics, insight, accent = "" }) {
-    return (
-        <article className={`ai-overview-card ${accent}`}>
-            <div className="ai-overview-card-top">
-                <div className="ai-overview-icon">{icon}</div>
-                <span className={`ai-overview-status ${status === "Unavailable" ? "is-error" : ""}`}>
-                    <span />
-                    {status}
-                </span>
-            </div>
-            <div className="ai-overview-title">
-                <h3>{title}</h3>
-                <p>{subtitle}</p>
-            </div>
-            <div className="ai-overview-metrics">
-                {metrics.map((metric) => (
-                    <div className="ai-overview-metric" key={metric.label}>
-                        <span>{metric.label}</span>
-                        <strong>{metric.value}</strong>
-                    </div>
-                ))}
-            </div>
-            {insight ? (
-                <p className="ai-overview-insight">{insight}</p>
-            ) : (
-                <p className="ai-overview-insight muted">No additional recommendation returned.</p>
-            )}
-        </article>
-    );
-}
-
-function ChatMessage({ message, onRetry, onCopy }) {
-    const assistant = message.role === "assistant";
-    const [copied, setCopied] = useState(false);
-
-    const copyResponse = async () => {
-        const content = [
-            message.content,
-            ...(message.recommendations || []).map(
-                (item, index) => `${index + 1}. ${item}`
-            ),
-        ].join("\n\n");
-
-        try {
-            await onCopy(content);
-            setCopied(true);
-            window.setTimeout(
-                () => setCopied(false),
-                1600
-            );
-        } catch {
-            setCopied(false);
-        }
-    };
-
-    const amount =
-        message.amount !== null &&
-        message.amount !== undefined
-            ? formatCurrency(message.amount)
-            : null;
-
-    return (
-        <article
-            className={`ai-message-row ${
-                assistant ? "assistant-row" : "user-row"
-            }`}
+      <nav className="ai-mobile-tabs" aria-label="AI workspace panels">
+        <button
+          className={mobilePanel === "library" ? "active" : ""}
+          onClick={() => setMobilePanel("library")}
         >
-            <div
-                className={`ai-message-avatar ${
-                    assistant
-                        ? "assistant-avatar"
-                        : "user-avatar"
-                }`}
-                aria-hidden="true"
-            >
-                {assistant ? <FaBolt /> : "YOU"}
+          History
+        </button>
+
+        <button
+          className={mobilePanel === "chat" ? "active" : ""}
+          onClick={() => setMobilePanel("chat")}
+        >
+          Assistant
+        </button>
+
+        <button
+          className={mobilePanel === "insights" ? "active" : ""}
+          onClick={() => setMobilePanel("insights")}
+        >
+          Insights
+        </button>
+      </nav>
+
+      <div className="ai-workspace-grid">
+        {/* LEFT: CONVERSATION LIBRARY */}
+        <aside
+          className={`ai-library-panel ${
+            mobilePanel === "library" ? "mobile-visible" : ""
+          }`}
+        >
+          <div className="ai-panel-heading">
+            <div>
+              <span className="ai-eyebrow">YOUR SPACE</span>
+              <h2>Conversations</h2>
             </div>
 
-            <div className="ai-message-content">
-                <div className="ai-message-meta">
-                    <strong>
-                        {assistant ? "NeuroWallet AI" : "You"}
-                    </strong>
+            <button
+              className="ai-icon-button"
+              onClick={handleCreateConversation}
+              title="New conversation"
+              aria-label="New conversation"
+            >
+              <FiPlus />
+            </button>
+          </div>
 
-                    {assistant && (
-                        <span className="ai-message-model">
-                            FINANCIAL COPILOT
-                        </span>
-                    )}
+          <button
+            className="ai-new-chat-button"
+            onClick={handleCreateConversation}
+          >
+            <FiPlus />
+            New conversation
+            <span>⌘ K</span>
+          </button>
 
-                    <time>
-                        {formatTime(message.timestamp)}
-                    </time>
-                </div>
+          <label className="ai-search-box">
+            <FiSearch />
 
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search conversations"
+              aria-label="Search conversations"
+            />
+
+            <kbd>/</kbd>
+          </label>
+
+          <div className="ai-library-label">RECENT</div>
+
+          <div className="ai-conversation-list">
+            {visibleConversations.length > 0 ? (
+              visibleConversations.map((item) => (
                 <div
-                    className={`ai-message-bubble ${
-                        message.error ? "message-error" : ""
-                    }`}
+                  key={item.id}
+                  className={`ai-conversation-row ${
+                    item.id === activeId ? "selected" : ""
+                  }`}
                 >
-                    <p>{message.content}</p>
+                  {renameId === item.id ? (
+                    <form
+                      className="ai-rename-form"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        handleSaveRename(item.id);
+                      }}
+                    >
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={(event) =>
+                          setRenameValue(event.target.value)
+                        }
+                        maxLength={80}
+                      />
 
-                    {assistant &&
-                        !message.error &&
-                        (message.intent ||
-                            message.category ||
-                            amount) && (
-                            <div className="ai-response-metadata">
-                                {message.intent && (
-                                    <span>
-                                        <small>Analysis</small>
-                                        <strong>
-                                            {formatLabel(message.intent)}
-                                        </strong>
-                                    </span>
-                                )}
+                      <button type="submit" aria-label="Save title">
+                        <FiCheck />
+                      </button>
 
-                                {message.category && (
-                                    <span>
-                                        <small>Category</small>
-                                        <strong>
-                                            {message.category}
-                                        </strong>
-                                    </span>
-                                )}
-
-                                {amount && (
-                                    <span>
-                                        <small>Amount</small>
-                                        <strong>{amount}</strong>
-                                    </span>
-                                )}
-                            </div>
-                        )}
-
-                    {assistant &&
-                        !message.error &&
-                        message.recommendations?.length > 0 && (
-                            <div className="ai-recommendation-list">
-                                <h4>
-                                    <FaLightbulb />
-                                    Recommended next steps
-                                </h4>
-
-                                <ol>
-                                    {message.recommendations.map(
-                                        (item, index) => (
-                                            <li
-                                                key={`${message.id}-${index}`}
-                                            >
-                                                {item}
-                                            </li>
-                                        )
-                                    )}
-                                </ol>
-                            </div>
-                        )}
-                </div>
-
-                {assistant && !message.error && (
-                    <div className="ai-message-actions">
-                        <button
-                            type="button"
-                            onClick={copyResponse}
-                            aria-label="Copy AI response"
-                        >
-                            {copied ? <FaCheck /> : <FaClipboard />}
-                            {copied
-                                ? "Copied"
-                                : "Copy response"}
-                        </button>
-                    </div>
-                )}
-
-                {message.error && (
-                    <div className="ai-message-actions">
-                        <button
-                            type="button"
-                            className="ai-retry-button"
-                            onClick={() =>
-                                onRetry(
-                                    message.question,
-                                    message.id
-                                )
-                            }
-                        >
-                            <FaRotate />
-                            Retry request
-                        </button>
-                    </div>
-                )}
-            </div>
-        </article>
-    );
-}
-
-function AIInsightsPage() {
-    const [messages, setMessages] = useState([]);
-    const [question, setQuestion] = useState("");
-    const [chatLoading, setChatLoading] = useState(false);
-    const [chatError, setChatError] = useState("");
-    // This reflects the last real assistant request, not a guessed API health check.
-    const [assistantStatus, setAssistantStatus] = useState("idle");
-    const [expandedSignal, setExpandedSignal] = useState(null);
-    const [data, setData] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [errors, setErrors] = useState({});
-    const [lastUpdated, setLastUpdated] = useState(null);
-
-    const chatEndRef = useRef(null);
-    const textareaRef = useRef(null);
-    const requestInProgress = useRef(false);
-    const messageId = useRef(0);
-    const mountedRef = useRef(true);
-
-    const loadData = useCallback(async () => {
-        setLoading(true);
-        setErrors({});
-
-        const results = await Promise.allSettled(
-            resources.map((resource) => resource.load())
-        );
-
-        if (!mountedRef.current) return;
-
-        const nextData = {};
-        const nextErrors = {};
-
-        results.forEach((result, index) => {
-            const key = resources[index].key;
-
-            if (result.status === "fulfilled") {
-                nextData[key] = unwrapResponse(result.value);
-            } else {
-                nextErrors[key] = getErrorMessage(
-                    result.reason
-                );
-            }
-        });
-
-        setData(nextData);
-        setErrors(nextErrors);
-        setLastUpdated(new Date());
-        setLoading(false);
-    }, []);
-
-    useEffect(() => {
-        mountedRef.current = true;
-        loadData();
-
-        return () => {
-            mountedRef.current = false;
-        };
-    }, [loadData]);
-
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "end",
-        });
-    }, [messages, chatLoading]);
-
-    const copyText = useCallback(async (text) => {
-        if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(text);
-            return;
-        }
-
-        const temporary = document.createElement("textarea");
-        temporary.value = text;
-        temporary.style.position = "fixed";
-        temporary.style.opacity = "0";
-
-        document.body.appendChild(temporary);
-        temporary.select();
-
-        const copied = document.execCommand("copy");
-        temporary.remove();
-
-        if (!copied) {
-            throw new Error(
-                "Copy is not available in this browser."
-            );
-        }
-    }, []);
-
-    const sendQuestion = useCallback(
-        async (input, retryMessageId = null) => {
-            const normalizedQuestion =
-                typeof input === "string"
-                    ? input.trim()
-                    : "";
-
-            if (
-                !normalizedQuestion ||
-                requestInProgress.current
-            ) {
-                return;
-            }
-
-            if (
-                normalizedQuestion.length >
-                MAX_QUESTION_LENGTH
-            ) {
-                setChatError(
-                    `Your question cannot exceed ${MAX_QUESTION_LENGTH} characters.`
-                );
-                return;
-            }
-
-            requestInProgress.current = true;
-            setChatLoading(true);
-            setAssistantStatus("connecting");
-            setChatError("");
-            setQuestion("");
-
-            if (retryMessageId) {
-                setMessages((previous) =>
-                    previous.filter(
-                        (message) =>
-                            message.id !== retryMessageId
-                    )
-                );
-            } else {
-                setMessages((previous) => [
-                    ...previous,
-                    {
-                        id: ++messageId.current,
-                        role: "user",
-                        content: normalizedQuestion,
-                        timestamp: new Date().toISOString(),
-                    },
-                ]);
-            }
-
-            try {
-                const rawResponse =
-                    await askAIAssistant(
-                        normalizedQuestion
-                    );
-
-                const assistantResponse =
-                    normalizeAssistantResponse(
-                        unwrapResponse(rawResponse)
-                    );
-
-                if (!mountedRef.current) return;
-
-                setAssistantStatus("available");
-                setMessages((previous) => [
-                    ...previous,
-                    {
-                        id: ++messageId.current,
-                        role: "assistant",
-                        content: assistantResponse.answer,
-                        intent: assistantResponse.intent,
-                        category: assistantResponse.category,
-                        amount: assistantResponse.amount,
-                        recommendations:
-                            assistantResponse.recommendations,
-                        timestamp: new Date().toISOString(),
-                    },
-                ]);
-            } catch (error) {
-                if (!mountedRef.current) return;
-
-                const errorMessage =
-                    getErrorMessage(error);
-
-                setAssistantStatus("error");
-                setChatError(errorMessage);
-
-                setMessages((previous) => [
-                    ...previous,
-                    {
-                        id: ++messageId.current,
-                        role: "assistant",
-                        content: errorMessage,
-                        timestamp: new Date().toISOString(),
-                        error: true,
-                        question: normalizedQuestion,
-                    },
-                ]);
-            } finally {
-                requestInProgress.current = false;
-
-                if (mountedRef.current) {
-                    setChatLoading(false);
-                    textareaRef.current?.focus();
-                }
-            }
-        },
-        []
-    );
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        sendQuestion(question);
-    };
-
-    const handleKeyDown = (event) => {
-        if (
-            event.key === "Enter" &&
-            !event.shiftKey
-        ) {
-            event.preventDefault();
-            sendQuestion(question);
-        }
-    };
-
-    const clearConversation = () => {
-        if (requestInProgress.current) return;
-
-        setMessages([]);
-        setChatError("");
-        setQuestion("");
-        textareaRef.current?.focus();
-    };
-
-    const insight = data.insights || {};
-    const score = data.score || {};
-    const budget = data.budget || {};
-    const goal = data.goals || {};
-
-
-    const failedCount = Object.keys(errors).length;
-
-
-    return (
-        <main className="ai-insights-page">
-            <header className="ai-page-header">
-                <div className="ai-page-heading-copy">
-                    <p className="ai-eyebrow">
-                        NEUROWALLET INTELLIGENCE
-                    </p>
-
-                    <h1>AI Financial Assistant</h1>
-
-                    <p className="ai-page-description">
-                        Your personal financial copilot,
-                        grounded in the financial data returned
-                        by your NeuroWallet account.
-                    </p>
-                </div>
-
-                <div className="ai-header-actions">
-                    <span className="ai-live-indicator">
-                        <span />
-                        GEMINI ASSISTANT
-                    </span>
-
-                    <button
+                      <button
                         type="button"
-                        className="ai-refresh-button"
-                        onClick={loadData}
-                        disabled={loading}
-                    >
-                        <FaRotate
-                            className={
-                                loading ? "ai-spinning" : ""
-                            }
-                        />
-                        {loading
-                            ? "Refreshing"
-                            : "Refresh data"}
-                    </button>
-                </div>
-            </header>
-
-            <section
-                className="ai-capability-strip"
-                aria-label="Assistant capabilities"
-            >
-                <div>
-                    <FaChartLine />
-                    <span>Spending analysis</span>
-                </div>
-
-                <div>
-                    <FaCoins />
-                    <span>Savings guidance</span>
-                </div>
-
-                <div>
-                    <FaBullseye />
-                    <span>Goal planning</span>
-                </div>
-
-                <div>
-                    <FaShieldHalved />
-                    <span>Financial health</span>
-                </div>
-            </section>
-
-            <section className="ai-workspace-grid">
-                <div className="ai-chat-workspace">
-                    <div className="ai-chat-header">
-                        <div className="ai-chat-brand">
-                            <div className="ai-brand-icon">
-                                <FaBolt />
-                            </div>
-
-                            <div>
-                                <h2>NeuroWallet AI</h2>
-                                <p>
-                                    Personal financial intelligence
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="ai-chat-header-actions">
-                            <span className={`ai-chat-status ai-chat-status-${assistantStatus}`}>
-                                <span />
-                                {chatLoading
-                                    ? "Connecting"
-                                    : assistantStatus === "available"
-                                        ? "Assistant responded"
-                                        : assistantStatus === "error"
-                                            ? "Request failed"
-                                            : "Ready to chat"}
-                            </span>
-
-                            <button
-                                type="button"
-                                className="ai-clear-button"
-                                onClick={clearConversation}
-                                disabled={
-                                    chatLoading ||
-                                    messages.length === 0
-                                }
-                            >
-                                <FaTrashCan />
-                                New chat
-                            </button>
-                        </div>
-                    </div>
-
-                    <div
-                        className="ai-chat-body"
-                        aria-live="polite"
-                    >
-                        {messages.length === 0 ? (
-                            <div className="ai-welcome">
-                                <div className="ai-welcome-icon">
-                                    <FaBolt />
-                                </div>
-
-                                <p className="ai-welcome-eyebrow">
-                                    YOUR FINANCIAL COPILOT
-                                </p>
-
-                                <h2>
-                                    Your money deserves{" "}
-                                    <span>
-                                        smarter decisions.
-                                    </span>
-                                </h2>
-
-                                <p className="ai-welcome-description">
-                                    Ask a question about your
-                                    finances. NeuroWallet sends
-                                    it to your authenticated
-                                    backend, which builds trusted
-                                    financial context before
-                                    requesting an answer from Gemini.
-                                </p>
-
-                                <div className="ai-suggestions">
-                                    {suggestedQuestions.map(
-                                        (item) => (
-                                            <button
-                                                type="button"
-                                                className="ai-suggestion"
-                                                key={item.label}
-                                                onClick={() =>
-                                                    sendQuestion(
-                                                        item.question
-                                                    )
-                                                }
-                                                disabled={chatLoading}
-                                            >
-                                                <span className="ai-suggestion-icon">
-                                                    {item.icon}
-                                                </span>
-
-                                                <span className="ai-suggestion-copy">
-                                                    <strong>
-                                                        {item.label}
-                                                    </strong>
-                                                    <small>
-                                                        {item.detail}
-                                                    </small>
-                                                </span>
-
-                                                <FaArrowRight className="ai-suggestion-arrow" />
-                                            </button>
-                                        )
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="ai-conversation">
-                                {messages.map((message) => (
-                                    <ChatMessage
-                                        key={message.id}
-                                        message={message}
-                                        onRetry={sendQuestion}
-                                        onCopy={copyText}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        {chatLoading && (
-                            <div
-                                className="ai-typing-row"
-                                role="status"
-                                aria-label="NeuroWallet AI is preparing a response"
-                            >
-                                <div className="ai-message-avatar assistant-avatar">
-                                    <FaBolt />
-                                </div>
-
-                                <div className="ai-typing-bubble">
-                                    <span />
-                                    <span />
-                                    <span />
-                                    <small>
-                                        Reviewing your financial context...
-                                    </small>
-                                </div>
-                            </div>
-                        )}
-
-                        <div ref={chatEndRef} />
-                    </div>
-
-                    {chatError && (
-                        <div
-                            className="ai-chat-error"
-                            role="alert"
-                        >
-                            <FaCircleExclamation />
-                            <span>{chatError}</span>
-
-                            <button
-                                type="button"
-                                onClick={() => setChatError("")}
-                                aria-label="Dismiss error"
-                            >
-                                Dismiss
-                            </button>
-                        </div>
-                    )}
-
-                    <div className="ai-chat-composer">
-                        <form onSubmit={handleSubmit}>
-                            <textarea
-                                ref={textareaRef}
-                                value={question}
-                                onChange={(event) => {
-                                    setQuestion(event.target.value);
-
-                                    if (chatError) {
-                                        setChatError("");
-                                    }
-                                }}
-                                onKeyDown={handleKeyDown}
-                                placeholder="Ask anything about your finances..."
-                                maxLength={MAX_QUESTION_LENGTH}
-                                rows={2}
-                                disabled={chatLoading}
-                                aria-label="Ask your financial assistant"
-                            />
-
-                            <div className="ai-composer-footer">
-                                <span>
-                                    <FaLock />
-                                    Your question is sent to your authenticated NeuroWallet API.
-                                </span>
-
-                                <div>
-                                    <span>
-                                        {question.length}/{MAX_QUESTION_LENGTH}
-                                    </span>
-
-                                    <button
-                                        type="submit"
-                                        className="ai-send-button"
-                                        disabled={
-                                            chatLoading ||
-                                            !question.trim()
-                                        }
-                                        aria-label="Send message"
-                                    >
-                                        {chatLoading ? (
-                                            <span className="ai-send-spinner" />
-                                        ) : (
-                                            <FaPaperPlane />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <p className="ai-chat-disclaimer">
-                        <FaCircleExclamation />
-                        AI-generated information is educational,
-                        may be inaccurate, and is not personalized
-                        investment, tax or legal advice. Verify
-                        important decisions independently.
-                    </p>
-                </div>
-
-                <aside className="ai-insight-rail">
-                    <div className="ai-rail-heading">
-                        <div>
-                            <p className="ai-eyebrow">
-                                AI ANALYST DESK
-                            </p>
-                            <h2>Financial signals</h2>
-                        </div>
-
-                        <span
-                            className={`ai-data-source ${
-                                loading
-                                    ? "is-loading"
-                                    : failedCount
-                                        ? "has-warning"
-                                        : "is-ready"
-                            }`}
-                        >
-                            {loading
-                                ? "Updating"
-                                : failedCount
-                                    ? "Partial data"
-                                    : "API data"}
-                        </span>
-                    </div>
-
-                    <div className="ai-rail-context">
-                        <span className="ai-rail-context-mark"><FaBolt /></span>
-                        <div>
-                            <strong>Analysis context</strong>
-                            <p>Financial insights are grounded in your authenticated account data, budget assessment and savings goal.</p>
-                        </div>
-                    </div>
-
-                    <section className="ai-rail-card ai-rail-card-opportunity">
-                        <div className="ai-rail-card-heading">
-                            <span className="ai-rail-icon">
-                                <FaLightbulb />
-                            </span>
-
-                            <div>
-                                <h3>Opportunity</h3>
-                                <p>
-                                    AI-generated financial insight
-                                </p>
-                            </div>
-                        </div>
-
-                        <p>
-                            {insight.savingOpportunity ||
-                                (loading
-                                    ? "Loading your saving opportunity..."
-                                    : "No saving opportunity was returned.")}
-                        </p>
-                    </section>
-
-                    <section className="ai-rail-card ai-rail-card-warning">
-                        <div className="ai-rail-card-heading">
-                            <span className="ai-rail-icon">
-                                <FaCircleExclamation />
-                            </span>
-
-                            <div>
-                                <h3>Budget perspective</h3>
-                                <p>
-                                    Spending and income assessment
-                                </p>
-                            </div>
-                        </div>
-
-                        <p>
-                            {insight.budgetAlert ||
-                                (loading
-                                    ? "Loading your budget assessment..."
-                                    : "No budget alert was returned.")}
-                        </p>
-                    </section>
-
-                    <section className="ai-rail-card">
-                        <div className="ai-rail-card-heading">
-                            <span className="ai-rail-icon">
-                                <FaShieldHalved />
-                            </span>
-
-                            <div>
-                                <h3>Risk perspective</h3>
-                                <p>Backend financial assessment</p>
-                            </div>
-                        </div>
-
-                        <p>
-                            {insight.financialRisk ||
-                                score.risk ||
-                                (loading
-                                    ? "Loading your risk assessment..."
-                                    : "No risk assessment was returned.")}
-                        </p>
-                    </section>
-
-                    {failedCount > 0 && (
-                        <div
-                            className="ai-rail-error"
-                            role="status"
-                        >
-                            <FaCircleExclamation />
-
-                            <span>
-                                {failedCount} of {resources.length}{" "}
-                                financial data requests could not
-                                be loaded. Chat requests use the
-                                separate assistant endpoint.
-                            </span>
-                        </div>
-                    )}
-
-                    <div className="ai-rail-footnote">
-                        <FaLock />
+                        onClick={() => setRenameId(null)}
+                        aria-label="Cancel rename"
+                      >
+                        <FiX />
+                      </button>
+                    </form>
+                  ) : (
+                    <>
+                      <button
+                        className="ai-conversation-select"
+                        onClick={() => {
+                          setActiveId(item.id);
+                          setMobilePanel("chat");
+                        }}
+                      >
+                        <FiMessageCircle />
 
                         <span>
-                            Financial metrics are read from
-                            authenticated backend endpoints.
-                            Gemini responses are not used to
-                            calculate your financial score.
+                          <strong>{item.title}</strong>
+                          <small>
+                            {item.messages.length
+                              ? `${item.messages.length} messages · ${formatTime(
+                                  item.updatedAt
+                                )}`
+                              : "New chat"}
+                          </small>
                         </span>
+                      </button>
+
+                      <div className="ai-conversation-menu-wrap">
+                        <button
+                          className="ai-more-button"
+                          onClick={() =>
+                            setMenuId(
+                              menuId === item.id ? null : item.id
+                            )
+                          }
+                          aria-label="Conversation options"
+                        >
+                          <FiMoreHorizontal />
+                        </button>
+
+                        {menuId === item.id && (
+                          <div className="ai-popover-menu">
+                            <button
+                              onClick={() => handleBeginRename(item)}
+                            >
+                              <FiEdit2 />
+                              Rename
+                            </button>
+
+                            <button
+                              className="danger"
+                              onClick={() =>
+                                handleDeleteConversation(item.id)
+                              }
+                            >
+                              <FiTrash2 />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="ai-empty-search">
+                No matching conversations.
+              </div>
+            )}
+          </div>
+
+          <div className="ai-library-footer">
+            <span className="ai-footer-avatar">NW</span>
+
+            <div>
+              <strong>NeuroWallet AI</strong>
+              <small>Personal finance assistant</small>
+            </div>
+
+            <FiSliders />
+          </div>
+        </aside>
+
+        {/* CENTER: GEMINI AI ASSISTANT */}
+        <section
+          className={`ai-chat-panel ${
+            mobilePanel === "chat" ? "mobile-visible" : ""
+          }`}
+        >
+          <div className="ai-chat-heading">
+            <div className="ai-assistant-avatar">
+              <FiZap />
+            </div>
+
+            <div>
+              <h2>Neuro AI Assistant</h2>
+              <p>
+                <span />
+                Online · Financial context enabled
+              </p>
+            </div>
+
+            <button
+              className="ai-icon-button ai-chat-tools"
+              title="New conversation"
+              onClick={handleCreateConversation}
+            >
+              <FiEdit2 />
+            </button>
+          </div>
+
+          <div className="ai-chat-scroll" ref={scrollRef}>
+            {activeConversation?.messages?.length > 0 ? (
+              <div className="ai-message-stream">
+                <div className="ai-date-divider">
+                  <span>CONVERSATION</span>
+                </div>
+
+                {activeConversation.messages.map((item) => (
+                  <article
+                    key={item.id}
+                    className={`ai-message ${
+                      item.role === "user"
+                        ? "from-user"
+                        : "from-assistant"
+                    }`}
+                  >
+                    {item.role !== "user" && (
+                      <span className="ai-message-avatar">
+                        <FiZap />
+                      </span>
+                    )}
+
+                    <div className="ai-message-content">
+                      <div className="ai-message-meta">
+                        {item.role === "user" ? "You" : "Neuro AI"}
+                        <time>{formatTime(item.createdAt)}</time>
+                      </div>
+
+                      <div className="ai-message-bubble">
+                        {item.content}
+                      </div>
+
+                      {item.meta?.intent && (
+                        <div className="ai-response-tags">
+                          <span>
+                            {String(item.meta.intent).replaceAll("_", " ")}
+                          </span>
+
+                          {item.meta.category && (
+                            <span>{item.meta.category}</span>
+                          )}
+
+                          {item.meta.amount != null && (
+                            <span>{money(item.meta.amount)}</span>
+                          )}
+                        </div>
+                      )}
+
+                      {item.meta?.recommendations?.length > 0 && (
+                        <div className="ai-recommendation-list">
+                          <strong>Recommended next steps</strong>
+
+                          {item.meta.recommendations.map(
+                            (text, index) => (
+                              <p key={`${item.id}-${index}`}>
+                                <FiCheck />
+                                {text}
+                              </p>
+                            )
+                          )}
+                        </div>
+                      )}
                     </div>
-                </aside>
-            </section>
+                  </article>
+                ))}
 
-            <section className="ai-intelligence-section">
-                {(() => {
-                    const insight = data.insights || {};
-                    const budget = data.budget || {};
-                    const goals = data.goals || {};
-                    const income = Number(readField(budget, ["totalIncome", "income"]));
-                    const expenses = Number(readField(budget, ["totalExpense", "totalExpenses", "expenses"]));
-                    const remaining = Number(readField(budget, ["remainingBudget", "remainingBalance"]));
-                    const hasCashFlow = Number.isFinite(income) && income > 0 && Number.isFinite(expenses) && expenses >= 0;
-                    const safeRemaining = Number.isFinite(remaining) && remaining >= 0 ? remaining : Math.max(income - expenses, 0);
-                    const expenseWidth = hasCashFlow ? Math.min((expenses / income) * 100, 100) : 0;
-                    const remainingWidth = hasCashFlow ? Math.max(100 - expenseWidth, 0) : 0;
-                    const primaryInsight = readField(insight, ["savingOpportunity", "summary", "recommendation", "investmentSuggestion"]);
-                    const budgetInsight = readField(insight, ["budgetAlert", "budgetRecommendation"]);
-                    const riskInsight = readField(insight, ["financialRisk", "riskAssessment"]);
-                    const goalInsight = readField(goals, ["recommendation", "description", "advice"]);
-                    const goalName = readField(goals, ["goalName", "name"]);
-                    const target = readField(goals, ["targetAmount", "target"]);
-                    const progress = readField(goals, ["progressPercentage", "progress"]);
-                    const updated = lastUpdated ? lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : null;
-                    const signals = [
-                        { label: "Savings opportunity", text: primaryInsight, tone: "blue", source: "AI insights" },
-                        { label: "Budget observation", text: budgetInsight, tone: "amber", source: "Budget analysis" },
-                        { label: "Risk perspective", text: riskInsight || readField(data.score || {}, ["remark", "assessment", "recommendation"]), tone: "violet", source: "Financial assessment" },
-                        { label: "Goal direction", text: goalInsight, tone: "green", source: goalName ? String(goalName) : "Goal recommendation" },
-                    ].filter((item) => item.text);
-                    return (
-                        <>
-                            <div className="ai-intelligence-heading">
-                                <div>
-                                    <p className="ai-eyebrow">NEUROWALLET · AI ANALYSIS</p>
-                                    <h2>Intelligence brief</h2>
-                                    <p>Insights and next steps derived from your latest financial data.</p>
-                                </div>
-                                <div className="ai-brief-meta">
-                                    <span className="ai-brief-live-dot" />
-                                    {updated ? `Data refreshed at ${updated}` : loading ? "Analyzing your data" : "Awaiting data"}
-                                </div>
-                            </div>
+                {sending && (
+                  <div className="ai-message from-assistant">
+                    <span className="ai-message-avatar">
+                      <FiZap />
+                    </span>
 
-                            <div className="ai-intelligence-layout">
-                                <article className="ai-brief-feature">
-                                    <div className="ai-brief-feature-top">
-                                        <span className="ai-brief-kicker"><FaLightbulb /> EXECUTIVE SUMMARY</span>
-                                        <span className="ai-brief-index">01 / ANALYSIS</span>
-                                    </div>
-                                    <h3>What your financial data is telling us</h3>
-                                    <p className="ai-brief-lead">
-                                        {primaryInsight || (loading ? "Your financial insights are being prepared from your account data." : "No primary AI insight is available yet. Refresh your data to request the latest assessment.")}
-                                    </p>
-                                    <div className="ai-brief-divider" />
-                                    <div className="ai-brief-feature-foot">
-                                        <span><FaLock /> Based on authenticated account data</span>
-                                        <span>{errors.insights ? "Insight endpoint unavailable" : data.insights ? "AI insight received" : "Insight pending"}</span>
-                                    </div>
-                                </article>
+                    <div className="ai-message-content">
+                      <div className="ai-message-meta">
+                        Neuro AI
+                        <span>Analyzing your financial context</span>
+                      </div>
 
-                                <article className="ai-cashflow-panel">
-                                    <div className="ai-panel-heading">
-                                        <div>
-                                            <span className="ai-panel-overline">CASH FLOW BREAKDOWN</span>
-                                            <h3>Income allocation</h3>
-                                        </div>
-                                        <span className="ai-panel-icon"><FaChartLine /></span>
-                                    </div>
-                                    {hasCashFlow ? (
-                                        <>
-                                            <div className="ai-cashflow-total">{formatCurrency(income)}<span> total income</span></div>
-                                            <div className="ai-cashflow-track" aria-label="Income allocation">
-                                                <span className="ai-cashflow-expense" style={{ width: `${expenseWidth}%` }} />
-                                                <span className="ai-cashflow-remaining" style={{ width: `${remainingWidth}%` }} />
-                                            </div>
-                                            <div className="ai-cashflow-legend">
-                                                <div><i className="expense-dot" /><span>Expenses · {expenseWidth.toFixed(1)}%</span><strong>{formatCurrency(expenses)}</strong></div>
-                                                <div><i className="remaining-dot" /><span>Unspent · {remainingWidth.toFixed(1)}%</span><strong>{formatCurrency(safeRemaining)}</strong></div>
-                                            </div>
-                                            <p className="ai-cashflow-caption">A proportional view of recorded income allocated to expenses and the remaining amount.</p>
-                                        </>
-                                    ) : (
-                                        <div className="ai-visual-empty">Cash-flow visualization will appear when the budget endpoint returns income and expense values.</div>
-                                    )}
-                                </article>
-                            </div>
+                      <div className="ai-message-bubble ai-thinking">
+                        <LoadingLine />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="ai-chat-welcome">
+                <div className="ai-welcome-orb">
+                  <FiZap />
+                </div>
 
-                            <div className="ai-signal-header">
-                                <div>
-                                    <span className="ai-panel-overline">FROM YOUR FINANCIAL DATA</span>
-                                    <h3>Signals worth your attention</h3>
-                                </div>
-                                <span className="ai-signal-count">{signals.length} {signals.length === 1 ? "signal" : "signals"}</span>
-                            </div>
-
-                            <div className="ai-signal-list">
-                                {signals.length ? signals.map((signal, index) => {
-                                    const isExpanded = expandedSignal === signal.label;
-                                    return (
-                                        <article className={`ai-signal-row signal-${signal.tone}${isExpanded ? " is-expanded" : ""}`} key={signal.label}>
-                                            <span className="ai-signal-number">0{index + 1}</span>
-                                            <div className="ai-signal-copy">
-                                                <div className="ai-signal-titleline">
-                                                    <h4>{signal.label}</h4>
-                                                    <span>{signal.source}</span>
-                                                </div>
-                                                <p>{signal.text}</p>
-                                                {isExpanded && (
-                                                    <div className="ai-signal-detail">
-                                                        <span className="ai-signal-detail-label">DATA SOURCE</span>
-                                                        <span>{signal.source} · Authenticated NeuroWallet account data</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <button
-                                                type="button"
-                                                className="ai-signal-mark"
-                                                aria-expanded={isExpanded}
-                                                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${signal.label}`}
-                                                onClick={() => setExpandedSignal(isExpanded ? null : signal.label)}
-                                            >
-                                                <FaArrowRight />
-                                            </button>
-                                        </article>
-                                    );
-                                }) : (
-                                    <div className="ai-visual-empty">No additional recommendations were returned by the connected endpoints.</div>
-                                )}
-                            </div>
-
-                            {goalName && (
-                                <div className="ai-goal-direction-strip">
-                                    <div className="ai-goal-direction-icon"><FaBullseye /></div>
-                                    <div className="ai-goal-direction-copy">
-                                        <span>YOUR CURRENT SAVINGS FOCUS</span>
-                                        <strong>{String(goalName)}</strong>
-                                        {goalInsight && <p>{goalInsight}</p>}
-                                    </div>
-                                    <div className="ai-goal-direction-target">
-                                        <span>Target</span>
-                                        <strong>{displayFinancialValue(target, true)}</strong>
-                                        {progress !== undefined && <small>{displayFinancialValue(progress)}% progress</small>}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="ai-intelligence-footnote"><FaLock /> Financial values and assessments are supplied by your authenticated NeuroWallet APIs. This section interprets existing data; it does not calculate or replace your financial score.</div>
-                        </>
-                    );
-                })()}
-            </section>
-
-            <footer className="ai-page-footer">
-                <span>
-                    <FaLock />
-                    Authenticated NeuroWallet API · Current-page conversation
+                <span className="ai-eyebrow">
+                  YOUR FINANCIAL COPILOT
                 </span>
 
+                <h2>
+                  Make your money
+                  <br />
+                  <em>work smarter.</em>
+                </h2>
+
+                <p>
+                  Ask about your spending, savings, budget, or financial
+                  health. Neuro AI uses the financial context available
+                  to your authenticated account.
+                </p>
+
+                <div className="ai-prompt-grid">
+                  {QUICK_PROMPTS.map(
+                    ({ icon: Icon, title, prompt }) => (
+                      <button
+                        key={title}
+                        className="ai-prompt-card"
+                        onClick={() => sendQuestion(prompt)}
+                        disabled={sending}
+                      >
+                        <span>
+                          <Icon />
+                        </span>
+
+                        <strong>{title}</strong>
+                        <FiArrowUpRight />
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {chatError && (
+            <div className="ai-chat-error" role="alert">
+              <FiX />
+              {chatError}
+
+              <button
+                onClick={() => setChatError("")}
+                aria-label="Dismiss error"
+              >
+                <FiX />
+              </button>
+            </div>
+          )}
+
+          <form
+            className="ai-composer"
+            onSubmit={(event) => {
+              event.preventDefault();
+              sendQuestion();
+            }}
+          >
+            <textarea
+              ref={inputRef}
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  sendQuestion();
+                }
+              }}
+              placeholder="Ask Neuro AI about your finances…"
+              maxLength={500}
+              rows={2}
+              aria-label="Ask Neuro AI"
+            />
+
+            <div className="ai-composer-bottom">
+              <span>
+                <FiShield />
+                Your financial data is scoped to your authenticated account
+                <b>{message.length}/500</b>
+              </span>
+
+              <button
+                type="submit"
+                disabled={!message.trim() || sending}
+                aria-label="Send message"
+              >
+                <FiSend />
+              </button>
+            </div>
+          </form>
+
+          <p className="ai-disclaimer">
+            AI-generated guidance is informational and is not professional
+            financial advice.
+          </p>
+        </section>
+
+        {/* RIGHT: LIVE FINANCIAL INTELLIGENCE */}
+        <aside
+          className={`ai-insights-panel ${
+            mobilePanel === "insights" ? "mobile-visible" : ""
+          }`}
+        >
+          <div className="ai-panel-heading">
+            <div>
+              <span className="ai-eyebrow">LIVE FINANCIAL DATA</span>
+              <h2>Intelligence</h2>
+            </div>
+
+            <span
+              className={`ai-data-indicator ${resourceState}`}
+              title={`Financial data: ${resourceState}`}
+            >
+              <i />
+            </span>
+          </div>
+
+          {resourceError && (
+            <div className="ai-resource-warning">
+              {resourceError}
+            </div>
+          )}
+
+          <div className="ai-score-card">
+            <div className="ai-score-head">
+              <span>FINANCIAL HEALTH</span>
+              <FiActivity />
+            </div>
+
+            <div className="ai-score-main">
+              <strong>
+                {resourceState === "loading" ? "—" : score ?? "—"}
+              </strong>
+              <span>/ 100</span>
+            </div>
+
+            <div className="ai-score-track">
+              <i style={{ width: `${score ?? 0}%` }} />
+            </div>
+
+            <p>
+              {scoreRating || scoreRemark || "Financial score from your account"}
+            </p>
+
+            {scoreRisk && (
+              <p className="ai-score-risk">
+                Risk level: {scoreRisk}
+              </p>
+            )}
+          </div>
+
+          <div className="ai-section-title">
+            <h3>Budget overview</h3>
+            <span>From your account</span>
+          </div>
+
+          <div className="ai-metrics-grid">
+            <MetricCard
+              icon={FiTrendingUp}
+              label="Total income"
+              value={money(income)}
+              tone="green"
+            />
+
+            <MetricCard
+              icon={FiCreditCard}
+              label="Total expenses"
+              value={money(expense)}
+              tone="orange"
+            />
+
+            <MetricCard
+              icon={FiTarget}
+              label="Savings"
+              value={money(savings)}
+              tone="blue"
+            />
+
+            <MetricCard
+              icon={FiActivity}
+              label="Savings ratio"
+              value={percentage(savingsRatio)}
+              tone="purple"
+            />
+          </div>
+
+          <div className="ai-budget-detail">
+            <div>
+              <span>Remaining budget</span>
+              <strong>{money(remainingBudget)}</strong>
+            </div>
+
+            <div>
+              <span>Budget health</span>
+              <strong>
+                {budgetHealth == null ? "—" : `${budgetHealth}%`}
+              </strong>
+            </div>
+
+            {budgetStatus && (
+              <p>
+                Budget status: <strong>{budgetStatus}</strong>
+              </p>
+            )}
+          </div>
+
+          <div className="ai-section-title">
+            <h3>Transaction activity</h3>
+            <span>Analytics</span>
+          </div>
+
+          <div className="ai-transaction-summary">
+            <div>
+              <span>Total</span>
+              <strong>{totalTransactions ?? "—"}</strong>
+            </div>
+
+            <div>
+              <span>Successful</span>
+              <strong>{successfulTransactions ?? "—"}</strong>
+            </div>
+
+            <div>
+              <span>Failed</span>
+              <strong>{failedTransactions ?? "—"}</strong>
+            </div>
+          </div>
+
+          <div className="ai-section-title">
+            <h3>AI insights</h3>
+            <span>{insightList.length} signals</span>
+          </div>
+
+          <div className="ai-insight-stack">
+            {resourceState === "loading" ? (
+              <div className="ai-insight-skeleton">
+                <LoadingLine />
+              </div>
+            ) : insightList.length > 0 ? (
+              insightList.map((item) => (
+                <article
+                  className="ai-insight-item"
+                  key={item.title}
+                >
+                  <span className="ai-insight-icon">
+                    <FiZap />
+                  </span>
+
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.body}</p>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="ai-empty-data">
+                <FiFileText />
                 <span>
-                    AI can make mistakes. Verify important financial decisions.
+                  No insight items returned by the backend yet.
                 </span>
-            </footer>
-        </main>
-    );
+              </div>
+            )}
+          </div>
+
+          <div className="ai-section-title">
+            <h3>Goal recommendations</h3>
+            <FiTarget />
+          </div>
+
+          <div className="ai-goal-card">
+            {resourceState === "loading" ? (
+              <LoadingLine />
+            ) : hasGoal ? (
+              <>
+                {goal.goalName && (
+                  <strong className="ai-goal-name">
+                    {goal.goalName}
+                  </strong>
+                )}
+
+                <div className="ai-goal-amounts">
+                  <span>{money(goal.currentAmount)}</span>
+                  <span>of {money(goal.targetAmount)}</span>
+                </div>
+
+                <div className="ai-goal-progress">
+                  <i
+                    style={{
+                      width: `${Math.max(
+                        0,
+                        Math.min(100, Number(goal.progressPercentage) || 0)
+                      )}%`,
+                    }}
+                  />
+                </div>
+
+                {goal.recommendation && (
+                  <p>
+                    <FiCheck />
+                    {goal.recommendation}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="ai-muted">
+                No goal recommendations available yet.
+              </p>
+            )}
+          </div>
+
+          <button
+            className="ai-refresh-link"
+            onClick={loadFinancialData}
+            disabled={resourceState === "loading"}
+          >
+            <FiRefreshCw />
+            Refresh intelligence
+          </button>
+        </aside>
+      </div>
+    </main>
+  );
 }
-
-export default AIInsightsPage;

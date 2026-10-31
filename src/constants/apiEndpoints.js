@@ -45,7 +45,7 @@ export const API_ENDPOINTS = {
     MARK_ALL_NOTIFICATIONS_READ: "/notifications/read-all",
 
     // =========================================================
-    // AI — FINANCIAL INTELLIGENCE
+    // AI FINANCIAL INTELLIGENCE
     // =========================================================
 
     AI_INSIGHTS: "/ai/insights",
@@ -53,6 +53,18 @@ export const API_ENDPOINTS = {
     BUDGET_HEALTH: "/ai/budget-health",
     GOAL_RECOMMENDATION: "/ai/goals",
 
-    // Gemini conversational assistant
+    // Legacy single-question assistant
     AI_ASSISTANT: "/ai/assistant",
+
+    // =========================================================
+    // PERSISTENT AI CONVERSATIONS
+    // =========================================================
+
+    AI_CONVERSATIONS: "/ai/conversations",
+
+    AI_CONVERSATION: (conversationId) =>
+        `/ai/conversations/${encodeURIComponent(conversationId)}`,
+
+    AI_CONVERSATION_MESSAGES: (conversationId) =>
+        `/ai/conversations/${encodeURIComponent(conversationId)}/messages`,
 };

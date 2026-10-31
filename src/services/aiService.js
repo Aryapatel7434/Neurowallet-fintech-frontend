@@ -1,16 +1,78 @@
-
 import api from "../api/axiosConfig";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 // =========================================================
-// AI REQUEST CONFIGURATION
+// CONFIGURATION
 // =========================================================
 
 const AI_TIMEOUT = 90000;
+const STANDARD_TIMEOUT = 15000;
+
+const MAX_QUESTION_LENGTH = 500;
+const MAX_CONVERSATION_TITLE_LENGTH = 120;
+
+// =========================================================
+// VALIDATION
+// =========================================================
+
+const normalizeQuestion = (question) => {
+    const value =
+        typeof question === "string"
+            ? question.trim()
+            : "";
+
+    if (!value) {
+        throw new Error(
+            "Please enter a financial question."
+        );
+    }
+
+    if (value.length > MAX_QUESTION_LENGTH) {
+        throw new Error(
+            `Your question cannot exceed ${MAX_QUESTION_LENGTH} characters.`
+        );
+    }
+
+    return value;
+};
+
+const validateConversationId = (conversationId) => {
+    if (
+        typeof conversationId !== "string" ||
+        !conversationId.trim()
+    ) {
+        throw new Error(
+            "A valid conversation ID is required."
+        );
+    }
+
+    return conversationId.trim();
+};
+
+const normalizeTitle = (title) => {
+    const value =
+        typeof title === "string"
+            ? title.trim()
+            : "";
+
+    if (!value) {
+        throw new Error(
+            "Conversation title is required."
+        );
+    }
+
+    if (value.length > MAX_CONVERSATION_TITLE_LENGTH) {
+        throw new Error(
+            `Title cannot exceed ${MAX_CONVERSATION_TITLE_LENGTH} characters.`
+        );
+    }
+
+    return value;
+};
 
 // =========================================================
 // AI FINANCIAL INSIGHTS
-// GET /ai/insights
+// GET /api/ai/insights
 // =========================================================
 
 export const getAIInsights = async () => {
@@ -24,10 +86,9 @@ export const getAIInsights = async () => {
     return response.data;
 };
 
-
 // =========================================================
 // FINANCIAL HEALTH SCORE
-// GET /ai/financial-score
+// GET /api/ai/financial-score
 // =========================================================
 
 export const getFinancialScore = async () => {
@@ -38,10 +99,9 @@ export const getFinancialScore = async () => {
     return response.data;
 };
 
-
 // =========================================================
 // BUDGET HEALTH
-// GET /ai/budget-health
+// GET /api/ai/budget-health
 // =========================================================
 
 export const getBudgetHealth = async () => {
@@ -52,10 +112,9 @@ export const getBudgetHealth = async () => {
     return response.data;
 };
 
-
 // =========================================================
 // GOAL RECOMMENDATION
-// GET /ai/goals
+// GET /api/ai/goals
 // =========================================================
 
 export const getGoalRecommendation = async () => {
@@ -66,34 +125,147 @@ export const getGoalRecommendation = async () => {
     return response.data;
 };
 
-
 // =========================================================
-// GEMINI AI FINANCIAL ASSISTANT
-// POST /ai/assistant
+// LEGACY AI ASSISTANT
+// POST /api/ai/assistant
 // =========================================================
 
 export const askAIAssistant = async (question) => {
-
     const normalizedQuestion =
-        typeof question === "string"
-            ? question.trim()
-            : "";
-
-    // Frontend validation
-    if (!normalizedQuestion) {
-        throw new Error(
-            "Please enter a financial question."
-        );
-    }
-
-    if (normalizedQuestion.length > 500) {
-        throw new Error(
-            "Your question cannot exceed 500 characters."
-        );
-    }
+        normalizeQuestion(question);
 
     const response = await api.post(
         API_ENDPOINTS.AI_ASSISTANT,
+        {
+            question: normalizedQuestion,
+        },
+        {
+            timeout: AI_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// CREATE NEW CONVERSATION
+// POST /api/ai/conversations
+// =========================================================
+
+export const createAIConversation = async (
+    title = "New conversation"
+) => {
+    const normalizedTitle =
+        typeof title === "string" && title.trim()
+            ? normalizeTitle(title)
+            : "New conversation";
+
+    const response = await api.post(
+        API_ENDPOINTS.AI_CONVERSATIONS,
+        {
+            title: normalizedTitle,
+        },
+        {
+            timeout: STANDARD_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// GET ALL CONVERSATIONS
+// GET /api/ai/conversations
+// =========================================================
+
+export const listAIConversations = async () => {
+    const response = await api.get(
+        API_ENDPOINTS.AI_CONVERSATIONS,
+        {
+            timeout: STANDARD_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// GET CONVERSATION DETAILS
+// GET /api/ai/conversations/{conversationId}
+// =========================================================
+
+export const getAIConversation = async (
+    conversationId
+) => {
+    const id = validateConversationId(conversationId);
+
+    const response = await api.get(
+        API_ENDPOINTS.AI_CONVERSATION(id),
+        {
+            timeout: STANDARD_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// RENAME CONVERSATION
+// PATCH /api/ai/conversations/{conversationId}
+// =========================================================
+
+export const renameAIConversation = async (
+    conversationId,
+    title
+) => {
+    const id = validateConversationId(conversationId);
+    const normalizedTitle = normalizeTitle(title);
+
+    const response = await api.patch(
+        API_ENDPOINTS.AI_CONVERSATION(id),
+        {
+            title: normalizedTitle,
+        },
+        {
+            timeout: STANDARD_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// DELETE CONVERSATION
+// DELETE /api/ai/conversations/{conversationId}
+// =========================================================
+
+export const deleteAIConversation = async (
+    conversationId
+) => {
+    const id = validateConversationId(conversationId);
+
+    await api.delete(
+        API_ENDPOINTS.AI_CONVERSATION(id),
+        {
+            timeout: STANDARD_TIMEOUT,
+        }
+    );
+};
+
+// =========================================================
+// SEND MESSAGE TO PERSISTENT CONVERSATION
+// POST /api/ai/conversations/{conversationId}/messages
+// =========================================================
+
+export const sendAIConversationMessage = async (
+    conversationId,
+    question
+) => {
+    const id = validateConversationId(conversationId);
+    const normalizedQuestion = normalizeQuestion(question);
+
+    const response = await api.post(
+        API_ENDPOINTS.AI_CONVERSATION_MESSAGES(id),
         {
             question: normalizedQuestion,
         },
