@@ -1,249 +1,51 @@
-import {
-useEffect,
-useState
-} from "react";
+
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
-
-getNotifications,
-
-getUnreadNotifications,
-
-markNotificationRead,
-
-markAllNotificationsRead
-
-}
-from "../../services/notificationService";
+  getUnreadNotifications
+} from "../../services/notificationService";
 
 function NotificationBell() {
+  const [unreadCount, setUnreadCount] = useState(0);
+  const navigate = useNavigate();
 
-const [
-notifications,
-setNotifications
-] = useState([]);
-
-const [
-
-
-unreadCount,
-
-setUnreadCount
-
-
-] = useState(0);
-
-const [
-
-
-open,
-
-setOpen
-
-
-] = useState(false);
-
-const loadNotifications =
-async () => {
-
-
-  try {
-
-    const allNotifications =
-      await getNotifications();
-
-    const unreadNotifications =
-      await getUnreadNotifications();
-
-    setNotifications(
-      allNotifications
-    );
-
-    setUnreadCount(
-      unreadNotifications.length
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-};
-
-
-useEffect(() => {
-
-
-loadNotifications();
-
-
-}, []);
-
-const handleNotificationClick =
-async (id) => {
-
-
-  try {
-
-    await markNotificationRead(id);
-
-    await loadNotifications();
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-};
-
-
-const handleMarkAllRead =
-async () => {
-
-
-  try {
-
-    await markAllNotificationsRead();
-
-    await loadNotifications();
-
-  } catch (error) {
-
-    console.error(error);
-
-  }
-};
-
-
-return (
-
-
-<div
-  className="notification-container"
->
-
-  <button
-    className="notification-btn"
-    onClick={() =>
-      setOpen(!open)
+  const loadUnreadCount = async () => {
+    try {
+      const unreadNotifications = await getUnreadNotifications();
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error("Failed to load unread notifications:", error);
     }
-  >
+  };
 
-    🔔
+  useEffect(() => {
+    loadUnreadCount();
+  }, []);
 
-    <span
-      className="notification-count"
-    >
+  const handleBellClick = () => {
+    navigate("/notifications");
+  };
 
-      {unreadCount}
-
-    </span>
-
-  </button>
-
-  {
-
-    open && (
-
-      <div
-        className="notification-dropdown"
+  return (
+    <div className="notification-container">
+      <button
+        type="button"
+        className="notification-btn"
+        onClick={handleBellClick}
+        aria-label={`Open notifications. ${unreadCount} unread notifications`}
+        title="Open Notifications"
       >
+        🔔
 
-        <div
-          className="notification-header"
-        >
-
-          <h3>
-            Notifications
-          </h3>
-
-          <button
-            className="mark-all-btn"
-            onClick={
-              handleMarkAllRead
-            }
-          >
-
-            Mark All Read
-
-          </button>
-
-        </div>
-
-        {
-
-          notifications.length === 0
-
-            ? (
-
-              <p>
-                No Notifications
-              </p>
-
-            )
-
-            : (
-
-              notifications.map(
-                notification => (
-
-                  <div
-
-                    key={
-                      notification.id
-                    }
-
-                    className="notification-item"
-
-                    onClick={() =>
-                      handleNotificationClick(
-                        notification.id
-                      )
-                    }
-
-                  >
-
-                    <div
-                      className="notification-message"
-                    >
-
-                      {
-                        notification.message
-                      }
-
-                    </div>
-
-                    <div
-                      className="notification-time"
-                    >
-
-                      {
-                        new Date(
-                          notification.createdAt
-                        ).toLocaleString()
-                      }
-
-                    </div>
-
-                  </div>
-
-                )
-              )
-
-            )
-
-        }
-
-      </div>
-
-    )
-
-  }
-
-</div>
-
-
-);
+        {unreadCount > 0 && (
+          <span className="notification-count">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </button>
+    </div>
+  );
 }
 
 export default NotificationBell;

@@ -1,509 +1,761 @@
-import {
-  transferMoney
-} from "../../services/transferService";
-import { FaPlus } from "react-icons/fa";
-import { FaWallet } from "react-icons/fa";
-import { FaPaperPlane } from "react-icons/fa";
 
+import { useCallback, useEffect, useState } from "react";
 import {
-  FaArrowTrendDown
+  FaWallet,
+  FaPlus,
+  FaArrowDown,
+  FaPaperPlane,
+  FaRotateRight,
+  FaEye,
+  FaEyeSlash,
+  FaClockRotateLeft,
+  FaArrowRight,
 } from "react-icons/fa6";
-import "../../styles/wallet.css";
-import { useEffect, useState } from "react";
-
-import TransactionHistory
-from "../../components/wallet/TransactionHistory";
-import TransferInsights
-from "../../components/wallet/TransferInsights";
-import WalletAnalytics
-from "../../components/wallet/WalletAnalytics";
-import TransferActivity
-from "../../components/wallet/TransferActivity";
-import TransactionModal
-from "../../components/wallet/TransactionModal";
-import WalletHeader
-from "../../components/wallet/WalletHeader";
-import TransactionDetailsDrawer
-from "../../components/wallet/TransactionDetailsDrawer";
-import { TRANSACTION_CATEGORIES } from "../../constants/categories";
-import { CATEGORY_LABELS } from "../../constants/categoryLabels";
 import { toast } from "react-toastify";
+
+import "../../styles/wallet.css";
+
+import WalletHeader from "../../components/wallet/WalletHeader";
+import WalletAnalytics from "../../components/wallet/WalletAnalytics";
+import TransferActivity from "../../components/wallet/TransferActivity";
+import TransactionHistory from "../../components/wallet/TransactionHistory";
+import TransactionDetailsDrawer from "../../components/wallet/TransactionDetailsDrawer";
+
 import {
   getMyWallet,
   getTransactions,
   addMoney,
   withdrawMoney,
-  getWalletSummary
-}
-from "../../services/walletService";
+  getWalletSummary,
+} from "../../services/walletService";
+
+import { transferMoney } from "../../services/transferService";
+
+import { TRANSACTION_CATEGORIES } from "../../constants/categories";
+import { CATEGORY_LABELS } from "../../constants/categoryLabels";
+
+const formatCurrency = (amount) => {
+  const value = Number(amount);
+
+  if (!Number.isFinite(value)) return "₹0.00";
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
+const validateAmount = (value) => {
+  const amount = String(value ?? "").trim();
+
+  if (!amount) return "Please enter an amount.";
+  if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
+    return "Enter a valid amount with up to two decimal places.";
+  }
+  if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+    return "Amount must be greater than zero.";
+  }
+
+  return null;
+};
+
+const getErrorMessage = (error, fallback) => {
+  const message =
+    error?.response?.data?.message ||
+    error?.response?.data?.error;
+
+  return typeof message === "string" ? message : fallback;
+};
 
 function WalletPage() {
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [walletSummary, setWalletSummary] = useState(null);
 
-  const [wallet, setWallet] =
-    useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [actionLoading, setActionLoading] = useState("");
 
-  const [transactions,
-    setTransactions] =
-    useState([]);
-const [
-  selectedTransaction,
-  setSelectedTransaction
-] = useState(null);
-const [drawerOpen, setDrawerOpen] =
-useState(false);
-  const [loading, setLoading] =
-    useState(true);
+  const [addAmount, setAddAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [receiverEmail, setReceiverEmail] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
+  const [category, setCategory] = useState("OTHER");
 
-  const [amount, setAmount] =
-    useState("");
-const [receiverEmail,
-  setReceiverEmail] =
-  useState("");
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [balanceVisible, setBalanceVisible] = useState(true);
 
-const [transferAmount,
-  setTransferAmount] =
-  useState("");
-
-  const [category,
-  setCategory] =
-  useState("OTHER");
-
-const [walletSummary, setWalletSummary] = useState(null);
- const refreshWalletData = async () => {
-
+  const refreshWalletData = useCallback(async () => {
     try {
+      const [walletData, transactionData, summaryData] =
+        await Promise.all([
+          getMyWallet(),
+          getTransactions(),
+          getWalletSummary(),
+        ]);
 
-       const [
-    walletData,
-    transactionData,
-    summaryData
-] = await Promise.all([
-    getMyWallet(),
-    getTransactions(),
-    getWalletSummary()
-]);
+      if (!walletData) {
+        throw new Error("Wallet information is unavailable.");
+      }
 
-setWallet(walletData);
-setTransactions(transactionData);
-setWalletSummary(summaryData);
+      setWallet(walletData);
+      setTransactions(
+        Array.isArray(transactionData) ? transactionData : []
+      );
+      setWalletSummary(summaryData || null);
+      setLoadError("");
 
-        setWallet(walletData);
-
-        setTransactions(
-            Array.isArray(transactionData)
-                ? transactionData
-                : []
-        );
-
+      return true;
     } catch (error) {
+      console.error("Wallet refresh failed:", error);
 
-        console.error(
-            "Refresh Wallet Error:",
-            error
-        );
+      setLoadError(
+        getErrorMessage(
+          error,
+          "Unable to retrieve wallet information."
+        )
+      );
 
-        toast.error(
-            "Unable to refresh wallet."
-        );
+      return false;
+    }
+  }, []);
 
+  const loadWallet = useCallback(async () => {
+    setLoading(true);
+    await refreshWalletData();
+    setLoading(false);
+  }, [refreshWalletData]);
+
+  useEffect(() => {
+    loadWallet();
+  }, [loadWallet]);
+
+  const handleRefresh = async () => {
+    if (refreshing || actionLoading) return;
+
+    setRefreshing(true);
+    const success = await refreshWalletData();
+
+    if (success) {
+      toast.success("Wallet refreshed successfully.");
+    } else {
+      toast.error("Unable to refresh wallet.");
     }
 
-};
-console.log(
-  "Wallet:",
-  wallet
-);
-
-// console.log(
-//   "Transactions:",
-//   transactions
-// );
-console.log("Transactions API:", transactions);
-console.log(
-  "FIRST TRANSACTION:",
-  transactions[0]
-);
-console.log("Current Login:", localStorage.getItem("email"));
-useEffect(() => {
-
-  const loadWallet = async () => {
-
-    try {
-
-      await refreshWalletData();
-
-    } catch (error) {
-
-      console.error(error);
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
+    setRefreshing(false);
   };
 
-  loadWallet();
+  const refreshAfterTransaction = async () => {
+    try {
+      sessionStorage.setItem("dashboardRefresh", "true");
+    } catch (error) {
+      console.warn("Unable to update dashboard refresh signal:", error);
+    }
 
-}, []);
- const handleAddMoney =
-async () => {
+    const refreshed = await refreshWalletData();
 
-  if (!amount || Number(amount) <= 0) {
+    if (!refreshed) {
+      toast.warning(
+        "Operation completed, but wallet data could not be refreshed."
+      );
+    }
+  };
 
-    toast.error(
-      "Enter valid amount"
-    );
+  const handleAddMoney = async (event) => {
+    event.preventDefault();
 
-    return;
-  }
+    if (actionLoading) return;
 
-  try {
+    const validationError = validateAmount(addAmount);
 
-  await addMoney(Number(amount));
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
-await refreshWalletData();
-sessionStorage.setItem(
-    "dashboardRefresh",
-    "true"
-);
+    const amount = Number(addAmount);
 
-    setAmount("");
+    try {
+      setActionLoading("add");
 
-    toast.success(
-      `₹${amount} added successfully`
-    );
+      await addMoney(amount);
+      setAddAmount("");
 
-  } catch (error) {
+      await refreshAfterTransaction();
 
-    console.error(
-      "Add Money Error:",
-      error.response?.data
-    );
+      toast.success(`${formatCurrency(amount)} added successfully.`);
+    } catch (error) {
+      console.error("Add money failed:", error);
+      toast.error(getErrorMessage(error, "Unable to add money."));
+    } finally {
+      setActionLoading("");
+    }
+  };
 
-    console.error(
-      "Status:",
-      error.response?.status
-    );
+  const handleWithdraw = async (event) => {
+    event.preventDefault();
 
-    toast.error(
-      "Failed to add money"
-    );
+    if (actionLoading) return;
 
-  }
+    const validationError = validateAmount(withdrawAmount);
 
-};
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
- const handleWithdraw =
-async () => {
+    const amount = Number(withdrawAmount);
+    const balance = Number(wallet?.balance);
 
-  if (!amount || Number(amount) <= 0) {
+    if (Number.isFinite(balance) && amount > balance) {
+      toast.error("Insufficient wallet balance.");
+      return;
+    }
 
-    toast.error(
-      "Enter valid amount"
-    );
+    try {
+      setActionLoading("withdraw");
 
-    return;
-  }
+      await withdrawMoney(amount);
+      setWithdrawAmount("");
 
-  try {
+      await refreshAfterTransaction();
 
-   await withdrawMoney(Number(amount));
+      toast.success(`${formatCurrency(amount)} withdrawn successfully.`);
+    } catch (error) {
+      console.error("Withdrawal failed:", error);
+      toast.error(getErrorMessage(error, "Unable to withdraw money."));
+    } finally {
+      setActionLoading("");
+    }
+  };
 
-await refreshWalletData();
-sessionStorage.setItem(
-    "dashboardRefresh",
-    "true"
-);
+  const handleTransfer = async (event) => {
+    event.preventDefault();
 
-    setAmount("");
+    if (actionLoading) return;
 
-    toast.success(
-      `₹${amount} withdrawn successfully`
-    );
+    const email = receiverEmail.trim().toLowerCase();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  } catch (error) {
+    if (!emailPattern.test(email)) {
+      toast.error("Enter a valid receiver email.");
+      return;
+    }
 
-    console.error(
-      "Withdraw Error:",
-      error.response?.data
-    );
+    const currentEmail = (
+      localStorage.getItem("email") || ""
+    ).trim().toLowerCase();
 
-    console.error(
-      "Status:",
-      error.response?.status
-    );
+    if (currentEmail && email === currentEmail) {
+      toast.error("You cannot transfer money to yourself.");
+      return;
+    }
 
-    toast.error(
-      "Withdraw failed"
-    );
+    const validationError = validateAmount(transferAmount);
 
-  }
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
 
-};
-const handleTransfer = async () => {
+    const amount = Number(transferAmount);
+    const balance = Number(wallet?.balance);
 
-  try {
+    if (Number.isFinite(balance) && amount > balance) {
+      toast.error("Insufficient wallet balance.");
+      return;
+    }
 
-    console.log("Receiver:", receiverEmail);
-    console.log("Amount:", transferAmount);
+    try {
+      setActionLoading("transfer");
 
-    const response =
-      await transferMoney(
-  receiverEmail,
-  Number(transferAmount),
-  category
-);
+      await transferMoney(email, amount, category);
 
-    console.log(
-      "Transfer Success:",
-      response
-    );
+      setReceiverEmail("");
+      setTransferAmount("");
+      setCategory("OTHER");
 
-    await refreshWalletData();
+      await refreshAfterTransaction();
 
-    sessionStorage.setItem(
-    "dashboardRefresh",
-    "true"
-);
+      toast.success("Transfer completed successfully.");
+    } catch (error) {
+      console.error("Transfer failed:", error);
+      toast.error(
+        getErrorMessage(error, "Unable to complete transfer.")
+      );
+    } finally {
+      setActionLoading("");
+    }
+  };
 
-    setReceiverEmail("");
-    setTransferAmount("");
-    setCategory("OTHER");
+  const scrollToSection = (sectionId) => {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
-    toast.success(
-      "Transfer completed successfully"
-    );
-
-  } catch (error) {
-
-    console.log(
-      "FULL ERROR:",
-      error
-    );
-
-    console.log(
-      "RESPONSE:",
-      error.response
-    );
-
-    console.log(
-      "DATA:",
-      error.response?.data
-    );
-
-    console.log(
-      "STATUS:",
-      error.response?.status
-    );
-
-    toast.error(
-      "Transfer failed"
-    );
-  }
-};
   if (loading) {
+    return (
+      <main className="wallet-page">
+        <WalletHeader />
+        <div className="wallet-loading">
+          <div className="wallet-loading-spinner" />
+          <h2>Loading wallet</h2>
+          <p>Retrieving your wallet information securely...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!wallet && loadError) {
+    return (
+      <main className="wallet-page">
+        <WalletHeader />
+
+        <section className="wallet-error-panel">
+          <FaWallet />
+          <h2>Unable to load wallet</h2>
+          <p>{loadError}</p>
+
+          <button
+            type="button"
+            className="wallet-primary-btn"
+            onClick={loadWallet}
+          >
+            <FaRotateRight />
+            Retry
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  const walletStatus =
+    walletSummary?.walletStatus || "Status unavailable";
+
   return (
-    <div className="loading-screen">
-      <div className="loader"></div>
-      <h2>Loading NeuroWallet...</h2>
-    </div>
-  );
-}
-  return (
+    <main className="wallet-page wallet-page-v2">
+      <WalletHeader />
 
-    <div className="wallet-container">
+      {/* PAGE TITLE */}
+      <section className="wallet-page-heading">
+        <div>
+          <span className="wallet-page-eyebrow">
+            DIGITAL WALLET
+          </span>
+          <h1>My Wallet</h1>
+          <p>
+            Manage your balance, move money and review wallet activity.
+          </p>
+        </div>
 
-     <div className="wallet-header">
+        <button
+          type="button"
+          className="wallet-refresh-btn"
+          onClick={handleRefresh}
+          disabled={refreshing || Boolean(actionLoading)}
+        >
+          <FaRotateRight className={refreshing ? "is-refreshing" : ""} />
+          {refreshing ? "Refreshing..." : "Refresh"}
+        </button>
+      </section>
 
-  <div className="wallet-header-top">
+      {loadError && (
+        <div className="wallet-inline-error" role="alert">
+          {loadError}
+        </div>
+      )}
 
-     <WalletHeader wallet={wallet} />
+      {/* TOP OVERVIEW */}
+      <section className="wallet-command-grid">
+        <article className="wallet-balance-panel wallet-balance-panel-v2">
+          <div className="wallet-balance-top">
+            <div className="wallet-brand">
+              <span className="wallet-brand-icon">
+                <FaWallet />
+              </span>
+              <div>
+                <span className="wallet-card-label">
+                  AVAILABLE BALANCE
+                </span>
+                <h2>NeuroWallet</h2>
+              </div>
+            </div>
 
+            <span className="wallet-active-status">
+              <span />
+              {walletStatus}
+            </span>
+          </div>
 
-  </div>
+          <div className="wallet-balance-content">
+            <span>Available Balance</span>
 
-</div>
+            <div className="wallet-balance-value-row">
+              <h2>
+                {balanceVisible
+                  ? formatCurrency(wallet?.balance)
+                  : "₹ ••••••••"}
+              </h2>
 
-           <div className="wallet-card">
+              <button
+                type="button"
+                className="wallet-balance-visibility"
+                onClick={() => setBalanceVisible((visible) => !visible)}
+                aria-label={
+                  balanceVisible ? "Hide balance" : "Show balance"
+                }
+              >
+                {balanceVisible ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+          </div>
 
-  <div className="wallet-card-top">
+          <div className="wallet-balance-footer">
+            <span>Currency: INR</span>
+            <span>
+              {walletSummary?.lastUpdated
+                ? `Updated ${new Date(
+                    walletSummary.lastUpdated
+                  ).toLocaleString("en-IN")}`
+                : "Latest wallet balance"}
+            </span>
+          </div>
+        </article>
 
-     <h3 className="premium-title">
-  <FaWallet />
-  <span>NeuroWallet Premium</span>
-</h3>
+        <article className="wallet-quick-actions">
+          <div className="wallet-section-heading">
+            <div>
+              <h2>Quick Actions</h2>
+              <p>Access your wallet operations</p>
+            </div>
+          </div>
 
-    <span
-      className="status-badge"
-    >
-      ACTIVE
-    </span>
+          <div className="wallet-quick-actions-grid">
+            <button
+              type="button"
+              className="wallet-quick-action add"
+              onClick={() => scrollToSection("wallet-add-form")}
+            >
+              <span><FaPlus /></span>
+              <strong>Add Money</strong>
+              <small>Fund wallet</small>
+            </button>
 
-  </div>
+            <button
+              type="button"
+              className="wallet-quick-action withdraw"
+              onClick={() => scrollToSection("wallet-withdraw-form")}
+            >
+              <span><FaArrowDown /></span>
+              <strong>Withdraw</strong>
+              <small>Move funds out</small>
+            </button>
 
-  <p
-    className="balance-label"
-  >
-    Available Balance
-  </p>
+            <button
+              type="button"
+              className="wallet-quick-action transfer"
+              onClick={() => scrollToSection("wallet-transfer-form")}
+            >
+              <span><FaPaperPlane /></span>
+              <strong>Transfer</strong>
+              <small>Send money</small>
+            </button>
 
- <h1 className="wallet-balance">
-  ₹{wallet?.balance || 0}
-</h1>
+            <button
+              type="button"
+              className="wallet-quick-action history"
+              onClick={() => scrollToSection("wallet-transaction-history")}
+            >
+              <span><FaClockRotateLeft /></span>
+              <strong>History</strong>
+              <small>View records</small>
+            </button>
+          </div>
+        </article>
+      </section>
 
-  <div
-    className="wallet-details"
-  >
+      {/* WALLET ACTIVITY METRICS */}
+      <section className="wallet-module-section wallet-activity-section">
+        <div className="wallet-section-heading">
+          <div>
+            <h2>Wallet Activity</h2>
+            <p>Your recorded credits, debits and transfers.</p>
+          </div>
+        </div>
 
-    <p>
-      Currency : INR
-    </p>
+        <WalletAnalytics summary={walletSummary} />
+      </section>
 
-    <p>
-      Last Updated :
-      Just Now
-    </p>
+      {/* MAIN WALLET WORKSPACE */}
+      <section className="wallet-workspace-grid">
+        <div className="wallet-workspace-main">
+          {/* RECENT WALLET ACTIVITY */}
+          <section className="wallet-module-section wallet-recent-section">
+            <div className="wallet-section-heading">
+              <div>
+                <h2>Recent Wallet Activity</h2>
+                <p>Your latest wallet movements.</p>
+              </div>
 
-  </div>
+              <button
+                type="button"
+                className="wallet-text-action"
+                onClick={() =>
+                  scrollToSection("wallet-transaction-history")
+                }
+              >
+                View history <FaArrowRight />
+              </button>
+            </div>
 
-</div>
-{/* console.log("Analytics Transactions:", transactions); */}
-<WalletAnalytics
-  wallet={wallet}
-  summary={walletSummary}
-/>
+            <TransferActivity transactions={transactions} />
+          </section>
 
-<TransferActivity
-  transactions={
-    transactions
-  }
-/>
-  <div className="wallet-actions">
+          {/* TRANSACTION HISTORY */}
+          <section
+            className="wallet-module-section"
+            id="wallet-transaction-history"
+          >
+            <TransactionHistory
+              transactions={transactions}
+              onSelectTransaction={setSelectedTransaction}
+            />
+          </section>
+        </div>
 
-    <input
-        type="number"
-        placeholder="Enter Amount"
-        value={amount}
-        onChange={(e)=>
-            setAmount(
-                e.target.value
-            )
-        }
-    />
+        {/* OPERATIONS SIDEBAR */}
+        <aside className="wallet-operations-sidebar">
+          <div className="wallet-section-heading">
+            <div>
+              <h2>Wallet Operations</h2>
+              <p>Secure money movement</p>
+            </div>
+          </div>
 
-<button
-  className="wallet-btn"
-  onClick={handleAddMoney}
->
-  <FaPlus />
-  <span>Add Money</span>
-</button>
+          <form
+            id="wallet-add-form"
+            className="wallet-operation-card wallet-operation-card-v2 add"
+            onSubmit={handleAddMoney}
+          >
+            <div className="wallet-operation-heading">
+              <span className="wallet-operation-icon add">
+                <FaPlus />
+              </span>
+              <div>
+                <h3>Add Money</h3>
+                <p>Fund your wallet.</p>
+              </div>
+            </div>
 
-<button
-  className="wallet-btn"
-  onClick={handleWithdraw}
->
-  <FaArrowTrendDown />
-  <span>Withdraw</span>
-</button>
+            <label htmlFor="wallet-add-amount">
+              Amount (INR)
+            </label>
+            <input
+              id="wallet-add-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="Enter amount"
+              value={addAmount}
+              onChange={(event) => setAddAmount(event.target.value)}
+              disabled={Boolean(actionLoading)}
+              required
+            />
 
-</div>
-{/* Transfer Money Section */}
+            <button
+              type="submit"
+              className="wallet-primary-btn"
+              disabled={Boolean(actionLoading)}
+            >
+              {actionLoading === "add" ? "Processing..." : "Add Money"}
+              <FaArrowRight />
+            </button>
+          </form>
 
-<div className="wallet-transfer">
+          <form
+            id="wallet-withdraw-form"
+            className="wallet-operation-card wallet-operation-card-v2 withdraw"
+            onSubmit={handleWithdraw}
+          >
+            <div className="wallet-operation-heading">
+              <span className="wallet-operation-icon withdraw">
+                <FaArrowDown />
+              </span>
+              <div>
+                <h3>Withdraw Money</h3>
+                <p>Withdraw from your wallet.</p>
+              </div>
+            </div>
 
-  <h3 className="transfer-title">
-  <FaPaperPlane />
-  <span>Quick Transfer</span>
-</h3>
+            <label htmlFor="wallet-withdraw-amount">
+              Amount (INR)
+            </label>
+            <input
+              id="wallet-withdraw-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputMode="decimal"
+              placeholder="Enter amount"
+              value={withdrawAmount}
+              onChange={(event) =>
+                setWithdrawAmount(event.target.value)
+              }
+              disabled={Boolean(actionLoading)}
+              required
+            />
 
-  <input
-    type="email"
-    placeholder="Receiver Email"
-    value={receiverEmail}
-    onChange={(e) =>
-      setReceiverEmail(
-        e.target.value
-      )
-    }
-  />
+            <button
+              type="submit"
+              className="wallet-secondary-btn"
+              disabled={Boolean(actionLoading)}
+            >
+              {actionLoading === "withdraw"
+                ? "Processing..."
+                : "Withdraw Money"}
+              <FaArrowRight />
+            </button>
+          </form>
 
-  <br />
-  <br />
+          <form
+            id="wallet-transfer-form"
+            className="wallet-transfer-panel wallet-transfer-panel-v2"
+            onSubmit={handleTransfer}
+          >
+            <div className="wallet-operation-heading">
+              <span className="wallet-operation-icon transfer">
+                <FaPaperPlane />
+              </span>
+              <div>
+                <h3>Quick Transfer</h3>
+                <p>Send money to another account.</p>
+              </div>
+            </div>
 
-  <input
-    type="number"
-    placeholder="Amount"
-    value={transferAmount}
-    onChange={(e) =>
-      setTransferAmount(
-        e.target.value
-      )
-    }
-  />
+            <div className="wallet-form-field">
+              <label htmlFor="wallet-receiver-email">
+                Receiver Email
+              </label>
+              <input
+                id="wallet-receiver-email"
+                type="email"
+                placeholder="receiver@example.com"
+                value={receiverEmail}
+                onChange={(event) =>
+                  setReceiverEmail(event.target.value)
+                }
+                autoComplete="off"
+                required
+                disabled={Boolean(actionLoading)}
+              />
+            </div>
 
-  <br />
-  <br />
-<select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  {TRANSACTION_CATEGORIES.map((category) => (
-    <option
-      key={category}
-      value={category}
-    >
-      {CATEGORY_LABELS[category]}
-    </option>
-  ))}
-</select>
-<br />
-<br />
-  <button
-    className="wallet-btn"
-    onClick={handleTransfer}
-  >
-    Transfer Money
-  </button>
+            <div className="wallet-form-field">
+              <label htmlFor="wallet-transfer-amount">
+                Amount (INR)
+              </label>
+              <input
+                id="wallet-transfer-amount"
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                placeholder="Enter amount"
+                value={transferAmount}
+                onChange={(event) =>
+                  setTransferAmount(event.target.value)
+                }
+                required
+                disabled={Boolean(actionLoading)}
+              />
+            </div>
 
-</div>
-<TransactionHistory
-transactions={transactions}
-onSelectTransaction={(tx)=>{
+            <div className="wallet-form-field">
+              <label htmlFor="wallet-transfer-category">
+                Transaction Category
+              </label>
+              <select
+                id="wallet-transfer-category"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                disabled={Boolean(actionLoading)}
+              >
+                {TRANSACTION_CATEGORIES.map((item) => (
+                  <option key={item} value={item}>
+                    {CATEGORY_LABELS[item] || item}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-setSelectedTransaction(tx);
+            <p className="wallet-transfer-note">
+              Verify receiver details before submitting.
+            </p>
 
-setDrawerOpen(true);
+            <button
+              type="submit"
+              className="wallet-primary-btn"
+              disabled={Boolean(actionLoading)}
+            >
+              {actionLoading === "transfer"
+                ? "Processing Transfer..."
+                : "Transfer Money"}
+              <FaPaperPlane />
+            </button>
+          </form>
 
-}}
-/>
-<TransactionDetailsDrawer
+          {/* BACKEND SUMMARY — NO FABRICATED MONTHLY TOTALS */}
+          <article className="wallet-mini-summary">
+            <div className="wallet-section-heading">
+              <div>
+                <h3>Wallet Summary</h3>
+                <p>Recorded account totals</p>
+              </div>
+            </div>
 
-transaction={selectedTransaction}
+            <div className="wallet-mini-summary-row">
+              <span>Total Credit</span>
+              <strong>
+                {formatCurrency(walletSummary?.totalCredit)}
+              </strong>
+            </div>
 
-open={drawerOpen}
+            <div className="wallet-mini-summary-row">
+              <span>Total Debit</span>
+              <strong>
+                {formatCurrency(walletSummary?.totalDebit)}
+              </strong>
+            </div>
 
-onClose={() => {
+            <div className="wallet-mini-summary-row">
+              <span>Transfer Volume</span>
+              <strong>
+                {formatCurrency(walletSummary?.totalTransfer)}
+              </strong>
+            </div>
 
-setDrawerOpen(false);
+            <div className="wallet-mini-summary-row">
+              <span>Total Transactions</span>
+              <strong>
+                {Number(walletSummary?.totalTransactions ?? 0)}
+              </strong>
+            </div>
+          </article>
+        </aside>
+      </section>
 
-}}
-
- />
-
-{/* <TransactionModal
-  transaction={
-    selectedTransaction
-  }
-  onClose={() =>
-    setSelectedTransaction(null)
-  }
-/> */}
-
-    </div>
-
+      <TransactionDetailsDrawer
+        transaction={selectedTransaction}
+        open={Boolean(selectedTransaction)}
+        onClose={() => setSelectedTransaction(null)}
+      />
+    </main>
   );
 }
 

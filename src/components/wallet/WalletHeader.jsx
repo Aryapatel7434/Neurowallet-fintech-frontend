@@ -1,69 +1,50 @@
+
+import { useMemo } from "react";
+import { FaWallet } from "react-icons/fa6";
 import NotificationBell from "./NotificationBell";
-function WalletHeader({ wallet }) {
 
-  const hour =
-    new Date().getHours();
+function WalletHeader() {
 
-  const greeting =
-    hour < 12
-      ? "Good Morning"
-      : hour < 18
-      ? "Good Afternoon"
-      : "Good Evening";
+    const greeting = useMemo(() => {
+        const hour = new Date().getHours();
 
-  return (
+        if (hour < 12) return "Good morning";
+        if (hour < 18) return "Good afternoon";
 
-     <div className="wallet-header">
+        return "Good evening";
+    }, []);
 
-  <div className="hero-top-right">
-    <NotificationBell />
-  </div>
+    return (
+        <header className="wallet-top-header">
 
-      <div className="hero-left">
+            <div className="wallet-top-header-content">
 
-        <h1>
-          NeuroWallet AI
-        </h1>
+                <div className="wallet-top-header-icon">
+                    <FaWallet />
+                </div>
 
-        <h2>
-          AI Powered Smart Financial Assistant
-        </h2>
+                <div className="wallet-top-header-text">
 
-        <p>
-          Track expenses, transfer money,
-          manage finances and receive
-          intelligent insights.
-        </p>
+                    <span className="wallet-top-eyebrow">
+                        {greeting}
+                    </span>
 
-        <div className="wallet-growth">
-          ↑ 12.5% This Month
-        </div>
+                    <h2>Welcome to NeuroWallet</h2>
 
-      </div>
+                    <p>
+                        Your wallet and financial activity, in one place.
+                    </p>
 
-      <div className="hero-right">
+                </div>
 
-        <div className="hero-balance-card">
+            </div>
 
-          <span>
-            Available Balance
-          </span>
+            <div className="wallet-top-header-actions">
+                <NotificationBell />
+            </div>
 
-          <h1>
-            ₹{wallet?.balance}
-          </h1>
-
-          <p>
-            Financial Health: Excellent
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  );
+        </header>
+    );
 }
 
 export default WalletHeader;

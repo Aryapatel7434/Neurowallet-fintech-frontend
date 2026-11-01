@@ -1,381 +1,417 @@
-import { HiMiniChartBar } from "react-icons/hi2";
-import {
-  FaArrowTrendUp,
-  FaArrowTrendDown
-} from "react-icons/fa6";
-import {
-  MdSwapHoriz
-} from "react-icons/md";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaArrowsLeftRight,
+  FaMagnifyingGlass,
+  FaReceipt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaArrowUpWideShort,
+  FaArrowDownShortWide,
+} from "react-icons/fa6";
+
+const PAGE_SIZE = 8;
+
+const formatCurrency = (amount) => {
+  const value = Number(amount);
+
+  if (!Number.isFinite(value)) return "₹0.00";
+
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
+const getDate = (transaction) => {
+  const value =
+    transaction?.timestamp ??
+    transaction?.createdAt ??
+    transaction?.transactionDate ??
+    transaction?.date;
+
+  if (!value) return null;
+
+  const parsed = new Date(value);
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatDate = (date) => {
+  if (!date) return "Date unavailable";
+
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getReference = (transaction) =>
+  transaction?.transactionId ??
+  transaction?.referenceId ??
+  transaction?.id ??
+  "Unavailable";
+
+const getType = (transaction) => {
+  const type = String(transaction?.type ?? "").toUpperCase();
+  const category = String(transaction?.category ?? "").toUpperCase();
+
+  if (type === "TRANSFER" || category === "TRANSFER") {
+    return {
+      label: "Transfer",
+      icon: FaArrowsLeftRight,
+      className: "transfer",
+    };
+  }
+
+  if (type === "CREDIT") {
+    return {
+      label: "Credit",
+      icon: FaArrowDown,
+      className: "credit",
+    };
+  }
+
+  if (type === "DEBIT") {
+    return {
+      label: "Debit",
+      icon: FaArrowUp,
+      className: "debit",
+    };
+  }
+
+  return {
+    label: type || "Other",
+    icon: FaReceipt,
+    className: "neutral",
+  };
+};
+
+const getStatus = (status) => {
+  const normalized = String(status ?? "UNKNOWN").toUpperCase();
+
+  if (["SUCCESS", "SUCCESSFUL", "COMPLETED"].includes(normalized)) {
+    return { label: "Success", className: "success" };
+  }
+
+  if (["PENDING", "PROCESSING", "IN_PROGRESS"].includes(normalized)) {
+    return { label: "Pending", className: "pending" };
+  }
+
+  if (["FAILED", "FAILURE", "REJECTED"].includes(normalized)) {
+    return { label: "Failed", className: "failed" };
+  }
+
+  return { label: normalized, className: "unknown" };
+};
 
 function TransactionHistory({
   transactions = [],
-  onSelectTransaction
+  onSelectTransaction,
 }) {
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortOrder, setSortOrder] = useState("NEWEST");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const [search, setSearch] =
-    useState("");
+  const filteredTransactions = useMemo(() => {
+    if (!Array.isArray(transactions)) return [];
 
-  const [filter, setFilter] =
-    useState("ALL");
+    const keyword = search.trim().toLowerCase();
 
-  const [currentPage,
-    setCurrentPage] =
-    useState(1);
-const recordsPerPage = 10;
+    return transactions
+      .filter((transaction) => {
+        const type = String(transaction?.type ?? "").toUpperCase();
+        const category = String(
+          transaction?.category ?? ""
+        ).toUpperCase();
+        const status = String(
+          transaction?.status ?? ""
+        ).toUpperCase();
 
-const loggedInUser =
-  localStorage.getItem("email");
+        const searchableText = [
+          transaction?.transactionId,
+          transaction?.referenceId,
+          transaction?.id,
+          transaction?.description,
+          transaction?.type,
+          transaction?.category,
+          transaction?.status,
+          transaction?.senderEmail,
+          transaction?.receiverEmail,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
 
-const filteredTransactions =
-  transactions.filter((tx) => {
+        const matchesSearch =
+          !keyword || searchableText.includes(keyword);
 
- const type = tx.type;
+        const matchesType =
+          typeFilter === "ALL" ||
+          type === typeFilter ||
+          (typeFilter === "TRANSFER" && category === "TRANSFER");
 
-    const matchesSearch =
-      type
-        .toLowerCase()
-        .includes(
-          search.toLowerCase()
-        );
+        const matchesStatus =
+          statusFilter === "ALL" ||
+          status === statusFilter ||
+          (statusFilter === "SUCCESS" && status === "SUCCESSFUL") ||
+          (statusFilter === "SUCCESS" && status === "COMPLETED") ||
+          (statusFilter === "FAILED" && status === "FAILURE");
 
-    const matchesFilter =
-      filter === "ALL"
-        ? true
-        : type === filter;
+        return matchesSearch && matchesType && matchesStatus;
+      })
+      .sort((a, b) => {
+        if (sortOrder === "AMOUNT_HIGH") {
+          return Number(b?.amount ?? 0) - Number(a?.amount ?? 0);
+        }
 
-    return (
-      matchesSearch &&
-      matchesFilter
-    );
+        if (sortOrder === "AMOUNT_LOW") {
+          return Number(a?.amount ?? 0) - Number(b?.amount ?? 0);
+        }
 
-  });
-  const lastIndex =
-    currentPage *
-    recordsPerPage;
+        const dateA = getDate(a)?.getTime() ?? 0;
+        const dateB = getDate(b)?.getTime() ?? 0;
 
-  const firstIndex =
-    lastIndex -
-    recordsPerPage;
+        return sortOrder === "OLDEST"
+          ? dateA - dateB
+          : dateB - dateA;
+      });
+  }, [transactions, search, typeFilter, statusFilter, sortOrder]);
 
-  const currentTransactions =
-    filteredTransactions.slice(
-      firstIndex,
-      lastIndex
-    );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / PAGE_SIZE)
+  );
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filteredTransactions.length /
-        recordsPerPage
-      )
-    );
+  const safePage = Math.min(currentPage, totalPages);
 
-  const getBadgeClass = (type) => {
+  const visibleTransactions = filteredTransactions.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
+  );
 
-    switch (type) {
-
-      case "CREDIT":
-        return "credit-badge";
-
-      case "DEBIT":
-        return "debit-badge";
-
-      case "TRANSFER":
-        return "transfer-badge";
-
-      default:
-        return "transfer-badge";
-
-    }
-
-  };
-
-  const getIcon = (type) => {
-
-    switch (type) {
-
-      case "CREDIT":
-        return <FaArrowTrendUp />;
-
-      case "DEBIT":
-        return <FaArrowTrendDown />;
-
-      case "TRANSFER":
-        return <MdSwapHoriz />;
-
-      default:
-        return <MdSwapHoriz />;
-
-    }
-
+  const updateFilter = (setter, value) => {
+    setter(value);
+    setCurrentPage(1);
   };
 
   return (
-
-    <div className="transaction-card">
-
-      <h2>
-        Recent Transactions
-      </h2>
-
-      <div className="transaction-toolbar">
-
-        <div className="transaction-filters">
-
-          <button
-            className={
-              filter === "ALL"
-                ? "filter-btn active"
-                : "filter-btn"
-            }
-            onClick={() =>
-              setFilter("ALL")
-            }
-          >
-            All
-          </button>
-
-          <button
-            className={
-              filter === "CREDIT"
-                ? "filter-btn active"
-                : "filter-btn"
-            }
-            onClick={() =>
-              setFilter("CREDIT")
-            }
-          >
-            Credit
-          </button>
-
-          <button
-            className={
-              filter === "DEBIT"
-                ? "filter-btn active"
-                : "filter-btn"
-            }
-            onClick={() =>
-              setFilter("DEBIT")
-            }
-          >
-            Debit
-          </button>
-
-          <button
-            className={
-              filter === "TRANSFER"
-                ? "filter-btn active"
-                : "filter-btn"
-            }
-            onClick={() =>
-              setFilter("TRANSFER")
-            }
-          >
-            Transfer
-          </button>
-
-        </div>
-
-        <div className="transaction-count">
-
-          <HiMiniChartBar />
-
-          <span>
-            {filteredTransactions.length}
+    <article className="wallet-history-card">
+      <div className="wallet-history-header">
+        <div>
+          <span className="wallet-page-eyebrow">
+            ACCOUNT RECORDS
           </span>
-
+          <h2>Transaction History</h2>
+          <p>Search and inspect your wallet transactions.</p>
         </div>
 
+        <span className="wallet-history-count">
+          {filteredTransactions.length} records
+        </span>
       </div>
 
-      <input
-        type="text"
-        placeholder="Search Credit, Debit, Transfer..."
-        className="transaction-search"
-        value={search}
-        onChange={(e) =>
-          setSearch(
-            e.target.value
-          )
-        }
-      />
+      <div className="wallet-history-controls">
+        <div className="wallet-history-search">
+          <FaMagnifyingGlass />
 
-      <table className="transaction-table">
+          <input
+            type="search"
+            placeholder="Search reference, category, type or status..."
+            value={search}
+            onChange={(event) =>
+              updateFilter(setSearch, event.target.value)
+            }
+            aria-label="Search transactions"
+          />
+        </div>
 
-        <thead>
+        <div className="wallet-history-filter-row">
+          <select
+            value={typeFilter}
+            onChange={(event) =>
+              updateFilter(setTypeFilter, event.target.value)
+            }
+            aria-label="Filter by transaction type"
+          >
+            <option value="ALL">All types</option>
+            <option value="CREDIT">Credit</option>
+            <option value="DEBIT">Debit</option>
+            <option value="TRANSFER">Transfer</option>
+          </select>
 
-          <tr>
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              updateFilter(setStatusFilter, event.target.value)
+            }
+            aria-label="Filter by transaction status"
+          >
+            <option value="ALL">All statuses</option>
+            <option value="SUCCESS">Success</option>
+            <option value="PENDING">Pending</option>
+            <option value="FAILED">Failed</option>
+          </select>
 
-            <th>Date</th>
+          <select
+            value={sortOrder}
+            onChange={(event) =>
+              updateFilter(setSortOrder, event.target.value)
+            }
+            aria-label="Sort transactions"
+          >
+            <option value="NEWEST">Newest first</option>
+            <option value="OLDEST">Oldest first</option>
+            <option value="AMOUNT_HIGH">Highest amount</option>
+            <option value="AMOUNT_LOW">Lowest amount</option>
+          </select>
+        </div>
+      </div>
 
-            <th>Type</th>
+      <div className="wallet-history-table-wrapper">
+        <table className="transaction-table">
+          <thead>
+            <tr>
+              <th>Transaction</th>
+              <th>Reference</th>
+              <th>Category</th>
+              <th>Date &amp; Time</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-            <th>Amount</th>
-
-            <th>Status</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {
-            currentTransactions.length === 0 ? (
-
+          <tbody>
+            {visibleTransactions.length === 0 ? (
               <tr>
-
-                <td
-                  colSpan="4"
-                  className="empty-state"
-                >
-                  No Transactions Found
+                <td colSpan="7">
+                  <div className="wallet-history-empty">
+                    <FaReceipt />
+                    <strong>No transactions found</strong>
+                    <span>
+                      Try adjusting your search or filters.
+                    </span>
+                  </div>
                 </td>
-
               </tr>
-
             ) : (
+              visibleTransactions.map((transaction, index) => {
+                const type = getType(transaction);
+                const status = getStatus(transaction?.status);
+                const Icon = type.icon;
+                const date = getDate(transaction);
 
-              currentTransactions.map((tx) => (
+                const key =
+                  transaction?.transactionId ??
+                  transaction?.referenceId ??
+                  transaction?.id ??
+                  `${date?.getTime() ?? "unknown"}-${index}`;
 
-                <tr
-                  key={
-                    tx.id ||
-                    tx.transactionId
-                  }
-                  onClick={() =>
-                    onSelectTransaction(tx)
-                  }
-                  style={{
-                    cursor: "pointer"
-                  }}
-                >
+                return (
+                  <tr key={key}>
+                    <td>
+                      <span
+                        className={`wallet-history-type ${type.className}`}
+                      >
+                        <Icon />
+                        {type.label}
+                      </span>
+                    </td>
 
-                  <td>
+                    <td>
+                      <span className="wallet-history-reference">
+                        {getReference(transaction)}
+                      </span>
+                    </td>
 
-                    {
-                      tx.timestamp
-                        ? new Date(
-                            tx.timestamp
-                          ).toLocaleDateString()
-                        : tx.createdAt
-                        ? new Date(
-                            tx.createdAt
-                          ).toLocaleDateString()
-                        : "-"
-                    }
+                    <td>
+                      {transaction?.category || "Uncategorized"}
+                    </td>
 
-                  </td>
+                    <td>{formatDate(date)}</td>
 
-                  <td>
+                    <td className="wallet-history-amount">
+                      {formatCurrency(transaction?.amount)}
+                    </td>
 
-                    <span
-                    className={
-    getBadgeClass(tx.type)
-}
-                    >
+                    <td>
+                      <span
+                        className={`wallet-history-status ${status.className}`}
+                      >
+                        {status.label}
+                      </span>
+                    </td>
 
-                      {
-    getIcon(tx.type)
-}
+                    <td>
+                      <button
+                        type="button"
+                        className="wallet-history-view"
+                        onClick={() =>
+                          onSelectTransaction?.(transaction)
+                        }
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
-                      {" "}
-
-                     {
-    tx.type
-}
-
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    ₹
-                    {Number(
-                      tx.amount || 0
-                    ).toLocaleString()}
-
-                  </td>
-
-                  <td>
-
-                    <span
-                      className={
-                        tx.status === "SUCCESS"
-                          ? "status-success"
-                          : tx.status === "FAILED"
-                          ? "status-failed"
-                          : "status-pending"
-                      }
-                    >
-
-                      {
-                        tx.status ||
-                        "SUCCESS"
-                      }
-
-                    </span>
-
-                  </td>
-
-                </tr>
-
-              ))
-
-            )
-          }
-
-        </tbody>
-
-      </table>
-
-      <div className="pagination">
-
-        <button
-          disabled={
-            currentPage === 1
-          }
-          onClick={() =>
-            setCurrentPage(
-              currentPage - 1
-            )
-          }
-        >
-          Previous
-        </button>
-
+      <div className="wallet-history-footer">
         <span>
-
-          Page {currentPage}
-          {" "}of{" "}
-          {totalPages}
-
+          Showing{" "}
+          {filteredTransactions.length === 0
+            ? 0
+            : (safePage - 1) * PAGE_SIZE + 1}
+          {" "}–{" "}
+          {Math.min(safePage * PAGE_SIZE, filteredTransactions.length)}
+          {" "}of {filteredTransactions.length}
         </span>
 
-        <button
-          disabled={
-            currentPage === totalPages
-          }
-          onClick={() =>
-            setCurrentPage(
-              currentPage + 1
-            )
-          }
-        >
-          Next
-        </button>
+        <div className="wallet-history-pagination">
+          <button
+            type="button"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={safePage <= 1}
+            aria-label="Previous page"
+          >
+            <FaChevronLeft />
+          </button>
 
+          <span>
+            {safePage} / {totalPages}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentPage((page) =>
+                Math.min(totalPages, page + 1)
+              )
+            }
+            disabled={safePage >= totalPages}
+            aria-label="Next page"
+          >
+            <FaChevronRight />
+          </button>
+        </div>
       </div>
-
-    </div>
-
+    </article>
   );
-
 }
 
 export default TransactionHistory;
