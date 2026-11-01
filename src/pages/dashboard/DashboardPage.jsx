@@ -1,5 +1,11 @@
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -17,8 +23,14 @@ import {
 // =============================================
 
 import { getMyWallet } from "../../services/walletService";
-import { getTransactionHistory } from "../../services/transactionService";
-import { getDashboardInsights } from "../../services/dashboardService";
+
+import {
+    getFilteredTransactionHistory,
+} from "../../services/transactionService";
+
+import {
+    getDashboardInsights,
+} from "../../services/dashboardService";
 
 // =============================================
 // STYLES
@@ -32,8 +44,11 @@ import "../../styles/loading.css";
 // =============================================
 
 import IncomeExpenseComparison from "../../components/dashboard/Analytics/IncomeExpenseComparison";
+
 import SpendingCategoryChart from "../../components/dashboard/Analytics/SpendingCategoryChart";
+
 import CashFlowChart from "../../components/dashboard/Analytics/CashFlowChart";
+
 import CashFlowInsights from "../../components/dashboard/Analytics/CashFlowInsights";
 
 // =============================================
@@ -41,6 +56,7 @@ import CashFlowInsights from "../../components/dashboard/Analytics/CashFlowInsig
 // =============================================
 
 import BudgetHealth from "../../components/dashboard/ai/BudgetHealth";
+
 import SmartGoals from "../../components/dashboard/ai/SmartGoals";
 
 // =============================================
@@ -54,6 +70,7 @@ import TransactionTable from "../../components/dashboard/activity/TransactionTab
 // =============================================
 
 import FinancialOverview from "../../components/dashboard/overview/FinancialOverview";
+
 import FinancialHealth from "../../components/dashboard/health/FinancialHealth";
 
 // =============================================
@@ -61,7 +78,9 @@ import FinancialHealth from "../../components/dashboard/health/FinancialHealth";
 // =============================================
 
 import DashboardHero from "../../components/dashboard/layout/DashboardHero";
+
 import DashboardSkeleton from "../../components/dashboard/common/DashboardSkeleton";
+
 import TransactionRiskMonitor from "../../components/dashboard/security/TransactionRiskMonitor";
 
 // =============================================
@@ -71,17 +90,126 @@ import TransactionRiskMonitor from "../../components/dashboard/security/Transact
 import useAI from "../../hooks/useAI";
 
 // =============================================
+// DATE FILTER HELPERS
+// =============================================
+
+const formatLocalDate = (date) => {
+
+    const year = date.getFullYear();
+
+    const month = String(
+        date.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+        date.getDate()
+    ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+// =============================================
+// GET DASHBOARD DATE RANGE
+// =============================================
+
+const getDashboardDateRange = (period) => {
+
+    const today = new Date();
+
+    const toDate = formatLocalDate(today);
+
+    const start = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    switch (period) {
+
+        case "Today":
+
+            return {
+                fromDate: toDate,
+                toDate,
+            };
+
+        case "This Week": {
+
+            const day = start.getDay();
+
+            const daysSinceMonday = (day + 6) % 7;
+
+            start.setDate(
+                start.getDate() - daysSinceMonday
+            );
+
+            return {
+                fromDate: formatLocalDate(start),
+                toDate,
+            };
+        }
+
+        case "This Month":
+
+            start.setDate(1);
+
+            return {
+                fromDate: formatLocalDate(start),
+                toDate,
+            };
+
+        case "This Year":
+
+            start.setMonth(0, 1);
+
+            return {
+                fromDate: formatLocalDate(start),
+                toDate,
+            };
+
+        case "All Time":
+
+        default:
+
+            return {
+                fromDate: null,
+                toDate: null,
+            };
+    }
+};
+
+// =============================================
 // DASHBOARD PAGE
 // =============================================
+
 function DashboardPage() {
 
+    // =========================================
+    // DASHBOARD STATE
+    // =========================================
+
     const [wallet, setWallet] = useState(null);
+
     const [transactions, setTransactions] = useState([]);
+
     const [dashboardInsights, setDashboardInsights] = useState(null);
 
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState("");
+
     const [partialError, setPartialError] = useState("");
+
+    // =========================================
+    // GLOBAL FILTER STATE
+    // =========================================
+
+    const [dashboardPeriod, setDashboardPeriod] = useState("Today");
+
+    const [dashboardSearch, setDashboardSearch] = useState("");
+
+    // Prevent older API responses from replacing newer results.
+    const requestSequence = useRef(0);
 
     // =========================================
     // AI DATA
@@ -101,17 +229,71 @@ function DashboardPage() {
 
     const fetchDashboardData = useCallback(async () => {
 
+        const requestId = ++requestSequence.current;
+
         setLoading(true);
+
         setError("");
+
         setPartialError("");
+
+        const {
+            fromDate,
+            toDate,
+        } = getDashboardDateRange(dashboardPeriod);
 
         try {
 
+            // =================================
+            // TRANSACTION FILTER PARAMETERS
+            // =================================
+
+            const transactionFilters = {
+
+                page: 0,
+
+                size: 100,
+
+                keyword: dashboardSearch || undefined,
+
+                fromDate: fromDate || undefined,
+
+                toDate: toDate || undefined,
+
+                sortBy: "timestamp",
+
+                direction: "DESC",
+
+            };
+
+            // =================================
+            // PARALLEL API REQUESTS
+            // =================================
+
             const results = await Promise.allSettled([
+
                 getMyWallet(),
-                getTransactionHistory(0, 100),
-                getDashboardInsights(),
+
+                getFilteredTransactionHistory(
+                    transactionFilters
+                ),
+
+                getDashboardInsights({
+                    fromDate,
+                    toDate,
+                }),
+
             ]);
+
+            // =================================
+            // IGNORE STALE RESPONSES
+            // =================================
+
+            if (
+                requestId !== requestSequence.current
+            ) {
+                return;
+            }
 
             const [
                 walletResult,
@@ -119,7 +301,13 @@ function DashboardPage() {
                 insightsResult,
             ] = results;
 
-            if (walletResult.status === "fulfilled") {
+            // =================================
+            // WALLET RESPONSE
+            // =================================
+
+            if (
+                walletResult.status === "fulfilled"
+            ) {
 
                 setWallet(walletResult.value);
 
@@ -132,9 +320,16 @@ function DashboardPage() {
 
             }
 
-            if (transactionsResult.status === "fulfilled") {
+            // =================================
+            // TRANSACTION RESPONSE
+            // =================================
 
-                const transactionData = transactionsResult.value;
+            if (
+                transactionsResult.status === "fulfilled"
+            ) {
+
+                const transactionData =
+                    transactionsResult.value;
 
                 const transactionList = Array.isArray(
                     transactionData?.content
@@ -149,15 +344,23 @@ function DashboardPage() {
             } else {
 
                 console.error(
-                    "Transaction API failed:",
+                    "Filtered transaction API failed:",
                     transactionsResult.reason
                 );
 
             }
 
-            if (insightsResult.status === "fulfilled") {
+            // =================================
+            // DASHBOARD INSIGHTS RESPONSE
+            // =================================
 
-                setDashboardInsights(insightsResult.value);
+            if (
+                insightsResult.status === "fulfilled"
+            ) {
+
+                setDashboardInsights(
+                    insightsResult.value
+                );
 
             } else {
 
@@ -168,17 +371,26 @@ function DashboardPage() {
 
             }
 
+            // =================================
+            // API FAILURE HANDLING
+            // =================================
+
             const failedResults = results.filter(
-                (result) => result.status === "rejected"
+                (result) =>
+                    result.status === "rejected"
             );
 
-            if (failedResults.length === results.length) {
+            if (
+                failedResults.length === results.length
+            ) {
 
                 setError(
                     "Unable to load dashboard data. Please check your connection and try again."
                 );
 
-            } else if (failedResults.length > 0) {
+            } else if (
+                failedResults.length > 0
+            ) {
 
                 setPartialError(
                     "Some dashboard information could not be loaded. Available information is still displayed."
@@ -186,16 +398,32 @@ function DashboardPage() {
 
             }
 
+            // =================================
+            // CLEAR REFRESH FLAG
+            // =================================
+
             try {
-                sessionStorage.removeItem("dashboardRefresh");
+
+                sessionStorage.removeItem(
+                    "dashboardRefresh"
+                );
+
             } catch (storageError) {
+
                 console.warn(
                     "Could not clear dashboard refresh flag:",
                     storageError
                 );
+
             }
 
         } catch (err) {
+
+            if (
+                requestId !== requestSequence.current
+            ) {
+                return;
+            }
 
             console.error(
                 "Unexpected dashboard loading error:",
@@ -208,19 +436,122 @@ function DashboardPage() {
 
         } finally {
 
-            setLoading(false);
+            if (
+                requestId === requestSequence.current
+            ) {
+
+                setLoading(false);
+
+            }
 
         }
+
+    }, [
+        dashboardPeriod,
+        dashboardSearch,
+    ]);
+
+    // =========================================
+    // GLOBAL NAVBAR EVENT LISTENERS
+    // =========================================
+
+    useEffect(() => {
+
+        // =================================
+        // GLOBAL SEARCH EVENT
+        // =================================
+
+        const handleDashboardSearch = (event) => {
+
+            setDashboardSearch(
+                String(
+                    event.detail?.query ?? ""
+                ).trim()
+            );
+
+        };
+
+        // =================================
+        // PERIOD CHANGE EVENT
+        // =================================
+
+        const handleDashboardPeriodChange = (event) => {
+
+            const nextPeriod = String(
+                event.detail?.period ?? "Today"
+            );
+
+            const allowedPeriods = [
+
+                "Today",
+
+                "This Week",
+
+                "This Month",
+
+                "This Year",
+
+                "All Time",
+
+            ];
+
+            setDashboardPeriod(
+
+                allowedPeriods.includes(nextPeriod)
+                    ? nextPeriod
+                    : "Today"
+
+            );
+
+        };
+
+        // =================================
+        // REGISTER EVENTS
+        // =================================
+
+        window.addEventListener(
+            "neurowallet:dashboard-search",
+            handleDashboardSearch
+        );
+
+        window.addEventListener(
+            "neurowallet:dashboard-period-change",
+            handleDashboardPeriodChange
+        );
+
+        // =================================
+        // CLEANUP EVENTS
+        // =================================
+
+        return () => {
+
+            window.removeEventListener(
+                "neurowallet:dashboard-search",
+                handleDashboardSearch
+            );
+
+            window.removeEventListener(
+                "neurowallet:dashboard-period-change",
+                handleDashboardPeriodChange
+            );
+
+        };
 
     }, []);
 
     // =========================================
-    // INITIAL DASHBOARD LOAD
+    // INITIAL LOAD + FILTER REFRESH
     // =========================================
 
     useEffect(() => {
 
         fetchDashboardData();
+
+        return () => {
+
+            requestSequence.current += 1;
+
+        };
 
     }, [fetchDashboardData]);
 
@@ -231,10 +562,15 @@ function DashboardPage() {
     const activitySummary = useMemo(() => {
 
         const summary = {
+
             total: transactions.length,
+
             successful: 0,
+
             pending: 0,
+
             failed: 0,
+
         };
 
         transactions.forEach((transaction) => {
@@ -299,7 +635,9 @@ function DashboardPage() {
                         disabled={loading}
                     >
 
-                        <FaArrowRotateRight aria-hidden="true" />
+                        <FaArrowRotateRight
+                            aria-hidden="true"
+                        />
 
                         Try Again
 
@@ -318,29 +656,46 @@ function DashboardPage() {
     // =========================================
 
     const savingOpportunity =
+
         insights?.savingOpportunity ||
+
         "No saving recommendation is available right now.";
 
     const budgetAlert =
+
         insights?.budgetAlert ||
+
         "No budget alert is available right now.";
 
     const investmentSuggestion =
+
         insights?.investmentSuggestion || "";
 
     const financialRisk =
+
         insights?.financialRisk || "";
 
-    const confidence = Number(insights?.confidence);
+    const confidence = Number(
+        insights?.confidence
+    );
 
     const hasConfidence =
+
         insights?.confidence !== null &&
+
         insights?.confidence !== undefined &&
+
         insights?.confidence !== "" &&
+
         Number.isFinite(confidence);
 
     const confidencePercentage = hasConfidence
-        ? Math.max(0, Math.min(100, confidence))
+
+        ? Math.max(
+            0,
+            Math.min(100, confidence)
+        )
+
         : 0;
 
     // =========================================
@@ -350,6 +705,74 @@ function DashboardPage() {
     return (
 
         <main className="nw-dashboard-content-area">
+
+            {/* =================================
+                ACTIVE FILTER CONTEXT
+            ================================= */}
+
+            {(dashboardSearch || dashboardPeriod !== "Today") && (
+
+                <div
+                    className="nw-dashboard-filter-context"
+                    role="status"
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: "0.5rem",
+                        marginBottom: "1rem",
+                        color: "#a9b9d0",
+                        fontSize: "0.875rem",
+                    }}
+                >
+
+                    <span>
+
+                        Showing {dashboardPeriod.toLowerCase()} data
+
+                        {dashboardSearch
+                            ? ` matching “${dashboardSearch}”`
+                            : ""
+                        }
+
+                    </span>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+
+                            setDashboardSearch("");
+
+                            window.dispatchEvent(
+
+                                new CustomEvent(
+                                    "neurowallet:dashboard-search",
+                                    {
+                                        detail: {
+                                            query: "",
+                                        },
+                                    }
+                                )
+
+                            );
+
+                        }}
+                        style={{
+                            border: 0,
+                            background: "transparent",
+                            color: "#8db8ff",
+                            cursor: "pointer",
+                        }}
+                    >
+
+                        Clear search
+
+                    </button>
+
+                </div>
+
+            )}
 
             {/* =================================
                 ROW 1 — DASHBOARD HERO
@@ -461,13 +884,9 @@ function DashboardPage() {
 
                         <article className="nw-dashboard-panel nw-dashboard-cashflow-panel">
 
-                            {/* EXISTING CASH FLOW CHART */}
-
                             <CashFlowChart
                                 transactions={transactions}
                             />
-
-                            {/* NEW — CASH FLOW INSIGHTS */}
 
                             <CashFlowInsights
                                 transactions={transactions}
@@ -697,12 +1116,17 @@ function DashboardPage() {
                                 </span>
 
                                 <strong>
+
                                     {activitySummary.total > 0
+
                                         ? `${(
                                             (activitySummary.successful /
                                                 activitySummary.total) * 100
                                         ).toFixed(1)}%`
-                                        : "—"}
+
+                                        : "—"
+                                    }
+
                                 </strong>
 
                             </div>
@@ -710,6 +1134,7 @@ function DashboardPage() {
                             <span className="nw-payment-success-caption">
 
                                 {activitySummary.successful} successful out of{" "}
+
                                 {activitySummary.total} loaded transactions
 
                             </span>
@@ -723,24 +1148,32 @@ function DashboardPage() {
                             aria-valuemin={0}
                             aria-valuemax={100}
                             aria-valuenow={
+
                                 activitySummary.total > 0
+
                                     ? Number((
                                         activitySummary.successful /
                                         activitySummary.total * 100
                                     ).toFixed(1))
+
                                     : 0
+
                             }
                         >
 
                             <span
                                 className="nw-payment-progress-success"
                                 style={{
+
                                     width: activitySummary.total > 0
+
                                         ? `${(
                                             (activitySummary.successful /
                                                 activitySummary.total) * 100
                                         )}%`
+
                                         : "0%",
+
                                 }}
                             />
 
@@ -753,8 +1186,13 @@ function DashboardPage() {
                                 <span className="nw-payment-stat-dot success" />
 
                                 <div>
-                                    <strong>{activitySummary.successful}</strong>
+
+                                    <strong>
+                                        {activitySummary.successful}
+                                    </strong>
+
                                     <span>Successful</span>
+
                                 </div>
 
                             </div>
@@ -764,8 +1202,13 @@ function DashboardPage() {
                                 <span className="nw-payment-stat-dot pending" />
 
                                 <div>
-                                    <strong>{activitySummary.pending}</strong>
+
+                                    <strong>
+                                        {activitySummary.pending}
+                                    </strong>
+
                                     <span>Pending</span>
+
                                 </div>
 
                             </div>
@@ -775,8 +1218,13 @@ function DashboardPage() {
                                 <span className="nw-payment-stat-dot failed" />
 
                                 <div>
-                                    <strong>{activitySummary.failed}</strong>
+
+                                    <strong>
+                                        {activitySummary.failed}
+                                    </strong>
+
                                     <span>Failed</span>
+
                                 </div>
 
                             </div>
@@ -805,7 +1253,9 @@ function DashboardPage() {
 
             </section>
 
-            {/* PARTIAL API FAILURE NOTICE */}
+            {/* =================================
+                PARTIAL API FAILURE NOTICE
+            ================================= */}
 
             {partialError && (
 
