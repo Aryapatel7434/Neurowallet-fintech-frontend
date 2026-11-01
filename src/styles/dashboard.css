@@ -1,21 +1,24 @@
 
 /* =========================================================
-   NEUROWALLET — MAIN DASHBOARD STYLESHEET
-   Target: Approved dark fintech dashboard reference
-   Scope: DashboardPage.jsx and its layout wrappers
-   Component-specific styles remain in their own CSS files.
+   NEUROWALLET — ENTERPRISE FINTECH DASHBOARD
+   Design reference: Approved Dark Navy Dashboard
+   File: src/styles/dashboard.css
    ========================================================= */
 
-/* ---------------------------------------------------------
+/* =========================================================
    1. DESIGN TOKENS
---------------------------------------------------------- */
+   ========================================================= */
 
 :root {
     --nw-page-bg: #050d19;
+    --nw-page-bg-soft: #071426;
+
     --nw-panel-bg: #091a2c;
     --nw-panel-bg-soft: #0d2035;
+    --nw-panel-bg-hover: #102943;
+
     --nw-panel-border: #193956;
-    --nw-panel-hover: #2b5b83;
+    --nw-panel-border-hover: #28649a;
 
     --nw-text: #f3f7ff;
     --nw-text-secondary: #b5c6dd;
@@ -23,25 +26,35 @@
 
     --nw-blue: #3978ff;
     --nw-blue-bright: #4a91ff;
+    --nw-blue-soft: rgba(57, 120, 255, 0.14);
+
     --nw-green: #13d6a0;
+    --nw-green-soft: rgba(19, 214, 160, 0.12);
+
     --nw-red: #ff657b;
+    --nw-red-soft: rgba(255, 101, 123, 0.12);
+
     --nw-purple: #9465ff;
+    --nw-amber: #ffb547;
 
     --nw-card-radius: 14px;
     --nw-card-padding: 14px;
-    --nw-layout-gap: 14px;
+    --nw-layout-gap: 13px;
 
-    --nw-dashboard-sidebar-width: 234px;
     --nw-dashboard-ai-width: 280px;
+
+    --nw-shadow-card:
+        0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
-/* ---------------------------------------------------------
-   2. GLOBAL DASHBOARD SAFETY
---------------------------------------------------------- */
+/* =========================================================
+   2. DASHBOARD BASE
+   ========================================================= */
 
-*,
-*::before,
-*::after {
+.nw-dashboard-content-area,
+.nw-dashboard-content-area *,
+.nw-dashboard-content-area *::before,
+.nw-dashboard-content-area *::after {
     box-sizing: border-box;
 }
 
@@ -58,6 +71,7 @@
     padding: 0;
 
     color: var(--nw-text);
+
     font-family:
         Inter,
         system-ui,
@@ -90,26 +104,27 @@
 }
 
 .nw-dashboard-content-area img,
-.nw-dashboard-content-area canvas,
-.nw-dashboard-content-area svg {
+.nw-dashboard-content-area svg,
+.nw-dashboard-content-area canvas {
     max-width: 100%;
 }
 
 .nw-dashboard-content-area .recharts-responsive-container {
     width: 100% !important;
     max-width: 100%;
+    min-width: 0;
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    3. SHARED DASHBOARD PANELS
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-panel {
     position: relative;
 
     width: 100%;
-    min-width: 0;
     max-width: 100%;
+    min-width: 0;
 
     background:
         linear-gradient(
@@ -121,7 +136,7 @@
     border: 1px solid var(--nw-panel-border);
     border-radius: var(--nw-card-radius);
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+    box-shadow: var(--nw-shadow-card);
 
     transition:
         border-color 180ms ease,
@@ -129,12 +144,12 @@
 }
 
 .nw-dashboard-panel:hover {
-    border-color: var(--nw-panel-hover);
+    border-color: var(--nw-panel-border-hover);
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    4. HERO SECTION
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-hero-section {
     width: 100%;
@@ -148,19 +163,16 @@
     margin: 0;
 }
 
-/* Keep the hero component's own background and artwork.
-   This wrapper only controls its position and dimensions. */
-
 .nw-dashboard-hero-section .dashboard-hero {
     width: 100%;
-    min-width: 0;
     max-width: 100%;
+    min-width: 0;
     margin: 0;
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    5. FINANCIAL OVERVIEW — FOUR KPI CARDS
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-overview-section {
     width: 100%;
@@ -182,8 +194,8 @@
 .nw-dashboard-overview-section .overview-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: stretch;
 
+    align-items: stretch;
     gap: 12px;
 
     width: 100%;
@@ -205,15 +217,15 @@
 
     overflow: hidden;
 
-    border: 1px solid var(--nw-panel-border);
-    border-radius: 13px;
-
     background:
         linear-gradient(
             145deg,
             #10243a,
             #091929
         );
+
+    border: 1px solid var(--nw-panel-border);
+    border-radius: 13px;
 
     box-shadow: none;
 
@@ -223,7 +235,7 @@
 }
 
 .nw-dashboard-overview-section .overview-card:hover {
-    border-color: var(--nw-panel-hover);
+    border-color: var(--nw-panel-border-hover);
     transform: translateY(-2px);
 }
 
@@ -305,11 +317,11 @@
     line-height: 1.45;
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    6. MAIN DASHBOARD GRID
-   Left: analytics + financial cards + activity
-   Right: AI Advisor
---------------------------------------------------------- */
+   Left: Main dashboard
+   Right: Neuro AI Advisor + Payment Performance
+   ========================================================= */
 
 .nw-dashboard-main-grid {
     display: grid;
@@ -318,7 +330,7 @@
         minmax(0, 1fr)
         minmax(260px, var(--nw-dashboard-ai-width));
 
-    align-items: stretch;
+    align-items: start;
     gap: var(--nw-layout-gap);
 
     width: 100%;
@@ -334,10 +346,10 @@
     min-width: 0;
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    7. ANALYTICS GRID
    Income vs Expenses + Spending Categories
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-analytics-grid {
     display: grid;
@@ -372,17 +384,15 @@
     min-width: 0;
 }
 
-/* Chart containers */
-
 .nw-dashboard-income-panel .recharts-responsive-container,
 .nw-dashboard-category-panel .recharts-responsive-container {
     max-width: 100%;
 }
 
-/* ---------------------------------------------------------
-   8. FINANCIAL HEALTH / BUDGET / GOALS
+/* =========================================================
+   8. FINANCIAL HEALTH / BUDGET / SAVINGS GOALS
    Three equal-width cards
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-financial-grid {
     display: grid;
@@ -418,13 +428,13 @@
     border: 1px solid var(--nw-panel-border);
     border-radius: var(--nw-card-radius);
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+    box-shadow: var(--nw-shadow-card);
 
     transition: border-color 180ms ease;
 }
 
 .nw-dashboard-financial-card:hover {
-    border-color: var(--nw-panel-hover);
+    border-color: var(--nw-panel-border-hover);
 }
 
 .nw-dashboard-financial-card > * {
@@ -445,8 +455,6 @@
     line-height: 1.5;
 }
 
-/* Keep numbers and currency values readable */
-
 .nw-dashboard-financial-card strong {
     font-variant-numeric: tabular-nums;
     word-break: normal;
@@ -459,9 +467,9 @@
     overflow-wrap: normal;
 }
 
-/* ---------------------------------------------------------
+/* =========================================================
    9. RECENT TRANSACTIONS + CASH FLOW
---------------------------------------------------------- */
+   ========================================================= */
 
 .nw-dashboard-activity-grid {
     display: grid;
@@ -495,8 +503,6 @@
     max-width: 100%;
     min-width: 0;
 }
-
-/* Transaction table */
 
 .nw-dashboard-transactions-panel {
     overflow-x: auto;
@@ -535,25 +541,26 @@
     max-width: 100%;
     overflow-x: auto;
 }
-/* ---------------------------------------------------------
-   10. RIGHT COLUMN — COMPACT NEURO AI SIDEBAR
---------------------------------------------------------- */
+
+/* =========================================================
+   10. RIGHT COLUMN — NEURO AI SIDEBAR
+   ========================================================= */
 
 .nw-dashboard-ai-sidebar {
     display: flex;
     flex-direction: column;
     align-self: start;
     align-items: stretch;
-    gap: var(--nw-layout-gap);
+
+    gap: 14px;
 
     width: 100%;
     min-width: 0;
     min-height: 0;
-    height: fit-content;
+    height: max-content;
 }
 
-.nw-dashboard-ai-panel,
-.nw-dashboard-activity-summary {
+.nw-dashboard-ai-panel {
     display: flex;
     flex-direction: column;
 
@@ -565,29 +572,30 @@
     padding: 0;
     overflow: hidden;
 
-    background: linear-gradient(
-        155deg,
-        #0b1c30,
-        #061424
-    );
+    background:
+        linear-gradient(
+            155deg,
+            #0b1c30,
+            #061424
+        );
 
     border: 1px solid #194b78;
     border-radius: 15px;
 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--nw-shadow-card);
 }
 
-.nw-dashboard-ai-panel > *,
-.nw-dashboard-activity-summary > * {
+.nw-dashboard-ai-panel > * {
     width: 100%;
     max-width: 100%;
     min-width: 0;
 }
 
-/* AI header */
+/* =========================================================
+   11. AI SIDEBAR HEADER
+   ========================================================= */
 
-.nw-dashboard-sidebar-heading,
-.nw-dashboard-summary-heading {
+.nw-dashboard-sidebar-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -602,13 +610,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
     min-width: 0;
 }
 
-.nw-dashboard-sidebar-icon,
-.nw-dashboard-summary-icon {
+.nw-dashboard-sidebar-icon {
     display: inline-flex;
     flex: 0 0 38px;
+
     align-items: center;
     justify-content: center;
 
@@ -624,19 +633,21 @@
     background: linear-gradient(135deg, #2865f5, #654cf5);
 }
 
-.nw-dashboard-sidebar-title h2,
-.nw-dashboard-summary-heading h2 {
+.nw-dashboard-sidebar-title h2 {
     margin: 0;
+
     color: var(--nw-text);
+
     font-size: 14px;
     font-weight: 750;
     line-height: 1.35;
 }
 
-.nw-dashboard-sidebar-title p,
-.nw-dashboard-summary-heading p {
+.nw-dashboard-sidebar-title p {
     margin: 3px 0 0;
+
     color: var(--nw-text-muted);
+
     font-size: 11px;
     line-height: 1.4;
 }
@@ -645,6 +656,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+
     flex: 0 0 auto;
 
     color: #35dfad;
@@ -655,12 +667,16 @@
 .nw-dashboard-status-dot {
     width: 7px;
     height: 7px;
+
     border-radius: 50%;
+
     background: #18d69d;
     box-shadow: 0 0 8px rgba(24, 214, 157, 0.45);
 }
 
-/* AI content */
+/* =========================================================
+   12. AI CONTENT
+   ========================================================= */
 
 .nw-dashboard-ai-content {
     display: flex;
@@ -669,10 +685,11 @@
 
     width: 100%;
     min-width: 0;
+
     padding: 12px;
 }
 
-/* Confidence */
+/* AI confidence */
 
 .nw-dashboard-confidence-row {
     display: flex;
@@ -682,6 +699,7 @@
     padding: 11px 12px;
 
     background: rgba(255, 255, 255, 0.035);
+
     border: 1px solid rgba(112, 148, 190, 0.14);
     border-radius: 11px;
 }
@@ -700,30 +718,38 @@
 
 .nw-dashboard-confidence-row strong {
     color: #42e4b2;
+
     font-size: 15px;
     font-weight: 800;
+
     font-variant-numeric: tabular-nums;
 }
 
 .nw-dashboard-confidence-track {
     display: block;
+
     width: 100%;
     height: 6px;
 
     overflow: hidden;
+
     border-radius: 99px;
     background: #1c3550;
 }
 
 .nw-dashboard-confidence-track span {
     display: block;
+
     height: 100%;
+
     border-radius: inherit;
+
     background: linear-gradient(90deg, #08c98e, #398aff);
+
     transition: width 250ms ease;
 }
 
-/* Insight items */
+/* AI insight items */
 
 .nw-dashboard-insight-item {
     display: flex;
@@ -733,11 +759,11 @@
     min-width: 0;
     padding: 11px;
 
+    background: rgba(255, 255, 255, 0.025);
+
     border: 1px solid rgba(112, 148, 190, 0.14);
     border-left: 3px solid transparent;
     border-radius: 11px;
-
-    background: rgba(255, 255, 255, 0.025);
 }
 
 .nw-insight-positive {
@@ -758,6 +784,7 @@
 .nw-dashboard-insight-icon {
     display: inline-flex;
     flex: 0 0 32px;
+
     align-items: center;
     justify-content: center;
 
@@ -790,7 +817,9 @@
 
 .nw-dashboard-insight-copy h3 {
     margin: 0 0 4px;
+
     color: var(--nw-text);
+
     font-size: 12px;
     font-weight: 750;
     line-height: 1.4;
@@ -805,13 +834,14 @@
     overflow: hidden;
 
     color: var(--nw-text-secondary);
+
     font-size: 11px;
     line-height: 1.55;
+
     overflow-wrap: anywhere;
 }
 
-/* Risk row */
-/* Financial Risk — Full-width aligned layout */
+/* Financial risk */
 
 .nw-dashboard-risk-row {
     display: flex;
@@ -822,6 +852,7 @@
 
     width: 100%;
     min-width: 0;
+
     padding: 13px 4px;
 
     border-top: 1px solid rgba(112, 148, 190, 0.15);
@@ -835,6 +866,7 @@
     width: 100%;
 
     color: #a9c1df;
+
     font-size: 12px;
     font-weight: 700;
 }
@@ -849,17 +881,19 @@
 
     width: 100%;
     max-width: 100%;
+
     margin: 0;
 
     color: #d4e2f5;
+
     font-size: 12px;
     font-weight: 450;
     line-height: 1.7;
 
     text-align: left;
+
     white-space: normal;
     overflow-wrap: anywhere;
-    word-break: normal;
 }
 
 /* AI action */
@@ -872,17 +906,25 @@
 
     width: 100%;
     min-height: 40px;
+
     margin-top: 2px;
     padding: 10px 12px;
 
     color: #fff;
-    background: linear-gradient(100deg, #315ff2, #4936c9);
+
+    background:
+        linear-gradient(
+            100deg,
+            #315ff2,
+            #4936c9
+        );
 
     border: 1px solid rgba(117, 137, 255, 0.35);
     border-radius: 10px;
 
     font-size: 12px;
     font-weight: 750;
+
     text-decoration: none;
 
     transition:
@@ -900,183 +942,21 @@
     transform: translateY(-1px);
 }
 
-/* Recent activity summary */
-
-.nw-dashboard-activity-summary {
-    padding: 0;
+.nw-dashboard-ai-action:focus-visible {
+    outline: 2px solid var(--nw-blue-bright);
+    outline-offset: 3px;
 }
 
-.nw-dashboard-summary-heading {
-    border-bottom: 0;
-}
-
-.nw-dashboard-summary-icon {
-    color: #8fc2ff;
-    background: rgba(59, 130, 246, 0.15);
-}
-
-.nw-dashboard-activity-total {
-    display: flex;
-    align-items: baseline;
-    gap: 9px;
-
-    margin: 0 13px;
-    padding: 11px 12px;
-
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(112, 148, 190, 0.14);
-    border-radius: 10px;
-}
-
-.nw-dashboard-activity-total strong {
-    color: var(--nw-text);
-    font-size: 25px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-}
-
-.nw-dashboard-activity-total span {
-    color: var(--nw-text-muted);
-    font-size: 11px;
-}
-
-.nw-dashboard-activity-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 7px;
-
-    padding: 11px 13px 8px;
-}
-
-.nw-activity-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 7px;
-
-    min-width: 0;
-    padding: 9px 8px;
-
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(112, 148, 190, 0.12);
-    border-radius: 9px;
-}
-
-.nw-activity-stat-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 25px;
-    height: 25px;
-    border-radius: 7px;
-    font-size: 11px;
-}
-
-.nw-activity-stat-icon.is-success {
-    color: #36dfaa;
-    background: rgba(16, 185, 129, 0.13);
-}
-
-.nw-activity-stat-icon.is-pending {
-    color: #ffc15c;
-    background: rgba(245, 158, 11, 0.13);
-}
-
-.nw-activity-stat-icon.is-failed {
-    color: #ff8295;
-    background: rgba(239, 68, 68, 0.13);
-}
-
-.nw-activity-stat > div {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.nw-activity-stat strong {
-    color: var(--nw-text);
-    font-size: 15px;
-    font-weight: 800;
-    font-variant-numeric: tabular-nums;
-}
-
-.nw-activity-stat span:last-child {
-    color: var(--nw-text-muted);
-    font-size: 10px;
-    line-height: 1.3;
-}
-
-.nw-dashboard-activity-note {
-    margin: 0;
-    padding: 0 13px 12px;
-
-    color: var(--nw-text-muted);
-    font-size: 10px;
-    line-height: 1.45;
-}
-
-/* ---------------------------------------------------------
-   17. COMPACT SIDEBAR RESPONSIVE FIXES
---------------------------------------------------------- */
-
-@media (max-width: 1450px) {
-    .nw-dashboard-ai-content {
-        gap: 9px;
-        padding: 10px;
-    }
-
-    .nw-dashboard-sidebar-heading,
-    .nw-dashboard-summary-heading {
-        padding: 12px;
-    }
-}
-
-@media (max-width: 1050px) {
-    .nw-dashboard-ai-sidebar {
-        align-self: stretch;
-        height: auto;
-    }
-
-    .nw-dashboard-ai-panel,
-    .nw-dashboard-activity-summary {
-        min-height: 0;
-        height: auto;
-    }
-}
-
-@media (max-width: 560px) {
-    .nw-dashboard-activity-stats {
-        gap: 6px;
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-
-    .nw-activity-stat {
-        padding: 8px 6px;
-    }
-
-    .nw-dashboard-insight-copy p {
-        -webkit-line-clamp: 4;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .nw-dashboard-ai-action,
-    .nw-dashboard-confidence-track span {
-        transition: none;
-    }
-}
-/* ---------------------------------------------------------
-   11. PARTIAL API FAILURE NOTICE
---------------------------------------------------------- */
+/* =========================================================
+   13. PARTIAL API FAILURE NOTICE
+   ========================================================= */
 
 .nw-dashboard-partial-error {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+
     gap: 12px;
 
     width: 100%;
@@ -1085,6 +965,7 @@
     color: #ffd78a;
 
     background: rgba(160, 105, 20, 0.12);
+
     border: 1px solid rgba(255, 185, 70, 0.25);
     border-radius: 10px;
 
@@ -1107,9 +988,14 @@
     background: #205d9f;
 }
 
-/* ---------------------------------------------------------
-   12. DASHBOARD ERROR STATE
---------------------------------------------------------- */
+.nw-dashboard-partial-error button:focus-visible {
+    outline: 2px solid var(--nw-blue-bright);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   14. DASHBOARD ERROR STATE
+   ========================================================= */
 
 .nw-dashboard-error {
     display: grid;
@@ -1117,6 +1003,7 @@
 
     width: 100%;
     min-height: 300px;
+
     padding: 24px;
 }
 
@@ -1127,6 +1014,7 @@
     padding: 28px;
 
     color: var(--nw-text);
+
     background: var(--nw-panel-bg);
 
     border: 1px solid #23415e;
@@ -1139,8 +1027,12 @@
 }
 
 .nw-dashboard-retry-btn {
-    padding: 10px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
+    padding: 10px 18px;
 
     color: #fff;
     background: #245bea;
@@ -1160,9 +1052,14 @@
     cursor: not-allowed;
 }
 
-/* ---------------------------------------------------------
-   13. RESPONSIVE — LAPTOP
---------------------------------------------------------- */
+.nw-dashboard-retry-btn:focus-visible {
+    outline: 2px solid var(--nw-blue-bright);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   15. LAPTOP RESPONSIVE
+   ========================================================= */
 
 @media (max-width: 1450px) {
     :root {
@@ -1177,6 +1074,15 @@
 
     .nw-dashboard-financial-card {
         padding: 11px;
+    }
+
+    .nw-dashboard-ai-content {
+        gap: 9px;
+        padding: 10px;
+    }
+
+    .nw-dashboard-sidebar-heading {
+        padding: 12px;
     }
 }
 
@@ -1204,11 +1110,17 @@
     .nw-dashboard-financial-card {
         padding: 10px;
     }
+
+    .nw-dashboard-activity-grid {
+        grid-template-columns:
+            minmax(0, 1.35fr)
+            minmax(260px, 1fr);
+    }
 }
 
-/* ---------------------------------------------------------
-   14. RESPONSIVE — TABLET
---------------------------------------------------------- */
+/* =========================================================
+   16. TABLET RESPONSIVE
+   ========================================================= */
 
 @media (max-width: 1050px) {
     .nw-dashboard-main-grid {
@@ -1216,6 +1128,10 @@
     }
 
     .nw-dashboard-ai-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-self: stretch;
+        align-items: start;
         height: auto;
     }
 
@@ -1225,8 +1141,7 @@
     }
 
     .nw-dashboard-analytics-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .nw-dashboard-activity-grid {
@@ -1234,15 +1149,17 @@
     }
 }
 
+/* =========================================================
+   17. SMALL TABLET
+   ========================================================= */
+
 @media (max-width: 760px) {
     .nw-dashboard-overview-section .overview-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .nw-dashboard-financial-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .nw-dashboard-analytics-grid {
@@ -1253,11 +1170,15 @@
     .nw-dashboard-category-panel {
         min-height: 220px;
     }
+
+    .nw-dashboard-ai-sidebar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
-/* ---------------------------------------------------------
-   15. RESPONSIVE — MOBILE
---------------------------------------------------------- */
+/* =========================================================
+   18. MOBILE RESPONSIVE
+   ========================================================= */
 
 @media (max-width: 560px) {
     :root {
@@ -1275,7 +1196,8 @@
     .nw-dashboard-overview-section .overview-grid,
     .nw-dashboard-financial-grid,
     .nw-dashboard-analytics-grid,
-    .nw-dashboard-activity-grid {
+    .nw-dashboard-activity-grid,
+    .nw-dashboard-ai-sidebar {
         grid-template-columns: minmax(0, 1fr);
     }
 
@@ -1307,42 +1229,1192 @@
         align-items: flex-start;
         flex-direction: column;
     }
-}
 
-/* ---------------------------------------------------------
-   16. ACCESSIBILITY
---------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-    .nw-dashboard-panel,
-    .nw-dashboard-overview-section .overview-card {
-        transition: none;
-    }
-
-    .nw-dashboard-overview-section .overview-card:hover {
-        transform: none;
+    .nw-dashboard-insight-copy p {
+        -webkit-line-clamp: 4;
     }
 }
-.dashboard-financial-cards {
+
+/* =========================================================
+   19. SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+    .nw-dashboard-overview-section .overview-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-sidebar-heading {
+        padding: 10px;
+    }
+
+    .nw-dashboard-ai-content {
+        padding: 10px;
+    }
+}
+
+/* =========================================================
+   20. DASHBOARD WIDTH AND ALIGNMENT
+   ========================================================= */
+
+.nw-dashboard-content-area .nw-dashboard-main-grid,
+.nw-dashboard-content-area .nw-dashboard-main-left,
+.nw-dashboard-content-area .nw-dashboard-analytics-grid,
+.nw-dashboard-content-area .nw-dashboard-financial-grid,
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Financial cards */
+
+.nw-dashboard-content-area .nw-dashboard-financial-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
     align-items: stretch;
+    gap: 14px;
+}
+
+.nw-dashboard-content-area .nw-dashboard-financial-card {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    min-width: 0;
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.nw-dashboard-content-area .nw-dashboard-financial-card > * {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Recent Transactions + Cash Flow */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.55fr)
+        minmax(280px, 1fr);
+    align-items: stretch;
+    gap: 14px;
+}
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 16px;
+    overflow: hidden;
+    border: 1px solid var(--nw-panel-border, #1d3550);
+    border-radius: 14px;
+    background: linear-gradient(145deg, #0e1d30, #0a1727);
+}
+
+/* Prevent transaction table from widening its card */
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel table {
+    width: 100%;
+    min-width: 540px;
+    border-collapse: collapse;
+}
+
+/* Cash flow chart uses available width */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel > * {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel canvas,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* =========================================================
+   21. SINGLE AI SIDEBAR
+   AI Advisor + Payment Performance
+   ========================================================= */
+
+.nw-dashboard-content-area .nw-dashboard-ai-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
+    min-width: 0;
+    height: max-content;
+}
+
+.nw-dashboard-content-area .nw-dashboard-ai-panel {
+    height: auto;
+    min-height: 0;
+}
+
+/* =========================================================
+   22. PAYMENT PERFORMANCE CARD
+   ========================================================= */
+
+.nw-dashboard-content-area .nw-payment-performance {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 16px;
+
+    color: var(--nw-text, #f3f7ff);
+
+    background:
+        linear-gradient(
+            155deg,
+            #10243a,
+            #091929
+        );
+
+    border: 1px solid #24527c;
+    border-radius: 15px;
+
+    box-shadow: var(--nw-shadow-card);
+}
+
+/* Header */
+
+.nw-payment-performance-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.nw-payment-performance-eyebrow {
+    color: #65aaff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.nw-payment-performance-header h3 {
+    margin: 5px 0 3px;
+    color: #f3f7ff;
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+.nw-payment-performance-header p {
+    margin: 0;
+    color: #91a9c5;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.nw-payment-performance-icon {
+    display: inline-flex;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    color: #77b4ff;
+    background: rgba(59, 130, 246, 0.16);
+
+    border: 1px solid rgba(87, 152, 255, 0.18);
+    border-radius: 12px;
+
+    font-size: 17px;
+}
+
+/* Success rate */
+
+.nw-payment-success-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.nw-payment-success-overview > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.nw-payment-success-label {
+    color: #b5c6dd;
+    font-size: 12px;
+}
+
+.nw-payment-success-overview strong {
+    color: #20dca8;
+    font-size: clamp(22px, 2vw, 28px);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.nw-payment-success-caption {
+    color: #8298b5;
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+/* Progress bar */
+
+.nw-payment-progress-track {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    background: #203750;
+    border-radius: 99px;
+}
+
+.nw-payment-progress-success {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #0fc99a, #21e0b0);
+    border-radius: inherit;
+    transition: width 220ms ease;
+}
+
+/* Transaction status statistics */
+
+.nw-payment-performance-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.nw-payment-performance-stat {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    min-width: 0;
+    padding: 10px 8px;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    border: 1px solid rgba(112, 148, 190, 0.13);
+    border-radius: 10px;
+}
+
+.nw-payment-stat-dot {
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.nw-payment-stat-dot.success {
+    background: #20dca8;
+}
+
+.nw-payment-stat-dot.pending {
+    background: #ffbd55;
+}
+
+.nw-payment-stat-dot.failed {
+    background: #ff7187;
+}
+
+.nw-payment-performance-stat > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     min-width: 0;
 }
 
-.dashboard-financial-cards > * {
-    min-width: 0;
+.nw-payment-performance-stat strong {
+    color: #f3f7ff;
+    font-size: 16px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 1100px) {
-    .dashboard-financial-cards {
+.nw-payment-performance-stat span:last-child {
+    color: #91a9c5;
+    font-size: 9px;
+    line-height: 1.3;
+}
+
+/* Footer */
+
+.nw-payment-performance-footer {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    padding-top: 11px;
+
+    color: #8298b5;
+
+    border-top: 1px solid rgba(112, 148, 190, 0.14);
+
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.nw-payment-performance-footer svg {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    color: #66aaff;
+}
+
+/* =========================================================
+   23. SIDEBAR RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+    .nw-dashboard-content-area .nw-dashboard-ai-sidebar {
+        display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+        height: auto;
     }
 }
 
 @media (max-width: 700px) {
-    .dashboard-financial-cards {
+    .nw-dashboard-content-area .nw-dashboard-ai-sidebar {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-financial-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-analytics-grid,
+    .nw-dashboard-content-area .nw-dashboard-activity-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .nw-dashboard-content-area .nw-dashboard-financial-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-transactions-panel,
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+        padding: 12px;
+    }
+}
+
+/* =========================================================
+   24. ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .nw-dashboard-panel,
+    .nw-dashboard-overview-section .overview-card,
+    .nw-dashboard-ai-action,
+    .nw-dashboard-confidence-track span,
+    .nw-payment-progress-success {
+        transition: none;
+    }
+
+    .nw-dashboard-overview-section .overview-card:hover,
+    .nw-dashboard-ai-action:hover {
+        transform: none;
+    }
+}   
+/* =========================================================
+   NEUROWALLET — COMPACT CASH FLOW INSIGHTS
+   Align with Recent Transactions
+   ========================================================= */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+    align-items: stretch;
+    gap: 14px;
+}
+
+/* Match both cards in the activity row */
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+    box-sizing: border-box;
+    align-self: stretch;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    border: 1px solid #193956;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #0e1d30, #091827);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* Cash flow card */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 15px;
+    overflow: hidden;
+}
+
+/* Prevent child components from forcing the card wider */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel > * {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+/* Keep metric groups compact */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="metrics"],
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="statistics"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 9px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Metric tiles */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="metric"],
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="stat-card"] {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 11px 10px;
+    overflow: hidden;
+    background: #102940;
+    border: 1px solid #1b3b58;
+    border-radius: 12px;
+}
+
+/* Keep labels readable */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="metric"] p,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="metric"] span {
+    min-width: 0;
+    margin: 0;
+    color: #91a9c5;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Currency values must not break digit by digit */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel strong {
+    color: #f3f7ff;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Compact net cash flow highlight */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="net-flow"],
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="netFlow"] {
+    padding: 13px;
+    background: #081a2b;
+    border: 1px solid #1d405f;
+    border-radius: 12px;
+}
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="net-flow"] strong,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="netFlow"] strong {
+    color: #13d6a0;
+    font-size: clamp(21px, 2vw, 27px);
+    letter-spacing: -0.7px;
+}
+
+/* Savings rate */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="savings"] {
+    min-width: 0;
+    padding-top: 11px;
+    border-top: 1px solid rgba(112, 148, 190, 0.18);
+}
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="savings"] strong {
+    color: #13d6a0;
+    font-size: 20px;
+}
+
+/* Smaller screens */
+
+@media (max-width: 1050px) {
+    .nw-dashboard-content-area .nw-dashboard-activity-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+        height: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="metrics"],
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel [class*="statistics"] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* =========================================================
+   NEUROWALLET — FINAL ACTIVITY GRID ALIGNMENT
+   Recent Transactions + Cash Flow
+========================================================= */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.55fr)
+        minmax(280px, 1fr);
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Keep both outer panels aligned */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid >
+.nw-dashboard-panel {
+    box-sizing: border-box;
+    align-self: stretch;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    border: 1px solid var(--nw-panel-border, #193956);
+    border-radius: 14px;
+}
+
+/* Transaction panel */
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel {
+    overflow: hidden;
+}
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Cash flow panel */
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    min-width: 0;
+    padding: 15px;
+    overflow: hidden;
+}
+
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel > * {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Cash Flow Insights must not inherit broad metric selectors */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights {
+    container-type: inline-size;
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 14px;
+    padding: 13px;
+    overflow: hidden;
+}
+
+/* Keep its metric layout controlled by its own stylesheet */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric {
+    display: flex;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 100%;
+    padding: 10px 8px;
+    overflow: hidden;
+    background: rgba(13, 32, 53, 0.85);
+    border: 1px solid rgba(130, 152, 181, 0.14);
+    border-radius: 10px;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Responsive activity layout */
+
+@media (max-width: 1050px) {
+    .nw-dashboard-content-area .nw-dashboard-activity-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+        height: auto;
+    }
+}
+
+@media (max-width: 560px) {
+    .nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+        padding: 12px;
+    }
+}
+
+/* =========================================================
+   FINAL FIX — CASH FLOW METRICS OVERLAPPING
+   Higher-specificity overrides for existing dashboard rules
+========================================================= */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Each metric gets its own full-width row */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics
+.nw-cash-metric {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 58px;
+
+    padding: 10px 12px;
+    overflow: hidden;
+
+    background: #102940;
+    border: 1px solid #1b3b58;
+    border-radius: 10px;
+}
+
+/* Icon stays at the left */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-icon {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+}
+
+/* Label and amount stay on the same line */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    color: #91a9c5;
+    font-size: 10px;
+    line-height: 1.4;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > strong {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 55%;
+    margin: 0;
+    color: #f3f7ff;
+    font-size: 12px;
+    font-weight: 750;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Keep the cash flow card from forcing horizontal overflow */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Smaller screens */
+
+@media (max-width: 560px) {
+    .nw-dashboard-content-area
+    .nw-dashboard-cashflow-panel
+    .nw-cash-insights
+    .nw-cash-metric-content {
+        gap: 6px;
+    }
+
+    .nw-dashboard-content-area
+    .nw-dashboard-cashflow-panel
+    .nw-cash-insights
+    .nw-cash-metric-content > span {
+        font-size: 9px;
+    }
+
+    .nw-dashboard-content-area
+    .nw-dashboard-cashflow-panel
+    .nw-cash-insights
+    .nw-cash-metric-content > strong {
+        font-size: 11px;
+    }
+}
+
+/* =========================================================
+   FINAL FIX — SHOW COMPLETE CASH FLOW CURRENCY VALUES
+========================================================= */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content {
+    display: flex !important;
+    flex: 1 1 auto;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    overflow: visible;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > span {
+    width: 100%;
+    color: #91a9c5;
+    font-size: 10px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow: visible;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > strong {
+    display: block;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+    color: #f3f7ff;
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: normal;
+    word-break: normal;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Keep metric cards comfortable */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric {
+    min-height: 68px;
+    align-items: center;
+    padding: 10px 12px;
+}
+
+/* =========================================================
+   NEUROWALLET — CASH FLOW / TRANSACTION TABLE VISUAL ALIGNMENT
+   Single-layer metric rows, consistent spacing and sizing
+========================================================= */
+
+/* Keep the two dashboard panels aligned */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    align-items: stretch;
+    gap: 14px;
+}
+
+.nw-dashboard-content-area .nw-dashboard-transactions-panel,
+.nw-dashboard-content-area .nw-dashboard-cashflow-panel {
+    align-self: stretch;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Cash flow insights card */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #0d2035, #091827);
+    border: 1px solid #193956;
+    border-radius: 13px;
+    box-shadow: none;
+}
+
+/* Net cash flow section */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-net {
+    padding: 12px;
+    border-radius: 11px;
+    background: #071727;
+    border: 1px solid #1b3854;
+}
+
+/* Metric list — one column */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 1px solid #1b3854;
+    border-radius: 11px;
+}
+
+/* Each metric is one clean row */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics
+.nw-cash-metric {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 11px;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 62px;
+    margin: 0;
+    padding: 10px 12px;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden;
+}
+
+/* Subtle separators, like table rows */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-metrics
+.nw-cash-metric + .nw-cash-metric {
+    border-top: 1px solid rgba(130, 152, 181, 0.14) !important;
+}
+
+/* Icon */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid rgba(130, 152, 181, 0.12);
+    border-radius: 9px;
+}
+
+/* Remove the accidental nested card from metric content */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 4px !important;
+
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+/* Metric labels */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > span {
+    display: block;
+    width: 100%;
+    margin: 0;
+    color: #91a9c5;
+    font-size: 10px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: normal;
+}
+
+/* Complete currency values */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-metric-content > strong {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+
+    color: #f3f7ff;
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: normal;
+    word-break: normal;
+
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Savings section */
+
+.nw-dashboard-content-area
+.nw-dashboard-cashflow-panel
+.nw-cash-insights
+.nw-cash-insights-footer {
+    margin-top: 12px;
+    padding-top: 11px;
+}
+
+/* Responsive */
+
+@media (max-width: 560px) {
+    .nw-dashboard-content-area
+    .nw-dashboard-cashflow-panel
+    .nw-cash-insights {
+        padding: 12px;
+    }
+
+    .nw-dashboard-content-area
+    .nw-dashboard-cashflow-panel
+    .nw-cash-metric {
+        min-height: 58px;
+        padding: 9px 10px;
+    }
+}
+/* =========================================================
+   NEUROWALLET — RECENT TRANSACTIONS / CASH FLOW ALIGNMENT
+   Make the inner transaction card fill its dashboard panel.
+   ========================================================= */
+
+.nw-dashboard-content-area .nw-dashboard-activity-grid {
+    align-items: stretch;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-activity-grid
+.nw-dashboard-transactions-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    align-self: stretch;
+}
+
+.nw-dashboard-content-area
+.nw-dashboard-transactions-panel
+> .transaction-card.nw-transaction-reference {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 100%;
+}
+
+/* Let the table area consume the remaining vertical space. */
+.nw-dashboard-content-area
+.nw-dashboard-transactions-panel
+.transaction-card
+.table-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* Keep pagination aligned with the bottom of the card. */
+.nw-dashboard-content-area
+.nw-dashboard-transactions-panel
+.transaction-card
+.transaction-pagination {
+    flex: 0 0 auto;
+    margin-top: auto;
+}
+/* =========================================================
+   NEUROWALLET — FULL HEIGHT DASHBOARD SIDEBAR
+========================================================= */
+
+@media (min-width: 1051px) {
+
+    .nw-dashboard-content-area .nw-dashboard-main-grid {
+        align-items: stretch;
+    }
+
+    .nw-dashboard-content-area .nw-dashboard-ai-sidebar {
+        align-self: stretch;
+        height: auto;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nw-dashboard-content-area .nw-transaction-risk-panel {
+        flex: 1 1 auto;
     }
 }

@@ -14,11 +14,25 @@ import {
     FaClock,
     FaCopy,
     FaFileCsv,
+    FaShieldHalved,
+    FaSpinner,
 } from "react-icons/fa6";
+
+import {
+    getTransactionFraudAnalysis,
+} from "../../../services/aiService";
 
 import "./TransactionTable.css";
 
-const PAGE_SIZE = 5;
+// =========================================================
+// CONFIGURATION
+// =========================================================
+
+const PAGE_SIZE = 7;
+
+// =========================================================
+// USER HELPER
+// =========================================================
 
 function getCurrentUser() {
     try {
@@ -28,7 +42,16 @@ function getCurrentUser() {
     }
 }
 
+// =========================================================
+// TRANSACTION TABLE
+// =========================================================
+
 function TransactionTable({ transactions = [] }) {
+
+    // =====================================================
+    // TABLE STATE
+    // =====================================================
+
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [sortBy, setSortBy] = useState("NEWEST");
@@ -36,9 +59,27 @@ function TransactionTable({ transactions = [] }) {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [actionMessage, setActionMessage] = useState("");
 
+    // =====================================================
+    // FRAUD ANALYSIS STATE
+    // =====================================================
+
+    const [fraudLoading, setFraudLoading] = useState(false);
+    const [fraudError, setFraudError] = useState("");
+    const [fraudResult, setFraudResult] = useState(null);
+    const [fraudTransaction, setFraudTransaction] = useState(null);
+
+    // =====================================================
+    // REFERENCES
+    // =====================================================
+
     const tableRef = useRef(null);
     const menuRef = useRef(null);
+
     const user = useMemo(() => getCurrentUser(), []);
+
+    // =====================================================
+    // HELPERS
+    // =====================================================
 
     const formatCurrency = (amount) =>
         new Intl.NumberFormat("en-IN", {
@@ -56,6 +97,10 @@ function TransactionTable({ transactions = [] }) {
 
     const getTransactionKey = (tx, index) =>
         String(tx.transactionId ?? `${getTimestamp(tx)}-${index}`);
+
+    // =====================================================
+    // FILTER AND SORT TRANSACTIONS
+    // =====================================================
 
     const filteredTransactions = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -99,6 +144,10 @@ function TransactionTable({ transactions = [] }) {
         });
     }, [transactions, search, statusFilter, sortBy]);
 
+    // =====================================================
+    // PAGINATION
+    // =====================================================
+
     const totalPages = Math.max(
         1,
         Math.ceil(filteredTransactions.length / PAGE_SIZE)
@@ -125,11 +174,19 @@ function TransactionTable({ transactions = [] }) {
         filteredTransactions.length
     );
 
+    // =====================================================
+    // FILTER RESET
+    // =====================================================
+
     useEffect(() => {
         setCurrentPage(1);
         setOpenMenuId(null);
         setActionMessage("");
     }, [search, statusFilter, sortBy]);
+
+    // =====================================================
+    // OUTSIDE CLICK AND ESCAPE HANDLING
+    // =====================================================
 
     useEffect(() => {
         const handleOutsideClick = (event) => {
@@ -143,6 +200,10 @@ function TransactionTable({ transactions = [] }) {
 
         const handleEscape = (event) => {
             if (event.key === "Escape") {
+                if (!fraudLoading && fraudTransaction) {
+                    setFraudTransaction(null);
+                }
+
                 setOpenMenuId(null);
             }
         };
@@ -154,7 +215,11 @@ function TransactionTable({ transactions = [] }) {
             document.removeEventListener("mousedown", handleOutsideClick);
             document.removeEventListener("keydown", handleEscape);
         };
-    }, []);
+    }, [fraudLoading, fraudTransaction]);
+
+    // =====================================================
+    // CSV EXPORT
+    // =====================================================
 
     const escapeCSV = (value) =>
         `"${String(value ?? "").replace(/"/g, '""')}"`;
@@ -222,6 +287,10 @@ function TransactionTable({ transactions = [] }) {
         setActionMessage("Transaction exported successfully.");
     };
 
+    // =====================================================
+    // COPY TO CLIPBOARD
+    // =====================================================
+
     const copyText = async (value, label) => {
         if (!value) {
             setActionMessage(`${label} is not available.`);
@@ -231,6 +300,7 @@ function TransactionTable({ transactions = [] }) {
 
         try {
             await navigator.clipboard.writeText(String(value));
+
             setActionMessage(`${label} copied successfully.`);
         } catch {
             setActionMessage(
@@ -241,25 +311,16 @@ function TransactionTable({ transactions = [] }) {
         setOpenMenuId(null);
     };
 
+    // =====================================================
+    // TRANSACTION HELPERS
+    // =====================================================
+
     const getCounterpartyEmail = (tx) => {
         const incoming =
             Boolean(user?.email) &&
             tx.receiverEmail === user.email;
 
         return incoming ? tx.senderEmail : tx.receiverEmail;
-    };
-
-    const handleViewAll = () => {
-        setSearch("");
-        setStatusFilter("ALL");
-        setSortBy("NEWEST");
-        setCurrentPage(1);
-        setOpenMenuId(null);
-
-        tableRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-        });
     };
 
     const getDisplayName = (email) => {
@@ -275,6 +336,10 @@ function TransactionTable({ transactions = [] }) {
 
         return email.slice(0, 2).toUpperCase();
     };
+
+    // =====================================================
+    // TRANSACTION STATUS
+    // =====================================================
 
     const getStatusIcon = (status) => {
         switch (String(status || "").toUpperCase()) {
@@ -302,22 +367,106 @@ function TransactionTable({ transactions = [] }) {
         }
     };
 
+    // =====================================================
+    // AI FRAUD DETECTION
+    // GET /api/ai/fraud/{transactionId}
+    // =====================================================
+
+    const handleFraudAnalysis = async (transaction) => {
+        if (
+            transaction?.transactionId == null ||
+            !Number.isSafeInteger(Number(transaction.transactionId)) ||
+            Number(transaction.transactionId) <= 0
+        ) {
+            setActionMessage(
+                "A valid transaction ID is required for fraud analysis."
+            );
+
+            setOpenMenuId(null);
+            return;
+        }
+
+        setOpenMenuId(null);
+        setFraudTransaction(transaction);
+        setFraudResult(null);
+        setFraudError("");
+        setFraudLoading(true);
+
+        try {
+            const result = await getTransactionFraudAnalysis(
+                transaction.transactionId
+            );
+
+            setFraudResult(result);
+        } catch (error) {
+            setFraudError(
+                error?.response?.data?.message ||
+                error?.response?.data?.error ||
+                error?.message ||
+                "Unable to analyze this transaction."
+            );
+        } finally {
+            setFraudLoading(false);
+        }
+    };
+
+    const closeFraudModal = () => {
+        if (fraudLoading) return;
+
+        setFraudTransaction(null);
+        setFraudResult(null);
+        setFraudError("");
+    };
+
+    // =====================================================
+    // VIEW ALL
+    // =====================================================
+
+    const handleViewAll = () => {
+        setSearch("");
+        setStatusFilter("ALL");
+        setSortBy("NEWEST");
+        setCurrentPage(1);
+        setOpenMenuId(null);
+
+        tableRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    };
+
+    // =====================================================
+    // PAGINATION NAVIGATION
+    // =====================================================
+
     const goToPage = (page) => {
         setCurrentPage(Math.max(1, Math.min(page, totalPages)));
         setOpenMenuId(null);
     };
 
+    // =====================================================
+    // RENDER
+    // =====================================================
+
     return (
         <section className="transaction-card nw-transaction-reference">
+
+            {/* =============================================
+                TABLE HEADER
+            ============================================= */}
+
             <header className="transaction-header">
+
                 <div className="transaction-title">
                     <h2>Recent Transactions</h2>
+
                     <p className="transaction-subtitle">
                         Review your latest wallet activity
                     </p>
                 </div>
 
                 <div className="transaction-header-actions">
+
                     <button
                         type="button"
                         className="export-btn"
@@ -336,12 +485,21 @@ function TransactionTable({ transactions = [] }) {
                         View All
                         <FaArrowRight aria-hidden="true" />
                     </button>
+
                 </div>
+
             </header>
 
+            {/* =============================================
+                SEARCH AND FILTER TOOLBAR
+            ============================================= */}
+
             <div className="transaction-toolbar">
+
                 <div className="toolbar-left">
+
                     <div className="search-wrapper">
+
                         <FaMagnifyingGlass
                             className="search-icon"
                             aria-hidden="true"
@@ -357,6 +515,7 @@ function TransactionTable({ transactions = [] }) {
                                 setSearch(event.target.value)
                             }
                         />
+
                     </div>
 
                     <select
@@ -377,28 +536,40 @@ function TransactionTable({ transactions = [] }) {
                         className="sort-filter"
                         aria-label="Sort transactions"
                         value={sortBy}
-                        onChange={(event) => setSortBy(event.target.value)}
+                        onChange={(event) =>
+                            setSortBy(event.target.value)
+                        }
                     >
                         <option value="NEWEST">Newest First</option>
                         <option value="OLDEST">Oldest First</option>
                         <option value="HIGH_AMOUNT">Highest Amount</option>
                         <option value="LOW_AMOUNT">Lowest Amount</option>
                     </select>
+
                 </div>
 
                 <div className="toolbar-right">
+
                     <div className="record-count" aria-live="polite">
                         <span>Showing</span>
                         <strong>{firstRecord}-{lastRecord}</strong>
                         <span>of</span>
                         <strong>{filteredTransactions.length}</strong>
                     </div>
+
                 </div>
+
             </div>
+
+            {/* =============================================
+                ACTION FEEDBACK
+            ============================================= */}
 
             {actionMessage && (
                 <div className="transaction-feedback" role="status">
+
                     <span>{actionMessage}</span>
+
                     <button
                         type="button"
                         onClick={() => setActionMessage("")}
@@ -406,11 +577,18 @@ function TransactionTable({ transactions = [] }) {
                     >
                         ×
                     </button>
+
                 </div>
             )}
 
+            {/* =============================================
+                TRANSACTION TABLE
+            ============================================= */}
+
             <div className="table-wrapper" ref={tableRef}>
+
                 <table className="transaction-table">
+
                     <thead>
                         <tr>
                             <th scope="col">Transaction</th>
@@ -425,7 +603,9 @@ function TransactionTable({ transactions = [] }) {
                     </thead>
 
                     <tbody>
+
                         {paginatedTransactions.length === 0 ? (
+
                             <tr>
                                 <td colSpan={6}>
                                     <div className="empty-state">
@@ -435,50 +615,68 @@ function TransactionTable({ transactions = [] }) {
                                     </div>
                                 </td>
                             </tr>
+
                         ) : (
+
                             paginatedTransactions.map((tx, index) => {
+
                                 const incoming =
                                     Boolean(user?.email) &&
                                     tx.receiverEmail === user.email;
 
                                 const timestamp = getTimestamp(tx);
+
                                 const status = String(
                                     tx.status || "UNKNOWN"
                                 ).toUpperCase();
 
                                 const rowKey = getTransactionKey(tx, index);
+
                                 const counterpartyEmail =
                                     getCounterpartyEmail(tx);
 
                                 return (
+
                                     <tr key={rowKey}>
+
+                                        {/* TRANSACTION ID */}
+
                                         <td>
+
                                             <div className="nw-tx-id">
+
                                                 <span className="nw-tx-icon">
+
                                                     {incoming ? (
-                                                        <FaArrowDown
-                                                            aria-hidden="true"
-                                                        />
+                                                        <FaArrowDown aria-hidden="true" />
                                                     ) : (
-                                                        <FaArrowUp
-                                                            aria-hidden="true"
-                                                        />
+                                                        <FaArrowUp aria-hidden="true" />
                                                     )}
+
                                                 </span>
 
                                                 <div className="nw-tx-id-text">
+
                                                     <strong>
                                                         {tx.transactionId != null
                                                             ? `#${tx.transactionId}`
                                                             : "Transaction"}
                                                     </strong>
+
                                                     <span>Wallet transfer</span>
+
                                                 </div>
+
                                             </div>
+
                                         </td>
 
+                                        {/* COUNTERPARTY */}
+
                                         <td>
+
                                             <div className="user-cell">
+
                                                 <div
                                                     className={`user-avatar ${
                                                         incoming
@@ -487,13 +685,12 @@ function TransactionTable({ transactions = [] }) {
                                                     }`}
                                                 >
                                                     {getInitials(
-                                                        incoming
-                                                            ? tx.senderEmail
-                                                            : tx.receiverEmail
+                                                        counterpartyEmail
                                                     )}
                                                 </div>
 
                                                 <div className="user-info">
+
                                                     <span className="user-name">
                                                         {getDisplayName(
                                                             counterpartyEmail
@@ -504,12 +701,19 @@ function TransactionTable({ transactions = [] }) {
                                                         {counterpartyEmail ||
                                                             "Contact unavailable"}
                                                     </span>
+
                                                 </div>
+
                                             </div>
+
                                         </td>
 
+                                        {/* DATE */}
+
                                         <td>
+
                                             <div className="transaction-date">
+
                                                 <span>
                                                     {timestamp
                                                         ? new Date(
@@ -538,10 +742,15 @@ function TransactionTable({ transactions = [] }) {
                                                           )
                                                         : ""}
                                                 </small>
+
                                             </div>
+
                                         </td>
 
+                                        {/* AMOUNT */}
+
                                         <td>
+
                                             <div
                                                 className={
                                                     incoming
@@ -549,14 +758,21 @@ function TransactionTable({ transactions = [] }) {
                                                         : "amount-debit"
                                                 }
                                             >
+
                                                 <span className="amount-sign">
                                                     {incoming ? "+" : "-"}
                                                 </span>
+
                                                 {formatCurrency(tx.amount)}
+
                                             </div>
+
                                         </td>
 
+                                        {/* STATUS */}
+
                                         <td>
+
                                             <span
                                                 className={`status ${getStatusClass(
                                                     status
@@ -565,9 +781,13 @@ function TransactionTable({ transactions = [] }) {
                                                 {getStatusIcon(status)}
                                                 {status}
                                             </span>
+
                                         </td>
 
+                                        {/* ACTION MENU */}
+
                                         <td>
+
                                             <div
                                                 className="transaction-action-menu"
                                                 ref={
@@ -576,6 +796,7 @@ function TransactionTable({ transactions = [] }) {
                                                         : null
                                                 }
                                             >
+
                                                 <button
                                                     type="button"
                                                     className="action-btn"
@@ -599,10 +820,12 @@ function TransactionTable({ transactions = [] }) {
                                                 </button>
 
                                                 {openMenuId === rowKey && (
+
                                                     <div
                                                         className="transaction-action-dropdown"
                                                         role="menu"
                                                     >
+
                                                         <button
                                                             type="button"
                                                             role="menuitem"
@@ -631,6 +854,25 @@ function TransactionTable({ transactions = [] }) {
                                                             Copy email
                                                         </button>
 
+                                                        {/* AI FRAUD ANALYSIS */}
+
+                                                        <button
+                                                            type="button"
+                                                            role="menuitem"
+                                                            disabled={
+                                                                !tx.transactionId ||
+                                                                fraudLoading
+                                                            }
+                                                            onClick={() =>
+                                                                handleFraudAnalysis(tx)
+                                                            }
+                                                        >
+                                                            <FaShieldHalved
+                                                                aria-hidden="true"
+                                                            />
+                                                            Analyze Fraud Risk
+                                                        </button>
+
                                                         <button
                                                             type="button"
                                                             role="menuitem"
@@ -643,25 +885,306 @@ function TransactionTable({ transactions = [] }) {
                                                             <FaFileCsv />
                                                             Export transaction
                                                         </button>
+
                                                     </div>
+
                                                 )}
+
                                             </div>
+
                                         </td>
+
                                     </tr>
+
                                 );
                             })
+
                         )}
+
                     </tbody>
+
                 </table>
+
             </div>
 
+            {/* =============================================
+                AI FRAUD ANALYSIS MODAL
+            ============================================= */}
+
+            {fraudTransaction && (
+
+                <div
+                    className="fraud-modal-overlay"
+                    role="presentation"
+                    onMouseDown={(event) => {
+                        if (
+                            event.target === event.currentTarget &&
+                            !fraudLoading
+                        ) {
+                            closeFraudModal();
+                        }
+                    }}
+                >
+
+                    <section
+                        className="fraud-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="fraud-modal-title"
+                    >
+
+                        {/* MODAL HEADER */}
+
+                        <header className="fraud-modal-header">
+
+                            <div>
+
+                                <h3 id="fraud-modal-title">
+                                    <FaShieldHalved aria-hidden="true" />
+                                    AI Fraud Risk Analysis
+                                </h3>
+
+                                <p>
+                                    Transaction #
+                                    {fraudTransaction.transactionId}
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                aria-label="Close fraud analysis"
+                                disabled={fraudLoading}
+                                onClick={closeFraudModal}
+                            >
+                                ×
+                            </button>
+
+                        </header>
+
+                        {/* MODAL BODY */}
+
+                        <div className="fraud-modal-body">
+
+                            {/* LOADING */}
+
+                            {fraudLoading && (
+
+                                <div className="fraud-loading">
+
+                                    <FaSpinner className="fraud-spinner" />
+
+                                    <p>
+                                        Analyzing transaction risk...
+                                    </p>
+
+                                    <small>
+                                        Fetching the backend fraud assessment.
+                                    </small>
+
+                                </div>
+
+                            )}
+
+                            {/* ERROR */}
+
+                            {!fraudLoading && fraudError && (
+
+                                <div
+                                    className="fraud-error"
+                                    role="alert"
+                                >
+
+                                    <strong>
+                                        Analysis unavailable
+                                    </strong>
+
+                                    <p>{fraudError}</p>
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            handleFraudAnalysis(
+                                                fraudTransaction
+                                            )
+                                        }
+                                    >
+                                        Try Again
+                                    </button>
+
+                                </div>
+
+                            )}
+
+                            {/* FRAUD RESULT */}
+
+                            {!fraudLoading && fraudResult && (
+
+                                <>
+
+                                    {/* RISK SUMMARY */}
+
+                                    <div className="fraud-risk-summary">
+
+                                        <div className="fraud-risk-heading">
+                                            <span>Risk Level</span>
+
+                                            <strong
+                                                className={`fraud-risk-level ${
+                                                    String(
+                                                        fraudResult.riskLevel ||
+                                                        "UNKNOWN"
+                                                    ).toLowerCase()
+                                                }`}
+                                            >
+                                                {fraudResult.riskLevel ||
+                                                    "UNKNOWN"}
+                                            </strong>
+                                        </div>
+
+                                        <div className="fraud-risk-score">
+
+                                            <strong>
+                                                {fraudResult.riskScore ?? "N/A"}
+                                            </strong>
+
+                                            <span>Risk Score</span>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* REASON */}
+
+                                    <div className="fraud-detail-section">
+
+                                        <h4>Assessment</h4>
+
+                                        <p>
+                                            {fraudResult.reason ||
+                                                "No assessment details provided."}
+                                        </p>
+
+                                    </div>
+
+                                    {/* RECOMMENDATION */}
+
+                                    <div className="fraud-detail-section">
+
+                                        <h4>Recommendation</h4>
+
+                                        <p>
+                                            {fraudResult.recommendation ||
+                                                "No recommendation provided."}
+                                        </p>
+
+                                    </div>
+
+                                    {/* RISK FACTORS */}
+
+                                    <div className="fraud-detail-section">
+
+                                        <h4>Risk Factors</h4>
+
+                                        {Array.isArray(
+                                            fraudResult.riskFactors
+                                        ) &&
+                                        fraudResult.riskFactors.length > 0 ? (
+
+                                            <ul>
+                                                {fraudResult.riskFactors.map(
+                                                    (factor, index) => (
+                                                        <li
+                                                            key={`${index}-${factor}`}
+                                                        >
+                                                            {factor}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ul>
+
+                                        ) : (
+
+                                            <p>
+                                                No risk factors reported.
+                                            </p>
+
+                                        )}
+
+                                    </div>
+
+                                    {/* GEMINI AI ANALYSIS */}
+
+                                    {fraudResult.aiAnalysis && (
+
+                                        <div className="fraud-detail-section">
+
+                                            <h4>
+                                                Gemini AI Analysis
+                                            </h4>
+
+                                            <p>
+                                                {fraudResult.aiAnalysis.analysis}
+                                            </p>
+
+                                            {fraudResult.aiAnalysis.recommendation && (
+
+                                                <p>
+                                                    <strong>
+                                                        AI Recommendation:{" "}
+                                                    </strong>
+
+                                                    {fraudResult.aiAnalysis.recommendation}
+                                                </p>
+
+                                            )}
+
+                                            {Array.isArray(
+                                                fraudResult.aiAnalysis.observations
+                                            ) &&
+                                            fraudResult.aiAnalysis.observations.length > 0 && (
+
+                                                <ul>
+                                                    {fraudResult.aiAnalysis.observations.map(
+                                                        (observation, index) => (
+                                                            <li key={index}>
+                                                                {observation}
+                                                            </li>
+                                                        )
+                                                    )}
+                                                </ul>
+
+                                            )}
+
+                                        </div>
+
+                                    )}
+
+                                </>
+
+                            )}
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+            )}
+
+            {/* =============================================
+                PAGINATION
+            ============================================= */}
+
             <footer className="transaction-pagination">
+
                 <span className="pagination-info">
                     Page <strong>{safePage}</strong> of{" "}
                     <strong>{totalPages}</strong>
                 </span>
 
                 <div className="pagination-controls">
+
                     <button
                         type="button"
                         className="pagination-btn"
@@ -685,8 +1208,11 @@ function TransactionTable({ transactions = [] }) {
                         Next
                         <FaArrowRight />
                     </button>
+
                 </div>
+
             </footer>
+
         </section>
     );
 }

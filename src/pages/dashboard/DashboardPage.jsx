@@ -9,10 +9,6 @@ import {
     FaTriangleExclamation,
     FaChartLine,
     FaShieldHeart,
-    FaReceipt,
-    FaCircleCheck,
-    FaClock,
-    FaCircleXmark,
     FaArrowRotateRight,
 } from "react-icons/fa6";
 
@@ -38,6 +34,7 @@ import "../../styles/loading.css";
 import IncomeExpenseComparison from "../../components/dashboard/Analytics/IncomeExpenseComparison";
 import SpendingCategoryChart from "../../components/dashboard/Analytics/SpendingCategoryChart";
 import CashFlowChart from "../../components/dashboard/Analytics/CashFlowChart";
+import CashFlowInsights from "../../components/dashboard/Analytics/CashFlowInsights";
 
 // =============================================
 // AI COMPONENTS
@@ -65,6 +62,7 @@ import FinancialHealth from "../../components/dashboard/health/FinancialHealth";
 
 import DashboardHero from "../../components/dashboard/layout/DashboardHero";
 import DashboardSkeleton from "../../components/dashboard/common/DashboardSkeleton";
+import TransactionRiskMonitor from "../../components/dashboard/security/TransactionRiskMonitor";
 
 // =============================================
 // AI HOOK
@@ -73,45 +71,9 @@ import DashboardSkeleton from "../../components/dashboard/common/DashboardSkelet
 import useAI from "../../hooks/useAI";
 
 // =============================================
-// HELPERS
-// =============================================
-
-const currencyFormatter = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-});
-
-function formatCurrency(value) {
-    const amount = Number(value);
-
-    if (!Number.isFinite(amount)) {
-        return "₹0";
-    }
-
-    return currencyFormatter.format(amount);
-}
-
-function getTransactionTimestamp(transaction) {
-    const value =
-        transaction?.timestamp ||
-        transaction?.createdAt ||
-        transaction?.date;
-
-    const timestamp = new Date(value).getTime();
-
-    return Number.isFinite(timestamp) ? timestamp : 0;
-}
-
-// =============================================
 // DASHBOARD PAGE
 // =============================================
-
 function DashboardPage() {
-
-    // =========================================
-    // DASHBOARD STATE
-    // =========================================
 
     const [wallet, setWallet] = useState(null);
     const [transactions, setTransactions] = useState([]);
@@ -157,17 +119,11 @@ function DashboardPage() {
                 insightsResult,
             ] = results;
 
-            // -------------------------------------
-            // WALLET DATA
-            // -------------------------------------
-
             if (walletResult.status === "fulfilled") {
 
                 setWallet(walletResult.value);
 
             } else {
-
-                setWallet(null);
 
                 console.error(
                     "Wallet API failed:",
@@ -175,10 +131,6 @@ function DashboardPage() {
                 );
 
             }
-
-            // -------------------------------------
-            // TRANSACTION DATA
-            // -------------------------------------
 
             if (transactionsResult.status === "fulfilled") {
 
@@ -196,8 +148,6 @@ function DashboardPage() {
 
             } else {
 
-                setTransactions([]);
-
                 console.error(
                     "Transaction API failed:",
                     transactionsResult.reason
@@ -205,17 +155,11 @@ function DashboardPage() {
 
             }
 
-            // -------------------------------------
-            // DASHBOARD INSIGHTS
-            // -------------------------------------
-
             if (insightsResult.status === "fulfilled") {
 
                 setDashboardInsights(insightsResult.value);
 
             } else {
-
-                setDashboardInsights(null);
 
                 console.error(
                     "Dashboard insights API failed:",
@@ -223,10 +167,6 @@ function DashboardPage() {
                 );
 
             }
-
-            // -------------------------------------
-            // PARTIAL / COMPLETE API FAILURE
-            // -------------------------------------
 
             const failedResults = results.filter(
                 (result) => result.status === "rejected"
@@ -246,7 +186,14 @@ function DashboardPage() {
 
             }
 
-            sessionStorage.removeItem("dashboardRefresh");
+            try {
+                sessionStorage.removeItem("dashboardRefresh");
+            } catch (storageError) {
+                console.warn(
+                    "Could not clear dashboard refresh flag:",
+                    storageError
+                );
+            }
 
         } catch (err) {
 
@@ -313,26 +260,6 @@ function DashboardPage() {
         });
 
         return summary;
-
-    }, [transactions]);
-
-    // =========================================
-    // LATEST TRANSACTION DATE
-    // =========================================
-
-    const latestTransactionDate = useMemo(() => {
-
-        if (transactions.length === 0) {
-            return null;
-        }
-
-        const latestTimestamp = Math.max(
-            ...transactions.map(getTransactionTimestamp)
-        );
-
-        return latestTimestamp > 0
-            ? new Date(latestTimestamp)
-            : null;
 
     }, [transactions]);
 
@@ -456,15 +383,11 @@ function DashboardPage() {
 
             <section className="nw-dashboard-main-grid">
 
-                {/* =================================
-                    LEFT — MAIN DASHBOARD
-                ================================= */}
+                {/* LEFT — MAIN DASHBOARD */}
 
                 <div className="nw-dashboard-main-left">
 
-                    {/* ---------------------------------
-                        ANALYTICS
-                    --------------------------------- */}
+                    {/* ANALYTICS */}
 
                     <section className="nw-dashboard-analytics-grid">
 
@@ -486,13 +409,9 @@ function DashboardPage() {
 
                     </section>
 
-                    {/* ---------------------------------
-                        FINANCIAL HEALTH / BUDGET / GOALS
-                    --------------------------------- */}
+                    {/* FINANCIAL HEALTH / BUDGET / GOALS */}
 
                     <section className="nw-dashboard-financial-grid">
-
-                        {/* CARD 1 — FINANCIAL HEALTH */}
 
                         <article className="nw-dashboard-panel nw-dashboard-financial-card">
 
@@ -504,8 +423,6 @@ function DashboardPage() {
 
                         </article>
 
-                        {/* CARD 2 — BUDGET HEALTH */}
-
                         <article className="nw-dashboard-panel nw-dashboard-financial-card">
 
                             <BudgetHealth
@@ -514,8 +431,6 @@ function DashboardPage() {
                             />
 
                         </article>
-
-                        {/* CARD 3 — SAVINGS GOALS */}
 
                         <article className="nw-dashboard-panel nw-dashboard-financial-card">
 
@@ -528,11 +443,11 @@ function DashboardPage() {
 
                     </section>
 
-                    {/* ---------------------------------
-                        RECENT TRANSACTIONS / CASH FLOW
-                    --------------------------------- */}
+                    {/* RECENT TRANSACTIONS / CASH FLOW */}
 
                     <section className="nw-dashboard-activity-grid">
+
+                        {/* RECENT TRANSACTIONS */}
 
                         <article className="nw-dashboard-panel nw-dashboard-transactions-panel">
 
@@ -542,9 +457,19 @@ function DashboardPage() {
 
                         </article>
 
+                        {/* CASH FLOW + CASH FLOW INSIGHTS */}
+
                         <article className="nw-dashboard-panel nw-dashboard-cashflow-panel">
 
+                            {/* EXISTING CASH FLOW CHART */}
+
                             <CashFlowChart
+                                transactions={transactions}
+                            />
+
+                            {/* NEW — CASH FLOW INSIGHTS */}
+
+                            <CashFlowInsights
                                 transactions={transactions}
                             />
 
@@ -560,9 +485,7 @@ function DashboardPage() {
 
                 <aside className="nw-dashboard-ai-sidebar">
 
-                    {/* ---------------------------------
-                        NEUROWALLET AI FINANCIAL SNAPSHOT
-                    --------------------------------- */}
+                    {/* NEUROWALLET AI ADVISOR */}
 
                     <section
                         className="nw-dashboard-panel nw-dashboard-ai-panel"
@@ -736,143 +659,153 @@ function DashboardPage() {
 
                     </section>
 
-                    {/* ---------------------------------
-                        RECENT TRANSACTION ACTIVITY
-                    --------------------------------- */}
+                    {/* PAYMENT PERFORMANCE */}
 
                     <section
-                        className="nw-dashboard-panel nw-dashboard-activity-summary"
-                        aria-label="Recent transaction activity"
+                        className="nw-payment-performance"
+                        aria-label="Payment performance monitor"
                     >
 
-                        <header className="nw-dashboard-summary-heading">
+                        <div className="nw-payment-performance-header">
 
                             <div>
 
-                                <h2>Recent Activity</h2>
+                                <span className="nw-payment-performance-eyebrow">
+                                    PAYMENT INTELLIGENCE
+                                </span>
 
-                                <p>
+                                <h3>Payment Performance</h3>
 
-                                    {latestTransactionDate
-                                        ? `Latest: ${latestTransactionDate.toLocaleDateString(
-                                            "en-IN",
-                                            {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            }
-                                        )}`
-                                        : "Your wallet activity"}
-
-                                </p>
+                                <p>Transaction reliability overview</p>
 
                             </div>
 
-                            <span className="nw-dashboard-summary-icon">
+                            <span className="nw-payment-performance-icon">
 
-                                <FaReceipt aria-hidden="true" />
+                                <FaShieldHeart aria-hidden="true" />
 
                             </span>
 
-                        </header>
+                        </div>
 
-                        {/* TOTAL TRANSACTIONS */}
+                        <div className="nw-payment-success-overview">
 
-                        <div className="nw-dashboard-activity-total">
+                            <div>
 
-                            <strong>{activitySummary.total}</strong>
+                                <span className="nw-payment-success-label">
+                                    Payment success rate
+                                </span>
 
-                            <span>Loaded transactions</span>
+                                <strong>
+                                    {activitySummary.total > 0
+                                        ? `${(
+                                            (activitySummary.successful /
+                                                activitySummary.total) * 100
+                                        ).toFixed(1)}%`
+                                        : "—"}
+                                </strong>
+
+                            </div>
+
+                            <span className="nw-payment-success-caption">
+
+                                {activitySummary.successful} successful out of{" "}
+                                {activitySummary.total} loaded transactions
+
+                            </span>
 
                         </div>
 
-                        {/* TRANSACTION STATUS */}
+                        <div
+                            className="nw-payment-progress-track"
+                            role="progressbar"
+                            aria-label="Payment success rate"
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-valuenow={
+                                activitySummary.total > 0
+                                    ? Number((
+                                        activitySummary.successful /
+                                        activitySummary.total * 100
+                                    ).toFixed(1))
+                                    : 0
+                            }
+                        >
 
-                        <div className="nw-dashboard-activity-stats">
+                            <span
+                                className="nw-payment-progress-success"
+                                style={{
+                                    width: activitySummary.total > 0
+                                        ? `${(
+                                            (activitySummary.successful /
+                                                activitySummary.total) * 100
+                                        )}%`
+                                        : "0%",
+                                }}
+                            />
 
-                            {/* SUCCESSFUL */}
+                        </div>
 
-                            <div className="nw-activity-stat">
+                        <div className="nw-payment-performance-stats">
 
-                                <span className="nw-activity-stat-icon is-success">
+                            <div className="nw-payment-performance-stat">
 
-                                    <FaCircleCheck aria-hidden="true" />
-
-                                </span>
+                                <span className="nw-payment-stat-dot success" />
 
                                 <div>
-
-                                    <strong>
-                                        {activitySummary.successful}
-                                    </strong>
-
+                                    <strong>{activitySummary.successful}</strong>
                                     <span>Successful</span>
-
                                 </div>
 
                             </div>
 
-                            {/* PENDING */}
+                            <div className="nw-payment-performance-stat">
 
-                            <div className="nw-activity-stat">
-
-                                <span className="nw-activity-stat-icon is-pending">
-
-                                    <FaClock aria-hidden="true" />
-
-                                </span>
+                                <span className="nw-payment-stat-dot pending" />
 
                                 <div>
-
-                                    <strong>
-                                        {activitySummary.pending}
-                                    </strong>
-
+                                    <strong>{activitySummary.pending}</strong>
                                     <span>Pending</span>
-
                                 </div>
 
                             </div>
 
-                            {/* FAILED */}
+                            <div className="nw-payment-performance-stat">
 
-                            <div className="nw-activity-stat">
-
-                                <span className="nw-activity-stat-icon is-failed">
-
-                                    <FaCircleXmark aria-hidden="true" />
-
-                                </span>
+                                <span className="nw-payment-stat-dot failed" />
 
                                 <div>
-
-                                    <strong>
-                                        {activitySummary.failed}
-                                    </strong>
-
+                                    <strong>{activitySummary.failed}</strong>
                                     <span>Failed</span>
-
                                 </div>
 
                             </div>
 
                         </div>
 
-                        <p className="nw-dashboard-activity-note">
+                        <div className="nw-payment-performance-footer">
 
-                            Based on the transactions currently loaded.
+                            <FaShieldHeart aria-hidden="true" />
 
-                        </p>
+                            <span>
+                                Based on the currently loaded transaction records
+                            </span>
+
+                        </div>
 
                     </section>
+
+                    {/* TRANSACTION RISK MONITOR */}
+
+                    <TransactionRiskMonitor
+                        transactions={transactions}
+                    />
 
                 </aside>
 
             </section>
 
-            {/* =================================
-                PARTIAL API FAILURE NOTICE
-            ================================= */}
+            {/* PARTIAL API FAILURE NOTICE */}
 
             {partialError && (
 
@@ -886,6 +819,7 @@ function DashboardPage() {
                     <button
                         type="button"
                         onClick={fetchDashboardData}
+                        disabled={loading}
                     >
 
                         Refresh

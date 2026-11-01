@@ -49,6 +49,7 @@ function getTransactionDate(transaction) {
   if (!value) return null;
 
   const date = new Date(value);
+
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
@@ -65,10 +66,11 @@ function CashFlowChart({ transactions = [] }) {
     successfulCount,
   } = useMemo(() => {
     const now = new Date();
+
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    // Build the last six calendar months, including year boundaries.
+    // Six calendar months, including year boundaries.
     const months = Array.from({ length: 6 }, (_, index) => {
       const date = new Date(
         currentYear,
@@ -85,11 +87,11 @@ function CashFlowChart({ transactions = [] }) {
       };
     });
 
-    let income = 0;
-    let expense = 0;
-    let thisMonthNet = 0;
-    let lastMonthNet = 0;
-    let count = 0;
+    const firstMonth = new Date(
+      currentYear,
+      currentMonth - 5,
+      1
+    );
 
     const previousMonthDate = new Date(
       currentYear,
@@ -97,27 +99,61 @@ function CashFlowChart({ transactions = [] }) {
       1
     );
 
+    let income = 0;
+    let expense = 0;
+    let thisMonthNet = 0;
+    let lastMonthNet = 0;
+    let count = 0;
+
+    const userEmail = String(user.email || "")
+      .trim()
+      .toLowerCase();
+
+    if (!userEmail) {
+      return {
+        monthlyData: months,
+        totalIncome: 0,
+        totalExpense: 0,
+        netCashFlow: 0,
+        currentNet: 0,
+        previousNet: 0,
+        successfulCount: 0,
+      };
+    }
+
     transactions.forEach((transaction) => {
-      if (transaction.status !== "SUCCESS") return;
+      const status = String(transaction.status || "")
+        .trim()
+        .toUpperCase();
+
+      if (status !== "SUCCESS") return;
 
       const amount = Number(transaction.amount);
-      if (!Number.isFinite(amount)) return;
+
+      if (!Number.isFinite(amount) || amount <= 0) return;
 
       const date = getTransactionDate(transaction);
-      if (!date) return;
+
+      if (!date || date < firstMonth || date > now) return;
+
+      const senderEmail = String(
+        transaction.senderEmail || ""
+      ).trim().toLowerCase();
+
+      const receiverEmail = String(
+        transaction.receiverEmail || ""
+      ).trim().toLowerCase();
+
+      const isIncoming = receiverEmail === userEmail;
+      const isOutgoing = senderEmail === userEmail;
+
+      // Ignore transactions that do not belong to this user.
+      if (!isIncoming && !isOutgoing) return;
+
+      // Avoid counting self-transfers twice.
+      if (isIncoming && isOutgoing) return;
 
       count += 1;
-
-      const isIncoming =
-        Boolean(user.email) &&
-        transaction.receiverEmail === user.email;
-
-      const isOutgoing =
-        Boolean(user.email) &&
-        transaction.senderEmail === user.email;
-
-      // Only count transactions involving the logged-in user.
-      if (!isIncoming && !isOutgoing) return;
 
       const transactionMonth = date.getMonth();
       const transactionYear = date.getFullYear();
@@ -128,10 +164,7 @@ function CashFlowChart({ transactions = [] }) {
           item.year === transactionYear
       );
 
-      if (chartMonth) {
-        if (isIncoming) chartMonth.income += amount;
-        if (isOutgoing) chartMonth.expense += amount;
-      }
+      if (!chartMonth) return;
 
       const isCurrentMonth =
         transactionMonth === currentMonth &&
@@ -142,6 +175,7 @@ function CashFlowChart({ transactions = [] }) {
         transactionYear === previousMonthDate.getFullYear();
 
       if (isIncoming) {
+        chartMonth.income += amount;
         income += amount;
 
         if (isCurrentMonth) thisMonthNet += amount;
@@ -149,6 +183,7 @@ function CashFlowChart({ transactions = [] }) {
       }
 
       if (isOutgoing) {
+        chartMonth.expense += amount;
         expense += amount;
 
         if (isCurrentMonth) thisMonthNet -= amount;
@@ -191,6 +226,7 @@ function CashFlowChart({ transactions = [] }) {
 
   return (
     <section className="chart-card cashflow-card">
+      {/* Header */}
       <div className="chart-card-header">
         <div className="chart-card-title">
           <div className="chart-card-icon cashflow-icon">
@@ -216,74 +252,92 @@ function CashFlowChart({ transactions = [] }) {
         </span>
       </div>
 
-      <div className="analytics-main-value">
-        {formatCurrency(netCashFlow)}
+      {/* Main balance */}
+      <div className="cashflow-main">
+        <div className="analytics-main-value">
+          {formatCurrency(netCashFlow)}
+        </div>
+
+        <p className="analytics-main-subtitle">
+          Six-month net cash flow
+        </p>
       </div>
 
-      <p className="analytics-main-subtitle">
-        Net cash flow ·{" "}
-        {growthPercentage === null
-          ? "No previous-month baseline"
-          : `${growthPercentage >= 0 ? "↑" : "↓"} ${Math.abs(
-              growthPercentage
-            ).toFixed(1)}% vs last month`}
-      </p>
-
+      {/* Income and expense summary */}
       <div className="cashflow-summary">
         <div className="cashflow-summary-item">
           <span className="cashflow-dot income-dot" />
+
           <div>
-            <span className="cashflow-summary-label">Total income</span>
+            <span className="cashflow-summary-label">
+              Total income
+            </span>
+
             <strong>{formatCurrency(totalIncome)}</strong>
           </div>
         </div>
 
         <div className="cashflow-summary-item">
           <span className="cashflow-dot expense-dot" />
+
           <div>
-            <span className="cashflow-summary-label">Total expenses</span>
+            <span className="cashflow-summary-label">
+              Total expenses
+            </span>
+
             <strong>{formatCurrency(totalExpense)}</strong>
           </div>
         </div>
       </div>
 
+      {/* Monthly chart */}
       <div className="premium-chart cashflow-chart">
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={monthlyData}
-            margin={{ top: 10, right: 8, left: 4, bottom: 0 }}
+            margin={{
+              top: 8,
+              right: 8,
+              left: 0,
+              bottom: 2,
+            }}
           >
             <CartesianGrid
               strokeDasharray="3 5"
-              stroke="#24324d"
+              stroke="#243a53"
               vertical={false}
             />
 
             <XAxis
               dataKey="month"
-              stroke="#8290aa"
-              tick={{ fill: "#8290aa", fontSize: 11 }}
+              stroke="#8298b5"
+              tick={{ fill: "#91a8c5", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
+              interval={0}
             />
 
             <YAxis
-              stroke="#8290aa"
-              tick={{ fill: "#8290aa", fontSize: 10 }}
+              stroke="#8298b5"
+              tick={{ fill: "#91a8c5", fontSize: 10 }}
               tickFormatter={formatAxisValue}
               tickLine={false}
               axisLine={false}
-              width={55}
+              width={54}
             />
 
             <Tooltip
-              cursor={{ stroke: "#536581", strokeDasharray: "4 4" }}
+              cursor={{
+                stroke: "#536581",
+                strokeDasharray: "4 4",
+              }}
               formatter={(value, name) => [
                 formatCurrency(value),
                 name,
               ]}
               labelFormatter={(label, payload) => {
                 const year = payload?.[0]?.payload?.year;
+
                 return year ? `${label} ${year}` : label;
               }}
               contentStyle={{
@@ -303,7 +357,7 @@ function CashFlowChart({ transactions = [] }) {
               wrapperStyle={{
                 color: "#aab7cc",
                 fontSize: "11px",
-                paddingTop: "8px",
+                paddingTop: "7px",
               }}
             />
 
@@ -311,13 +365,13 @@ function CashFlowChart({ transactions = [] }) {
               type="monotone"
               dataKey="income"
               name="Income"
-              stroke="#22c55e"
+              stroke="#13d6a0"
               strokeWidth={2.5}
               dot={false}
               activeDot={{
                 r: 4,
                 strokeWidth: 0,
-                fill: "#22c55e",
+                fill: "#13d6a0",
               }}
               connectNulls
             />
@@ -326,13 +380,13 @@ function CashFlowChart({ transactions = [] }) {
               type="monotone"
               dataKey="expense"
               name="Expense"
-              stroke="#f87171"
+              stroke="#ff657b"
               strokeWidth={2.5}
               dot={false}
               activeDot={{
                 r: 4,
                 strokeWidth: 0,
-                fill: "#f87171",
+                fill: "#ff657b",
               }}
               connectNulls
             />
@@ -340,17 +394,22 @@ function CashFlowChart({ transactions = [] }) {
         </ResponsiveContainer>
       </div>
 
+      {/* Footer */}
       <div className="analytics-footer">
         <div className="analytics-footer-left">
           <FaArrowUpRightFromSquare />
-          <span>{successfulCount} successful transactions</span>
+          <span>
+            {successfulCount} successful transactions
+          </span>
         </div>
 
         <span className="analytics-updated">
-          Updated {new Date().toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          Previous month comparison:{" "}
+          {growthPercentage === null
+            ? "Unavailable"
+            : `${growthPercentage >= 0 ? "+" : "-"}${Math.abs(
+                growthPercentage
+              ).toFixed(1)}%`}
         </span>
       </div>
     </section>

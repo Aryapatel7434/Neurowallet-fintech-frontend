@@ -45,14 +45,20 @@ export const API_ENDPOINTS = {
     MARK_ALL_NOTIFICATIONS_READ: "/notifications/read-all",
 
     // =========================================================
-    // AI FINANCIAL INTELLIGENCE
-    // =========================================================
+// AI FINANCIAL INTELLIGENCE
+// =========================================================
 
-    AI_INSIGHTS: "/ai/insights",
-    FINANCIAL_SCORE: "/ai/financial-score",
-    BUDGET_HEALTH: "/ai/budget-health",
-    GOAL_RECOMMENDATION: "/ai/goals",
+AI_INSIGHTS: "/ai/insights",
+FINANCIAL_SCORE: "/ai/financial-score",
+BUDGET_HEALTH: "/ai/budget-health",
+GOAL_RECOMMENDATION: "/ai/goals",
 
+// Legacy single-question assistant
+AI_ASSISTANT: "/ai/assistant",
+
+// Fraud detection
+AI_FRAUD: (transactionId) =>
+    `/ai/fraud/${encodeURIComponent(transactionId)}`,
     // Legacy single-question assistant
     AI_ASSISTANT: "/ai/assistant",
 

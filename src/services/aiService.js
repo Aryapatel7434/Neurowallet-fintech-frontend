@@ -22,9 +22,7 @@ const normalizeQuestion = (question) => {
             : "";
 
     if (!value) {
-        throw new Error(
-            "Please enter a financial question."
-        );
+        throw new Error("Please enter a financial question.");
     }
 
     if (value.length > MAX_QUESTION_LENGTH) {
@@ -41,9 +39,7 @@ const validateConversationId = (conversationId) => {
         typeof conversationId !== "string" ||
         !conversationId.trim()
     ) {
-        throw new Error(
-            "A valid conversation ID is required."
-        );
+        throw new Error("A valid conversation ID is required.");
     }
 
     return conversationId.trim();
@@ -56,9 +52,7 @@ const normalizeTitle = (title) => {
             : "";
 
     if (!value) {
-        throw new Error(
-            "Conversation title is required."
-        );
+        throw new Error("Conversation title is required.");
     }
 
     if (value.length > MAX_CONVERSATION_TITLE_LENGTH) {
@@ -93,7 +87,10 @@ export const getAIInsights = async () => {
 
 export const getFinancialScore = async () => {
     const response = await api.get(
-        API_ENDPOINTS.FINANCIAL_SCORE
+        API_ENDPOINTS.FINANCIAL_SCORE,
+        {
+            timeout: AI_TIMEOUT,
+        }
     );
 
     return response.data;
@@ -106,7 +103,10 @@ export const getFinancialScore = async () => {
 
 export const getBudgetHealth = async () => {
     const response = await api.get(
-        API_ENDPOINTS.BUDGET_HEALTH
+        API_ENDPOINTS.BUDGET_HEALTH,
+        {
+            timeout: AI_TIMEOUT,
+        }
     );
 
     return response.data;
@@ -119,7 +119,10 @@ export const getBudgetHealth = async () => {
 
 export const getGoalRecommendation = async () => {
     const response = await api.get(
-        API_ENDPOINTS.GOAL_RECOMMENDATION
+        API_ENDPOINTS.GOAL_RECOMMENDATION,
+        {
+            timeout: AI_TIMEOUT,
+        }
     );
 
     return response.data;
@@ -131,8 +134,7 @@ export const getGoalRecommendation = async () => {
 // =========================================================
 
 export const askAIAssistant = async (question) => {
-    const normalizedQuestion =
-        normalizeQuestion(question);
+    const normalizedQuestion = normalizeQuestion(question);
 
     const response = await api.post(
         API_ENDPOINTS.AI_ASSISTANT,
@@ -194,9 +196,7 @@ export const listAIConversations = async () => {
 // GET /api/ai/conversations/{conversationId}
 // =========================================================
 
-export const getAIConversation = async (
-    conversationId
-) => {
+export const getAIConversation = async (conversationId) => {
     const id = validateConversationId(conversationId);
 
     const response = await api.get(
@@ -239,9 +239,7 @@ export const renameAIConversation = async (
 // DELETE /api/ai/conversations/{conversationId}
 // =========================================================
 
-export const deleteAIConversation = async (
-    conversationId
-) => {
+export const deleteAIConversation = async (conversationId) => {
     const id = validateConversationId(conversationId);
 
     await api.delete(
@@ -269,6 +267,32 @@ export const sendAIConversationMessage = async (
         {
             question: normalizedQuestion,
         },
+        {
+            timeout: AI_TIMEOUT,
+        }
+    );
+
+    return response.data;
+};
+
+// =========================================================
+// AI FRAUD DETECTION
+// GET /api/ai/fraud/{transactionId}
+// =========================================================
+
+export const getTransactionFraudAnalysis = async (
+    transactionId
+) => {
+    const id = Number(transactionId);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        throw new Error(
+            "A valid transaction ID is required."
+        );
+    }
+
+    const response = await api.get(
+        API_ENDPOINTS.AI_FRAUD(id),
         {
             timeout: AI_TIMEOUT,
         }

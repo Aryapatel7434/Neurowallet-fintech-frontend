@@ -1,11 +1,18 @@
 
 /* =========================================================
    NEUROWALLET — RECENT TRANSACTIONS
-   Professional dark fintech dashboard
+   Enterprise FinTech Dashboard
+   Dark Navy / Blue Theme
+   ========================================================= */
+
+/* =========================================================
+   BASE
    ========================================================= */
 
 .nw-transaction-reference,
-.nw-transaction-reference * {
+.nw-transaction-reference *,
+.fraud-modal-overlay,
+.fraud-modal-overlay * {
     box-sizing: border-box;
 }
 
@@ -21,7 +28,9 @@
     border-radius: 16px;
 }
 
-/* -------------------- Header -------------------- */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .nw-transaction-reference .transaction-header {
     display: flex;
@@ -82,10 +91,15 @@
     border: 1px solid #29415d;
 }
 
-.nw-transaction-reference .export-btn:hover {
+.nw-transaction-reference .export-btn:hover:not(:disabled) {
     color: #fff;
     background: #183653;
     border-color: #347cff;
+}
+
+.nw-transaction-reference .export-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .nw-transaction-reference .view-btn {
@@ -99,7 +113,9 @@
     background: rgba(52, 124, 255, 0.1);
 }
 
-/* -------------------- Toolbar -------------------- */
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
 
 .nw-transaction-reference .transaction-toolbar {
     display: flex;
@@ -211,7 +227,9 @@
     font-weight: 750;
 }
 
-/* -------------------- Table container -------------------- */
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
 
 .nw-transaction-reference .table-wrapper {
     width: 100%;
@@ -238,7 +256,9 @@
     border-radius: 10px;
 }
 
-/* -------------------- Table structure -------------------- */
+/* =========================================================
+   TABLE STRUCTURE
+   ========================================================= */
 
 .nw-transaction-reference .transaction-table {
     width: 100%;
@@ -286,7 +306,7 @@
     border-bottom: 0;
 }
 
-/* Column sizing — fixes the original 60px first column */
+/* Column sizing */
 
 .nw-transaction-reference .transaction-table th:nth-child(1),
 .nw-transaction-reference .transaction-table td:nth-child(1) {
@@ -324,7 +344,9 @@
     white-space: nowrap;
 }
 
-/* -------------------- Transaction identity -------------------- */
+/* =========================================================
+   TRANSACTION IDENTITY
+   ========================================================= */
 
 .nw-transaction-reference .nw-tx-id {
     display: flex;
@@ -367,7 +389,9 @@
     line-height: 1.35;
 }
 
-/* -------------------- Recipient / sender -------------------- */
+/* =========================================================
+   RECIPIENT / SENDER
+   ========================================================= */
 
 .nw-transaction-reference .user-cell {
     display: flex;
@@ -429,7 +453,9 @@
     white-space: nowrap;
 }
 
-/* -------------------- Date -------------------- */
+/* =========================================================
+   DATE
+   ========================================================= */
 
 .nw-transaction-reference .transaction-date {
     display: flex;
@@ -451,7 +477,9 @@
     white-space: nowrap;
 }
 
-/* -------------------- Amount -------------------- */
+/* =========================================================
+   AMOUNT
+   ========================================================= */
 
 .nw-transaction-reference .amount-credit,
 .nw-transaction-reference .amount-debit {
@@ -478,7 +506,9 @@
     font-weight: 750;
 }
 
-/* -------------------- Status -------------------- */
+/* =========================================================
+   STATUS
+   ========================================================= */
 
 .nw-transaction-reference .status {
     display: inline-flex;
@@ -512,193 +542,9 @@
     background: rgba(245, 158, 11, 0.13);
 }
 
-/* -------------------- Actions -------------------- */
-
-.nw-transaction-reference .action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    color: #91a6c2;
-    background: transparent;
-    border: 0;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: color 0.2s ease, background 0.2s ease;
-}
-
-.nw-transaction-reference .action-btn:hover {
-    color: #fff;
-    background: #1b3450;
-}
-
-.nw-transaction-reference .action-btn:focus-visible,
-.nw-transaction-reference button:focus-visible,
-.nw-transaction-reference input:focus-visible,
-.nw-transaction-reference select:focus-visible {
-    outline: 2px solid #60a5fa;
-    outline-offset: 2px;
-}
-
-/* -------------------- Empty state -------------------- */
-
-.nw-transaction-reference .empty-state {
-    padding: 35px 15px;
-    color: #9fb2cc;
-    font-size: 13px;
-    text-align: center;
-}
-
-/* -------------------- Accessibility -------------------- */
-
-.nw-transaction-reference .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* -------------------- Tablet -------------------- */
-
-@media (max-width: 1100px) {
-    .nw-transaction-reference {
-        padding: 15px;
-    }
-
-    .nw-transaction-reference .transaction-header {
-        align-items: flex-start;
-    }
-
-    .nw-transaction-reference .transaction-toolbar {
-        align-items: stretch;
-    }
-
-    .nw-transaction-reference .toolbar-left {
-        flex-basis: 100%;
-    }
-
-    .nw-transaction-reference .toolbar-right {
-        justify-content: flex-start;
-    }
-}
-
-/* -------------------- Mobile -------------------- */
-
-@media (max-width: 768px) {
-    .nw-transaction-reference {
-        padding: 13px;
-    }
-
-    .nw-transaction-reference .transaction-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .nw-transaction-reference .transaction-header-actions {
-        justify-content: flex-start;
-    }
-
-    .nw-transaction-reference .toolbar-left {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .nw-transaction-reference .transaction-toolbar .search-wrapper,
-    .nw-transaction-reference .transaction-toolbar .status-filter,
-    .nw-transaction-reference .transaction-toolbar .sort-filter {
-        width: 100%;
-        max-width: none;
-    }
-
-    .nw-transaction-reference .toolbar-right {
-        justify-content: flex-start;
-    }
-
-    .nw-transaction-reference .transaction-table {
-        min-width: 760px;
-    }
-}
-
-@media (max-width: 480px) {
-    .nw-transaction-reference {
-        padding: 11px;
-        border-radius: 12px;
-    }
-
-    .nw-transaction-reference .transaction-title h2 {
-        font-size: 17px;
-    }
-
-    .nw-transaction-reference .transaction-header-actions {
-        width: 100%;
-    }
-
-    .nw-transaction-reference .export-btn,
-    .nw-transaction-reference .view-btn {
-        min-height: 35px;
-    }
-}
-
-/* -------------------- Reduced motion -------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-    .nw-transaction-reference *,
-    .nw-transaction-reference *::before,
-    .nw-transaction-reference *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-    }
-}
-
 /* =========================================================
-   NEUROWALLET — PAGINATION & TRANSACTION ACTION MENU
+   ACTION MENU
    ========================================================= */
-
-/* Keep the table readable */
-.nw-transaction-reference .transaction-table {
-    min-width: 760px;
-    table-layout: fixed;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(1),
-.nw-transaction-reference .transaction-table td:nth-child(1) {
-    width: 155px;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(2),
-.nw-transaction-reference .transaction-table td:nth-child(2) {
-    width: 170px;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(3),
-.nw-transaction-reference .transaction-table td:nth-child(3) {
-    width: 112px;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(4),
-.nw-transaction-reference .transaction-table td:nth-child(4) {
-    width: 130px;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(5),
-.nw-transaction-reference .transaction-table td:nth-child(5) {
-    width: 105px;
-}
-
-.nw-transaction-reference .transaction-table th:nth-child(6),
-.nw-transaction-reference .transaction-table td:nth-child(6) {
-    width: 45px;
-}
-
-/* -------------------- Action dropdown -------------------- */
 
 .nw-transaction-reference .transaction-action-menu {
     position: relative;
@@ -708,18 +554,23 @@
 }
 
 .nw-transaction-reference .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 30px;
     height: 30px;
+    padding: 0;
     color: #9aacc4;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 8px;
     cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
 }
 
 .nw-transaction-reference .action-btn:hover,
 .nw-transaction-reference .action-btn[aria-expanded="true"] {
-    color: #ffffff;
+    color: #fff;
     background: #1b3450;
     border-color: #294866;
 }
@@ -731,7 +582,7 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    width: 195px;
+    width: 205px;
     padding: 6px;
     background: #102238;
     border: 1px solid #294563;
@@ -762,12 +613,409 @@
     font-size: 13px;
 }
 
-.nw-transaction-reference .transaction-action-dropdown button:hover {
-    color: #ffffff;
+.nw-transaction-reference .transaction-action-dropdown button:hover:not(:disabled) {
+    color: #fff;
     background: #1b3653;
 }
 
-/* -------------------- Pagination -------------------- */
+.nw-transaction-reference .transaction-action-dropdown button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Fraud menu item */
+
+.nw-transaction-reference .transaction-action-dropdown button:has(.fa-shield-halved) {
+    color: #8bb7ff;
+}
+
+.nw-transaction-reference .transaction-action-dropdown button:has(.fa-shield-halved) svg {
+    color: #60a5fa;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.nw-transaction-reference .empty-state {
+    padding: 35px 15px;
+    color: #9fb2cc;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* =========================================================
+   ACTION FEEDBACK
+   ========================================================= */
+
+.nw-transaction-reference .transaction-feedback {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 9px 12px;
+    color: #86efac;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.nw-transaction-reference .transaction-feedback button {
+    flex: 0 0 auto;
+    padding: 0 4px;
+    color: #86efac;
+    background: transparent;
+    border: 0;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* =========================================================
+   AI FRAUD ANALYSIS MODAL
+   ========================================================= */
+
+.fraud-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(2, 8, 18, 0.78);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    animation: fraud-overlay-enter 0.2s ease;
+}
+
+.fraud-modal {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: min(85vh, 760px);
+    overflow: hidden;
+    color: #eaf2ff;
+    background: linear-gradient(145deg, #10243a, #081727);
+    border: 1px solid #294563;
+    border-radius: 17px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.55);
+    animation: fraud-modal-enter 0.25s ease;
+}
+
+/* Modal header */
+
+.fraud-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 21px 22px;
+    background: rgba(22, 48, 76, 0.55);
+    border-bottom: 1px solid #29415d;
+}
+
+.fraud-modal-header > div {
+    min-width: 0;
+}
+
+.fraud-modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: #f8fafc;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.fraud-modal-header h3 svg {
+    flex: 0 0 auto;
+    color: #60a5fa;
+    font-size: 18px;
+}
+
+.fraud-modal-header p {
+    margin: 6px 0 0;
+    color: #91a8c5;
+    font-size: 11px;
+}
+
+.fraud-modal-header > button {
+    display: flex;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    color: #a9bdd6;
+    background: #1b3450;
+    border: 1px solid #34506d;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.fraud-modal-header > button:hover:not(:disabled) {
+    color: #fff;
+    background: #294866;
+}
+
+.fraud-modal-header > button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Modal body */
+
+.fraud-modal-body {
+    max-height: calc(min(85vh, 760px) - 85px);
+    padding: 22px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #345574 #0b192a;
+}
+
+.fraud-modal-body::-webkit-scrollbar {
+    width: 7px;
+}
+
+.fraud-modal-body::-webkit-scrollbar-track {
+    background: #0b192a;
+}
+
+.fraud-modal-body::-webkit-scrollbar-thumb {
+    background: #345574;
+    border-radius: 10px;
+}
+
+/* Risk summary */
+
+.fraud-risk-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 19px;
+    background: linear-gradient(
+        135deg,
+        rgba(30, 64, 104, 0.48),
+        rgba(13, 35, 58, 0.7)
+    );
+    border: 1px solid #2b4b6c;
+    border-radius: 13px;
+}
+
+.fraud-risk-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.fraud-risk-heading > span {
+    color: #91a8c5;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fraud-risk-level {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 7px 12px;
+    color: #cbd5e1;
+    background: rgba(148, 163, 184, 0.13);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.fraud-risk-level.low {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.fraud-risk-level.medium {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.fraud-risk-level.high {
+    color: #fb923c;
+    background: rgba(249, 115, 22, 0.12);
+    border-color: rgba(249, 115, 22, 0.3);
+}
+
+.fraud-risk-level.critical {
+    color: #fb7185;
+    background: rgba(244, 63, 94, 0.13);
+    border-color: rgba(244, 63, 94, 0.35);
+}
+
+.fraud-risk-level.unknown {
+    color: #cbd5e1;
+}
+
+.fraud-risk-score {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.fraud-risk-score strong {
+    color: #f8fafc;
+    font-size: 29px;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.fraud-risk-score span {
+    color: #91a8c5;
+    font-size: 10px;
+}
+
+/* Detail sections */
+
+.fraud-detail-section {
+    margin-top: 14px;
+    padding: 15px 16px;
+    background: rgba(12, 30, 49, 0.8);
+    border: 1px solid rgba(52, 78, 108, 0.75);
+    border-radius: 11px;
+}
+
+.fraud-detail-section h4 {
+    margin: 0 0 9px;
+    color: #9fc3ff;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.fraud-detail-section p {
+    margin: 0;
+    color: #d1deee;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.fraud-detail-section p + p {
+    margin-top: 10px;
+}
+
+.fraud-detail-section p strong {
+    color: #f1f5f9;
+}
+
+.fraud-detail-section ul {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin: 0;
+    padding-left: 19px;
+    color: #d1deee;
+}
+
+.fraud-detail-section li {
+    padding-left: 3px;
+    font-size: 11px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.fraud-detail-section li::marker {
+    color: #60a5fa;
+}
+
+/* Loading state */
+
+.fraud-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 230px;
+    padding: 30px 15px;
+    text-align: center;
+}
+
+.fraud-spinner {
+    color: #60a5fa;
+    font-size: 34px;
+    animation: fraud-spin 1s linear infinite;
+}
+
+.fraud-loading p {
+    margin: 17px 0 5px;
+    color: #edf4ff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.fraud-loading small {
+    color: #91a8c5;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Error state */
+
+.fraud-error {
+    padding: 19px;
+    color: #fecdd3;
+    background: rgba(127, 29, 29, 0.16);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    border-radius: 11px;
+}
+
+.fraud-error strong {
+    display: block;
+    color: #fb7185;
+    font-size: 13px;
+}
+
+.fraud-error p {
+    margin: 8px 0 15px;
+    color: #fecdd3;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.fraud-error button {
+    min-height: 34px;
+    padding: 7px 13px;
+    color: #fff;
+    background: #9f2940;
+    border: 1px solid #be3855;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.fraud-error button:hover {
+    background: #be3855;
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
 
 .nw-transaction-reference .transaction-pagination {
     display: flex;
@@ -815,7 +1063,7 @@
 }
 
 .nw-transaction-reference .pagination-btn:hover:not(:disabled) {
-    color: #ffffff;
+    color: #fff;
     background: #183653;
     border-color: #347cff;
 }
@@ -831,7 +1079,7 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    color: #ffffff;
+    color: #fff;
     background: #1d4ed8;
     border: 1px solid #3b82f6;
     border-radius: 8px;
@@ -839,33 +1087,33 @@
     font-weight: 750;
 }
 
-/* -------------------- Action feedback -------------------- */
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
 
-.nw-transaction-reference .transaction-feedback {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-    padding: 9px 12px;
-    color: #86efac;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    border-radius: 8px;
-    font-size: 11px;
-}
-
-.nw-transaction-reference .transaction-feedback button {
-    flex: 0 0 auto;
-    padding: 0 4px;
-    color: #86efac;
-    background: transparent;
+.nw-transaction-reference .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
     border: 0;
-    font-size: 18px;
-    cursor: pointer;
 }
 
-/* -------------------- Dashboard card alignment -------------------- */
+.nw-transaction-reference button:focus-visible,
+.nw-transaction-reference input:focus-visible,
+.nw-transaction-reference select:focus-visible,
+.fraud-modal-overlay button:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   DASHBOARD CARD ALIGNMENT
+   ========================================================= */
 
 .nw-dashboard-bottom-grid {
     align-items: start;
@@ -881,9 +1129,102 @@
     height: auto;
 }
 
-/* -------------------- Responsive -------------------- */
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes fraud-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fraud-overlay-enter {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fraud-modal-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .nw-transaction-reference {
+        padding: 15px;
+    }
+
+    .nw-transaction-reference .transaction-header {
+        align-items: flex-start;
+    }
+
+    .nw-transaction-reference .transaction-toolbar {
+        align-items: stretch;
+    }
+
+    .nw-transaction-reference .toolbar-left {
+        flex-basis: 100%;
+    }
+
+    .nw-transaction-reference .toolbar-right {
+        justify-content: flex-start;
+    }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 768px) {
+    .nw-transaction-reference {
+        padding: 13px;
+    }
+
+    .nw-transaction-reference .transaction-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nw-transaction-reference .transaction-header-actions {
+        justify-content: flex-start;
+    }
+
+    .nw-transaction-reference .toolbar-left {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nw-transaction-reference .transaction-toolbar .search-wrapper,
+    .nw-transaction-reference .transaction-toolbar .status-filter,
+    .nw-transaction-reference .transaction-toolbar .sort-filter {
+        width: 100%;
+        max-width: none;
+    }
+
+    .nw-transaction-reference .toolbar-right {
+        justify-content: flex-start;
+    }
+
+    .nw-transaction-reference .transaction-table {
+        min-width: 760px;
+    }
+
     .nw-transaction-reference .transaction-pagination {
         align-items: flex-start;
         flex-direction: column;
@@ -893,9 +1234,50 @@
         width: 100%;
         justify-content: space-between;
     }
+
+    .fraud-modal-overlay {
+        align-items: center;
+        padding: 14px;
+    }
+
+    .fraud-modal {
+        max-height: 88vh;
+        border-radius: 14px;
+    }
+
+    .fraud-modal-header {
+        padding: 17px;
+    }
+
+    .fraud-modal-body {
+        max-height: calc(88vh - 75px);
+        padding: 16px;
+    }
 }
 
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
 @media (max-width: 480px) {
+    .nw-transaction-reference {
+        padding: 11px;
+        border-radius: 12px;
+    }
+
+    .nw-transaction-reference .transaction-title h2 {
+        font-size: 17px;
+    }
+
+    .nw-transaction-reference .transaction-header-actions {
+        width: 100%;
+    }
+
+    .nw-transaction-reference .export-btn,
+    .nw-transaction-reference .view-btn {
+        min-height: 35px;
+    }
+
     .nw-transaction-reference .pagination-btn {
         padding: 7px 9px;
         font-size: 10px;
@@ -903,5 +1285,52 @@
 
     .nw-transaction-reference .transaction-feedback {
         align-items: flex-start;
+    }
+
+    .fraud-modal-overlay {
+        padding: 10px;
+    }
+
+    .fraud-modal {
+        max-height: 90vh;
+    }
+
+    .fraud-modal-header h3 {
+        font-size: 14px;
+    }
+
+    .fraud-modal-body {
+        max-height: calc(90vh - 70px);
+        padding: 13px;
+    }
+
+    .fraud-risk-summary {
+        align-items: flex-start;
+        padding: 14px;
+    }
+
+    .fraud-risk-score strong {
+        font-size: 24px;
+    }
+
+    .fraud-detail-section {
+        padding: 13px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .nw-transaction-reference *,
+    .nw-transaction-reference *::before,
+    .nw-transaction-reference *::after,
+    .fraud-modal-overlay,
+    .fraud-modal-overlay * {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
