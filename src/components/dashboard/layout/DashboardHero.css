@@ -1,106 +1,80 @@
 
-/* =====================================================
-   NEUROWALLET — DASHBOARD HERO
-   Design: Approved dark fintech dashboard reference
-   ===================================================== */
+/* =========================================================
+   NEUROWALLET — EXECUTIVE DASHBOARD HERO
+   Compact | Dark Navy | Enterprise FinTech
+========================================================= */
 
 .dashboard-hero {
     position: relative;
     isolation: isolate;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    min-width: 0;
-    min-height: 132px;
-    padding: 22px 26px;
     overflow: hidden;
 
-    color: #f4f8ff;
+    width: 100%;
+    min-height: 174px;
+    margin: 0 0 14px;
+    padding: 24px 30px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
 
     background:
         radial-gradient(
-            ellipse at 72% 15%,
-            rgba(60, 75, 220, 0.35),
-            transparent 35%
-        ),
-        radial-gradient(
-            ellipse at 90% 100%,
-            rgba(0, 112, 255, 0.2),
-            transparent 38%
+            ellipse at 90% 50%,
+            rgba(39, 78, 132, 0.16),
+            transparent 42%
         ),
         linear-gradient(
-            105deg,
-            #06172a 0%,
-            #081b38 48%,
-            #101b58 100%
+            110deg,
+            #081727 0%,
+            #0b1c30 58%,
+            #102440 100%
         );
 
-    border: 1px solid #19436c;
-    border-radius: 14px;
+    border: 1px solid #1b3b58;
+    border-radius: 16px;
 
     box-shadow:
-        0 8px 25px rgba(0, 0, 0, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.035);
+        0 7px 20px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.025);
 }
 
-/* Decorative background glow */
-
-.dashboard-hero::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    width: 230px;
-    height: 230px;
-    top: -145px;
-    right: 34%;
-    border-radius: 50%;
-    background: rgba(255, 180, 125, 0.2);
-    filter: blur(35px);
-}
-
-/* Mountain-inspired decorative layers */
+/* Subtle decorative background */
 
 .dashboard-hero::after {
     content: "";
     position: absolute;
     z-index: -1;
-    right: 17%;
-    bottom: -85px;
-    width: 390px;
-    height: 180px;
 
-    background:
-        linear-gradient(
-            145deg,
-            transparent 35%,
-            rgba(36, 48, 178, 0.65) 36%,
-            rgba(16, 32, 105, 0.8) 72%,
-            transparent 73%
-        );
+    right: -55px;
+    bottom: -115px;
 
-    clip-path: polygon(
-        0 100%,
-        18% 38%,
-        32% 65%,
-        51% 12%,
-        72% 62%,
-        85% 35%,
-        100% 100%
-    );
+    width: 340px;
+    height: 200px;
 
-    opacity: 0.8;
+    border: 1px solid rgba(87, 139, 201, 0.10);
+    border-radius: 50%;
+
+    transform: rotate(-15deg);
     pointer-events: none;
 }
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
 
 .dashboard-hero .hero-header {
     position: relative;
     z-index: 1;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     width: 100%;
     min-width: 0;
-    gap: 20px;
+    gap: 30px;
 }
 
 .dashboard-hero .hero-left {
@@ -108,100 +82,263 @@
     min-width: 0;
 }
 
+/* =========================================================
+   LEFT CONTENT
+========================================================= */
+
+.dashboard-hero .hero-eyebrow {
+    margin: 0 0 9px;
+
+    color: #79b8ff;
+
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.35px;
+    text-transform: uppercase;
+}
+
 .dashboard-hero .hero-title {
-    margin: 0 0 7px;
-    color: #f5f8ff;
-    font-size: clamp(25px, 2.2vw, 36px);
+    margin: 0;
+
+    color: #f3f7ff;
+
+    font-size: clamp(22px, 2.1vw, 27px);
     font-weight: 750;
-    line-height: 1.2;
-    letter-spacing: -0.8px;
-    overflow-wrap: anywhere;
+    line-height: 1.25;
+    letter-spacing: -0.65px;
+}
+
+.dashboard-hero .hero-name {
+    color: #ffffff;
 }
 
 .dashboard-hero .hero-subtitle {
-    margin: 0;
-    max-width: 620px;
-    color: #b7cce9;
-    font-size: 14px;
+    margin: 8px 0 13px;
+
+    color: #9eb3cc;
+
+    font-size: 12px;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
-/* Optional right-side content if added later */
+/* =========================================================
+   STATUS CHIPS
+========================================================= */
 
-.dashboard-hero .hero-right {
+.dashboard-hero .hero-status-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.dashboard-hero .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 23px;
+    padding: 4px 9px;
+
+    color: #b6c8dd;
+
+    background: rgba(16, 40, 66, 0.75);
+    border: 1px solid rgba(112, 157, 205, 0.17);
+    border-radius: 6px;
+
+    font-size: 9px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.dashboard-hero .chip-dot {
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+
+    background: #22c997;
+    border-radius: 50%;
+}
+
+.dashboard-hero .hero-chip svg {
+    color: #82b9f3;
+    font-size: 10px;
+}
+
+.dashboard-hero .hero-chip:last-child svg {
+    color: #55d8b1;
+}
+
+/* =========================================================
+   RIGHT SIDE — PERSONAL PHILOSOPHY
+========================================================= */
+
+.dashboard-hero .hero-branding {
     position: relative;
-    z-index: 2;
-    flex: 0 0 auto;
-    min-width: 150px;
+
+    display: flex;
+    flex: 0 0 270px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: 105px;
+
+    padding-left: 25px;
+
+    border-left: 1px solid rgba(125, 164, 207, 0.16);
+}
+
+.dashboard-hero .hero-branding-label {
+    margin-bottom: 9px;
+
+    color: #718ba8;
+
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.dashboard-hero .hero-personal-tagline {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+
+    margin: 0;
+
+    color: rgba(218, 232, 250, 0.78);
+
+    font-family:
+        "Segoe Script",
+        "Lucida Handwriting",
+        "Brush Script MT",
+        cursive;
+
+    font-size: clamp(19px, 2vw, 25px);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.35;
+    letter-spacing: 0.2px;
+
     text-align: right;
 }
 
-.dashboard-hero .hero-illustration {
-    display: block;
-    width: 190px;
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
+.dashboard-hero .hero-personal-tagline span {
+    color: rgba(160, 193, 231, 0.82);
 }
 
-/* Focus and motion accessibility */
+.dashboard-hero .hero-branding-line {
+    width: 65px;
+    height: 2px;
 
-.dashboard-hero :focus-visible {
-    outline: 2px solid #55aaff;
-    outline-offset: 4px;
+    margin-top: 11px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #3988dc
+    );
+
+    border-radius: 5px;
+    opacity: 0.8;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
     .dashboard-hero {
-        transition:
-            border-color 180ms ease,
-            box-shadow 180ms ease;
+        padding: 21px 23px;
     }
 
-    .dashboard-hero:hover {
-        border-color: #28619a;
-        box-shadow:
-            0 10px 28px rgba(0, 80, 180, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-}
-
-/* Laptop */
-
-@media (max-width: 1050px) {
-    .dashboard-hero {
-        min-height: 122px;
-        padding: 20px;
+    .dashboard-hero .hero-branding {
+        flex-basis: 220px;
+        padding-left: 18px;
     }
 
     .dashboard-hero .hero-title {
-        font-size: clamp(24px, 3vw, 32px);
+        font-size: 23px;
+    }
+
+    .dashboard-hero .hero-personal-tagline {
+        font-size: 20px;
     }
 }
 
-/* Mobile */
-
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .dashboard-hero {
-        min-height: 110px;
-        padding: 18px;
+        min-height: 0;
+        padding: 20px 18px;
     }
 
     .dashboard-hero .hero-header {
+        flex-direction: column;
         align-items: flex-start;
+        gap: 17px;
+    }
+
+    .dashboard-hero .hero-left {
+        width: 100%;
     }
 
     .dashboard-hero .hero-title {
-        font-size: 25px;
-        letter-spacing: -0.5px;
+        font-size: 21px;
     }
 
     .dashboard-hero .hero-subtitle {
-        font-size: 12px;
+        font-size: 11px;
     }
 
-    .dashboard-hero .hero-right {
-        display: none;
+    .dashboard-hero .hero-branding {
+        align-items: flex-start;
+
+        width: 100%;
+        min-height: 0;
+
+        padding: 12px 0 0;
+        border-left: none;
+        border-top: 1px solid rgba(125, 164, 207, 0.16);
+    }
+
+    .dashboard-hero .hero-personal-tagline {
+        align-items: flex-start;
+        font-size: 19px;
+    }
+
+    .dashboard-hero .hero-branding-line {
+        background: linear-gradient(
+            90deg,
+            #3988dc,
+            transparent
+        );
+    }
+}
+
+@media (max-width: 420px) {
+    .dashboard-hero {
+        padding: 17px 14px;
+    }
+
+    .dashboard-hero .hero-title {
+        font-size: 19px;
+    }
+
+    .dashboard-hero .hero-chip {
+        font-size: 8px;
+        padding: 4px 7px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-hero *,
+    .dashboard-hero *::before,
+    .dashboard-hero *::after {
+        transition: none !important;
+        animation: none !important;
     }
 }
