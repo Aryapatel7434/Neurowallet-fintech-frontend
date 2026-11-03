@@ -24,6 +24,8 @@ import AIInsightsPage from "../pages/ai/AIInsightsPage";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 import SettingsPage from "../pages/settings/SettingsPage";
+import ScheduledTransactionsPage
+    from "../pages/scheduled/ScheduledTransactionsPage";
 function ComingSoonPage({ title }) {
     return (
         <main className="dashboard-page-content-inner">
@@ -96,7 +98,14 @@ function AppRoutes() {
                         </ProtectedLayout>
                     }
                 />
-
+                <Route
+    path="/scheduled"
+    element={
+        <ProtectedLayout>
+            <ScheduledTransactionsPage />
+        </ProtectedLayout>
+    }
+/>
                 <Route
                     path="/analytics"
                     element={

@@ -73,4 +73,16 @@ AI_FRAUD: (transactionId) =>
 
     AI_CONVERSATION_MESSAGES: (conversationId) =>
         `/ai/conversations/${encodeURIComponent(conversationId)}/messages`,
+
+    // =========================================================
+// SCHEDULED TRANSACTIONS
+// =========================================================
+
+SCHEDULED_TRANSACTIONS: "/scheduled-transactions",
+
+CREATE_SCHEDULED_TRANSACTION:
+    "/scheduled-transactions/schedule",
+
+SCHEDULED_TRANSACTION_BY_ID: (id) =>
+    `/scheduled-transactions/${encodeURIComponent(id)}`,
 };
