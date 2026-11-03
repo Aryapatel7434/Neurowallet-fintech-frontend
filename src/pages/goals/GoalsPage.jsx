@@ -1,5 +1,11 @@
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
 import {
     FaBullseye,
     FaPlus,
@@ -24,11 +30,26 @@ import {
     FaXmark,
     FaLightbulb,
     FaCircleCheck,
+    FaClock,
+    FaPause,
+    FaPlay,
+    FaBan,
+    FaClockRotateLeft,
+    FaChevronLeft,
+    FaChevronRight,
+    FaTriangleExclamation,
+    FaCircleInfo,
+    FaCheck,
 } from "react-icons/fa6";
+
 import { toast } from "react-toastify";
 
 import goalService from "../../services/goalService";
 import "./GoalsPage.css";
+
+// ======================================================
+// CONSTANTS
+// ======================================================
 
 const INITIAL_FORM = {
     goalName: "",
@@ -38,6 +59,9 @@ const INITIAL_FORM = {
     targetDate: "",
     priority: "MEDIUM",
 };
+
+const PAGE_SIZE = 6;
+const HISTORY_PAGE_SIZE = 5;
 
 const CATEGORY_CONFIG = {
     EMERGENCY_FUND: {
@@ -82,19 +106,33 @@ const CATEGORY_CONFIG = {
     },
 };
 
-const formatCurrency = (value) =>
-    new Intl.NumberFormat("en-IN", {
+// ======================================================
+// FORMATTERS
+// ======================================================
+
+const formatCurrency = (value) => {
+    const amount = Number(value ?? 0);
+
+    return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
-        maximumFractionDigits: 0,
-    }).format(Number(value ?? 0));
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+    }).format(Number.isFinite(amount) ? amount : 0);
+};
 
 const formatDate = (value) => {
-    if (!value) return "No date set";
+    if (!value) return "Date unavailable";
 
-    const date = new Date(`${value}T00:00:00`);
+    const date = new Date(
+        /^\d{4}-\d{2}-\d{2}$/.test(value)
+            ? `${value}T00:00:00`
+            : value
+    );
 
-    if (Number.isNaN(date.getTime())) return "Date unavailable";
+    if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
+    }
 
     return new Intl.DateTimeFormat("en-IN", {
         day: "numeric",
@@ -103,25 +141,58 @@ const formatDate = (value) => {
     }).format(date);
 };
 
-const getProgress = (goal) => {
-    const supplied = Number(goal.progressPercentage);
+const formatDateTime = (value) => {
+    if (!value) return "Date unavailable";
 
-    if (Number.isFinite(supplied)) {
-        return Math.min(100, Math.max(0, supplied));
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
     }
 
-    const target = Number(goal.targetAmount);
-    const saved = Number(goal.currentAmount);
-
-    if (!target) return 0;
-
-    return Math.min(100, Math.max(0, (saved / target) * 100));
+    return new Intl.DateTimeFormat("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
 };
+
+const formatLabel = (value) => {
+    if (!value) return "Not available";
+
+    return String(value)
+        .replace(/_/g, " ")
+        .replace(/([A-Z])/g, " $1")
+        .trim()
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+};
+
+const getErrorMessage = (error, fallback) => {
+    return (
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        fallback
+    );
+};
+
+// ======================================================
+// RESPONSE HELPERS
+// ======================================================
 
 const getGoalsFromResponse = (response) => {
     if (Array.isArray(response)) return response;
-    if (Array.isArray(response?.content)) return response.content;
-    if (Array.isArray(response?.data)) return response.data;
+
+    if (Array.isArray(response?.content)) {
+        return response.content;
+    }
+
+    if (Array.isArray(response?.data)) {
+        return response.data;
+    }
+
     if (Array.isArray(response?.data?.content)) {
         return response.data.content;
     }
@@ -129,20 +200,84 @@ const getGoalsFromResponse = (response) => {
     return [];
 };
 
-const getErrorMessage = (error, fallback) =>
-    error?.message ||
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    fallback;
+const getPageContent = (response) => {
+    if (Array.isArray(response)) return response;
 
-function SummaryCard({ icon: Icon, label, value, helper, color }) {
+    if (Array.isArray(response?.content)) {
+        return response.content;
+    }
+
+    if (Array.isArray(response?.data)) {
+        return response.data;
+    }
+
+    if (Array.isArray(response?.data?.content)) {
+        return response.data.content;
+    }
+
+    return [];
+};
+
+const getProgress = (goal) => {
+    const supplied = Number(goal?.progressPercentage);
+
+    if (Number.isFinite(supplied)) {
+        return Math.min(100, Math.max(0, supplied));
+    }
+
+    const target = Number(goal?.targetAmount || 0);
+    const saved = Number(goal?.currentAmount || 0);
+
+    if (target <= 0) return 0;
+
+    return Math.min(100, Math.max(0, (saved / target) * 100));
+};
+
+// ======================================================
+// STATUS HELPERS
+// ======================================================
+
+const getStatusClass = (status) => {
+    return String(status || "ACTIVE").toLowerCase();
+};
+
+const canEditGoal = (goal) => {
+    return ["ACTIVE", "PAUSED"].includes(goal.status);
+};
+
+const canPauseGoal = (goal) => {
+    return goal.status === "ACTIVE";
+};
+
+const canResumeGoal = (goal) => {
+    return goal.status === "PAUSED";
+};
+
+const canCancelGoal = (goal) => {
+    return ["ACTIVE", "PAUSED"].includes(goal.status);
+};
+
+// ======================================================
+// SUMMARY CARD
+// ======================================================
+
+function SummaryCard({
+    icon: Icon,
+    label,
+    value,
+    helper,
+    color,
+}) {
     return (
         <article className={`goals-summary-card ${color}`}>
             <div className="goals-summary-top">
                 <span className="goals-summary-icon">
                     <Icon />
                 </span>
-                <span className="goals-summary-helper">{helper}</span>
+
+                <span className="goals-summary-helper">
+                    {helper}
+                </span>
             </div>
 
             <p>{label}</p>
@@ -151,34 +286,60 @@ function SummaryCard({ icon: Icon, label, value, helper, color }) {
     );
 }
 
-function GoalCard({ goal, onEdit, onDelete, onContribute }) {
+// ======================================================
+// GOAL CARD
+// ======================================================
+
+function GoalCard({
+    goal,
+    busy,
+    onEdit,
+    onDelete,
+    onContribute,
+    onHistory,
+    onStatusChange,
+}) {
     const category =
-        CATEGORY_CONFIG[goal.category] || CATEGORY_CONFIG.OTHER;
+        CATEGORY_CONFIG[goal.category] ||
+        CATEGORY_CONFIG.OTHER;
 
     const CategoryIcon = category.icon;
+
     const progress = getProgress(goal);
+
     const completed = goal.status === "COMPLETED";
     const active = goal.status === "ACTIVE";
+    const paused = goal.status === "PAUSED";
+
+    const remaining = Math.max(
+        0,
+        Number(goal.targetAmount || 0) -
+        Number(goal.currentAmount || 0)
+    );
 
     return (
         <article className="goals-card">
+
             <div className="goals-card-heading">
+
                 <div className={`goals-category-icon ${category.color}`}>
                     <CategoryIcon />
                 </div>
 
                 <div className="goals-card-menu">
-                    <span className={`goals-status ${String(goal.status || "ACTIVE").toLowerCase()}`}>
-                        {goal.status || "ACTIVE"}
+
+                    <span className={`goals-status ${getStatusClass(goal.status)}`}>
+                        {formatLabel(goal.status)}
                     </span>
 
-                    {active && (
+                    {canEditGoal(goal) && (
                         <button
                             type="button"
                             className="goals-icon-button"
                             onClick={() => onEdit(goal)}
-                            aria-label={`Edit ${goal.goalName}`}
+                            disabled={busy}
                             title="Edit goal"
+                            aria-label={`Edit ${goal.goalName}`}
                         >
                             <FaPen />
                         </button>
@@ -188,25 +349,30 @@ function GoalCard({ goal, onEdit, onDelete, onContribute }) {
                         type="button"
                         className="goals-icon-button danger"
                         onClick={() => onDelete(goal)}
-                        aria-label={`Delete ${goal.goalName}`}
+                        disabled={busy}
                         title="Delete goal"
+                        aria-label={`Delete ${goal.goalName}`}
                     >
                         <FaTrash />
                     </button>
+
                 </div>
             </div>
 
             <div className="goals-card-title">
+
                 <div>
                     <span className="goals-category-label">
                         {category.label}
                     </span>
+
                     <h3>{goal.goalName}</h3>
                 </div>
 
-                <span className={`goals-priority ${String(goal.priority || "MEDIUM").toLowerCase()}`}>
-                    {goal.priority || "MEDIUM"}
+                <span className={`goals-priority ${getStatusClass(goal.priority)}`}>
+                    {formatLabel(goal.priority)}
                 </span>
+
             </div>
 
             {goal.description && (
@@ -216,7 +382,7 @@ function GoalCard({ goal, onEdit, onDelete, onContribute }) {
             )}
 
             <div className="goals-progress-info">
-                <span>Saved so far</span>
+                <span>Goal progress</span>
                 <strong>{progress.toFixed(1)}%</strong>
             </div>
 
@@ -235,25 +401,33 @@ function GoalCard({ goal, onEdit, onDelete, onContribute }) {
             </div>
 
             <div className="goals-amount-row">
+
                 <div>
-                    <strong>{formatCurrency(goal.currentAmount)}</strong>
+                    <strong>
+                        {formatCurrency(goal.currentAmount)}
+                    </strong>
                     <span>Saved</span>
                 </div>
 
                 <div className="goals-target-amount">
-                    <strong>{formatCurrency(goal.targetAmount)}</strong>
+                    <strong>
+                        {formatCurrency(goal.targetAmount)}
+                    </strong>
                     <span>Target</span>
                 </div>
+
             </div>
 
             <div className="goals-card-footer">
+
                 <div className="goals-deadline">
                     <FaCalendarDays />
+
                     <span>
                         {completed
                             ? "Goal achieved"
-                            : goal.remainingDays < 0
-                                ? "Past deadline"
+                            : Number(goal.remainingDays) < 0
+                                ? `${Math.abs(Number(goal.remainingDays))} days overdue`
                                 : `${goal.remainingDays ?? "—"} days left`}
                     </span>
                 </div>
@@ -263,6 +437,7 @@ function GoalCard({ goal, onEdit, onDelete, onContribute }) {
                         type="button"
                         className="goals-contribute-button"
                         onClick={() => onContribute(goal)}
+                        disabled={busy || remaining <= 0}
                     >
                         Add savings <FaArrowRight />
                     </button>
@@ -273,10 +448,59 @@ function GoalCard({ goal, onEdit, onDelete, onContribute }) {
                         <FaCircleCheck /> Achieved
                     </span>
                 )}
+
             </div>
+
+            <div className="goals-card-extra-actions">
+
+                <button
+                    type="button"
+                    onClick={() => onHistory(goal)}
+                    disabled={busy}
+                >
+                    <FaClockRotateLeft /> History
+                </button>
+
+                {canPauseGoal(goal) && (
+                    <button
+                        type="button"
+                        onClick={() => onStatusChange(goal, "PAUSED")}
+                        disabled={busy}
+                    >
+                        <FaPause /> Pause
+                    </button>
+                )}
+
+                {canResumeGoal(goal) && (
+                    <button
+                        type="button"
+                        onClick={() => onStatusChange(goal, "ACTIVE")}
+                        disabled={busy}
+                    >
+                        <FaPlay /> Resume
+                    </button>
+                )}
+
+                {canCancelGoal(goal) && (
+                    <button
+                        type="button"
+                        className="danger"
+                        onClick={() => onStatusChange(goal, "CANCELLED")}
+                        disabled={busy}
+                    >
+                        <FaBan /> Cancel
+                    </button>
+                )}
+
+            </div>
+
         </article>
     );
 }
+
+// ======================================================
+// GOAL FORM MODAL
+// ======================================================
 
 function GoalFormModal({
     open,
@@ -308,6 +532,7 @@ function GoalFormModal({
 
     const updateField = (event) => {
         const { name, value } = event.target;
+
         setForm((current) => ({
             ...current,
             [name]: value,
@@ -318,18 +543,26 @@ function GoalFormModal({
         event.preventDefault();
 
         if (form.goalName.trim().length < 3) {
-            toast.error("Goal name must contain at least 3 characters.");
+            toast.error(
+                "Goal name must contain at least 3 characters."
+            );
             return;
         }
 
-        if (!Number.isFinite(Number(form.targetAmount)) ||
-            Number(form.targetAmount) < 1) {
+        const targetAmount = Number(form.targetAmount);
+
+        if (
+            !Number.isFinite(targetAmount) ||
+            targetAmount <= 0
+        ) {
             toast.error("Enter a valid target amount.");
             return;
         }
 
-        if (!form.targetDate ||
-            form.targetDate <= new Date().toISOString().slice(0, 10)) {
+        if (
+            !form.targetDate ||
+            form.targetDate <= new Date().toISOString().slice(0, 10)
+        ) {
             toast.error("Please select a future target date.");
             return;
         }
@@ -338,12 +571,15 @@ function GoalFormModal({
             ...form,
             goalName: form.goalName.trim(),
             description: form.description.trim(),
-            targetAmount: Number(form.targetAmount),
+            targetAmount,
         });
     };
 
     return (
-        <div className="goals-modal-backdrop" onMouseDown={onClose}>
+        <div
+            className="goals-modal-backdrop"
+            onMouseDown={onClose}
+        >
             <section
                 className="goals-modal"
                 role="dialog"
@@ -351,14 +587,20 @@ function GoalFormModal({
                 aria-labelledby="goal-form-title"
                 onMouseDown={(event) => event.stopPropagation()}
             >
+
                 <div className="goals-modal-header">
+
                     <div>
                         <span className="goals-modal-eyebrow">
                             GOAL MANAGEMENT
                         </span>
+
                         <h2 id="goal-form-title">
-                            {editingGoal ? "Update your goal" : "Create a new goal"}
+                            {editingGoal
+                                ? "Update your goal"
+                                : "Create a new goal"}
                         </h2>
+
                         <p>
                             Turn your next milestone into a structured savings plan.
                         </p>
@@ -368,15 +610,22 @@ function GoalFormModal({
                         type="button"
                         className="goals-icon-button"
                         onClick={onClose}
+                        disabled={saving}
                         aria-label="Close dialog"
                     >
                         <FaXmark />
                     </button>
+
                 </div>
 
-                <form onSubmit={submit} className="goals-form">
+                <form
+                    onSubmit={submit}
+                    className="goals-form"
+                >
+
                     <label>
                         Goal name
+
                         <input
                             name="goalName"
                             value={form.goalName}
@@ -388,8 +637,10 @@ function GoalFormModal({
                     </label>
 
                     <div className="goals-form-grid">
+
                         <label>
                             Category
+
                             <select
                                 name="category"
                                 value={form.category}
@@ -408,6 +659,7 @@ function GoalFormModal({
 
                         <label>
                             Priority
+
                             <select
                                 name="priority"
                                 value={form.priority}
@@ -419,17 +671,20 @@ function GoalFormModal({
                                 <option value="HIGH">High</option>
                             </select>
                         </label>
+
                     </div>
 
                     <div className="goals-form-grid">
+
                         <label>
                             Target amount (₹)
+
                             <input
                                 type="number"
                                 name="targetAmount"
                                 value={form.targetAmount}
                                 onChange={updateField}
-                                min="1"
+                                min="0.01"
                                 step="0.01"
                                 placeholder="100000"
                                 required
@@ -438,21 +693,29 @@ function GoalFormModal({
 
                         <label>
                             Target date
+
                             <input
                                 type="date"
                                 name="targetDate"
                                 value={form.targetDate}
                                 onChange={updateField}
-                                min={new Date(Date.now() + 86400000)
-                                    .toISOString()
-                                    .slice(0, 10)}
+                                min={
+                                    new Date(Date.now() + 86400000)
+                                        .toISOString()
+                                        .slice(0, 10)
+                                }
                                 required
                             />
                         </label>
+
                     </div>
 
                     <label>
-                        Description <span className="goals-optional">(optional)</span>
+                        Description
+                        <span className="goals-optional">
+                            (optional)
+                        </span>
+
                         <textarea
                             name="description"
                             value={form.description}
@@ -464,6 +727,7 @@ function GoalFormModal({
                     </label>
 
                     <div className="goals-form-actions">
+
                         <button
                             type="button"
                             className="goals-secondary-button"
@@ -484,14 +748,26 @@ function GoalFormModal({
                                     ? "Save changes"
                                     : "Create goal"}
                         </button>
+
                     </div>
+
                 </form>
+
             </section>
         </div>
     );
 }
 
-function ContributionModal({ goal, saving, onClose, onSubmit }) {
+// ======================================================
+// CONTRIBUTION MODAL
+// ======================================================
+
+function ContributionModal({
+    goal,
+    saving,
+    onClose,
+    onSubmit,
+}) {
     const [amount, setAmount] = useState("");
     const [note, setNote] = useState("");
 
@@ -504,7 +780,8 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
 
     const remaining = Math.max(
         0,
-        Number(goal.targetAmount) - Number(goal.currentAmount)
+        Number(goal.targetAmount || 0) -
+        Number(goal.currentAmount || 0)
     );
 
     const submit = (event) => {
@@ -518,7 +795,9 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
         }
 
         if (value > remaining) {
-            toast.error("Contribution cannot exceed the remaining amount.");
+            toast.error(
+                "Contribution cannot exceed the remaining amount."
+            );
             return;
         }
 
@@ -529,7 +808,10 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
     };
 
     return (
-        <div className="goals-modal-backdrop" onMouseDown={onClose}>
+        <div
+            className="goals-modal-backdrop"
+            onMouseDown={onClose}
+        >
             <section
                 className="goals-modal goals-contribution-modal"
                 role="dialog"
@@ -537,12 +819,18 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
                 aria-labelledby="contribution-title"
                 onMouseDown={(event) => event.stopPropagation()}
             >
+
                 <div className="goals-modal-header">
+
                     <div>
                         <span className="goals-modal-eyebrow">
                             SAVINGS CONTRIBUTION
                         </span>
-                        <h2 id="contribution-title">Add to your goal</h2>
+
+                        <h2 id="contribution-title">
+                            Add to your goal
+                        </h2>
+
                         <p>{goal.goalName}</p>
                     </div>
 
@@ -550,10 +838,12 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
                         type="button"
                         className="goals-icon-button"
                         onClick={onClose}
+                        disabled={saving}
                         aria-label="Close dialog"
                     >
                         <FaXmark />
                     </button>
+
                 </div>
 
                 <div className="goals-contribution-summary">
@@ -561,26 +851,39 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
                     <strong>{formatCurrency(remaining)}</strong>
                 </div>
 
-                <form onSubmit={submit} className="goals-form">
+                <form
+                    onSubmit={submit}
+                    className="goals-form"
+                >
+
                     <label>
                         Contribution amount (₹)
+
                         <input
                             type="number"
                             min="0.01"
                             max={remaining}
                             step="0.01"
                             value={amount}
-                            onChange={(event) => setAmount(event.target.value)}
+                            onChange={(event) =>
+                                setAmount(event.target.value)
+                            }
                             placeholder="Enter amount"
                             required
                         />
                     </label>
 
                     <label>
-                        Note <span className="goals-optional">(optional)</span>
+                        Note
+                        <span className="goals-optional">
+                            (optional)
+                        </span>
+
                         <textarea
                             value={note}
-                            onChange={(event) => setNote(event.target.value)}
+                            onChange={(event) =>
+                                setNote(event.target.value)
+                            }
                             maxLength={500}
                             rows={3}
                             placeholder="Add a note for this contribution"
@@ -588,6 +891,7 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
                     </label>
 
                     <div className="goals-form-actions">
+
                         <button
                             type="button"
                             className="goals-secondary-button"
@@ -600,19 +904,521 @@ function ContributionModal({ goal, saving, onClose, onSubmit }) {
                         <button
                             type="submit"
                             className="goals-primary-button"
-                            disabled={saving}
+                            disabled={saving || remaining <= 0}
                         >
-                            {saving ? "Adding..." : "Confirm contribution"}
+                            {saving
+                                ? "Adding..."
+                                : "Confirm contribution"}
                         </button>
+
                     </div>
+
                 </form>
+
             </section>
         </div>
     );
 }
 
+// ======================================================
+// CONTRIBUTION HISTORY MODAL
+// ======================================================
+
+function ContributionHistoryModal({
+    goal,
+    onClose,
+}) {
+    const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+
+    const loadHistory = useCallback(async () => {
+        if (!goal?.goalId) return;
+
+        setLoading(true);
+        setError("");
+
+        try {
+            const response =
+                await goalService.getContributionHistory(
+                    goal.goalId,
+                    {
+                        page,
+                        size: HISTORY_PAGE_SIZE,
+                    }
+                );
+
+            setHistory(getPageContent(response));
+
+            const pageData = response?.data ?? response;
+
+            setTotalPages(
+                Number(pageData?.totalPages ?? 0)
+            );
+
+            setTotalElements(
+                Number(pageData?.totalElements ?? 0)
+            );
+
+        } catch (err) {
+            console.error(
+                "Contribution history failed:",
+                err
+            );
+
+            setError(
+                getErrorMessage(
+                    err,
+                    "Unable to load contribution history."
+                )
+            );
+        } finally {
+            setLoading(false);
+        }
+    }, [goal?.goalId, page]);
+
+    useEffect(() => {
+        loadHistory();
+    }, [loadHistory]);
+
+    useEffect(() => {
+        setPage(0);
+    }, [goal?.goalId]);
+
+    if (!goal) return null;
+
+    return (
+        <div
+            className="goals-modal-backdrop"
+            onMouseDown={onClose}
+        >
+            <section
+                className="goals-modal goals-history-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="history-title"
+                onMouseDown={(event) => event.stopPropagation()}
+            >
+
+                <div className="goals-modal-header">
+
+                    <div>
+                        <span className="goals-modal-eyebrow">
+                            SAVINGS ACTIVITY
+                        </span>
+
+                        <h2 id="history-title">
+                            Contribution history
+                        </h2>
+
+                        <p>{goal.goalName}</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="goals-icon-button"
+                        onClick={onClose}
+                        aria-label="Close history"
+                    >
+                        <FaXmark />
+                    </button>
+
+                </div>
+
+                <div className="goals-history-summary">
+                    <div>
+                        <span>Total saved</span>
+                        <strong>
+                            {formatCurrency(goal.currentAmount)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Contributions</span>
+                        <strong>{totalElements}</strong>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="goals-loading-state">
+                        <span className="goals-loader" />
+                        <strong>Loading contribution history...</strong>
+                    </div>
+                ) : error ? (
+                    <div className="goals-load-error" role="alert">
+                        <p>{error}</p>
+
+                        <button
+                            type="button"
+                            className="goals-secondary-button"
+                            onClick={loadHistory}
+                        >
+                            Try again
+                        </button>
+                    </div>
+                ) : history.length > 0 ? (
+                    <>
+
+                        <div className="goals-history-list">
+
+                            {history.map((item) => (
+                                <article
+                                    className="goals-history-item"
+                                    key={item.contributionId}
+                                >
+
+                                    <div className="goals-history-icon">
+                                        <FaCoins />
+                                    </div>
+
+                                    <div className="goals-history-details">
+
+                                        <strong>
+                                            {formatCurrency(item.amount)}
+                                        </strong>
+
+                                        <span>
+                                            {item.note || "Savings contribution"}
+                                        </span>
+
+                                        <small>
+                                            {formatDateTime(item.createdAt)}
+                                        </small>
+
+                                        <small>
+                                            Source: {formatLabel(item.source)}
+                                        </small>
+
+                                    </div>
+
+                                    <span className="goals-history-success">
+                                        <FaCheck /> Added
+                                    </span>
+
+                                </article>
+                            ))}
+
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="goals-pagination">
+
+                                <span>
+                                    Page {page + 1} of {totalPages}
+                                </span>
+
+                                <div>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setPage((current) =>
+                                                Math.max(0, current - 1)
+                                            )
+                                        }
+                                        disabled={page === 0 || loading}
+                                    >
+                                        <FaChevronLeft /> Previous
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setPage((current) =>
+                                                Math.min(
+                                                    totalPages - 1,
+                                                    current + 1
+                                                )
+                                            )
+                                        }
+                                        disabled={
+                                            page >= totalPages - 1 ||
+                                            loading
+                                        }
+                                    >
+                                        Next <FaChevronRight />
+                                    </button>
+                                </div>
+
+                            </div>
+                        )}
+
+                    </>
+                ) : (
+                    <div className="goals-empty-state">
+                        <div className="goals-empty-icon">
+                            <FaClockRotateLeft />
+                        </div>
+
+                        <h3>No contributions yet</h3>
+
+                        <p>
+                            Your savings contributions will appear here
+                            once you start adding money to this goal.
+                        </p>
+                    </div>
+                )}
+
+            </section>
+        </div>
+    );
+}
+
+// ======================================================
+// AI ADVISOR COMPONENT
+// ======================================================
+
+function GoalAdvisorPanel({
+    advisor,
+    loading,
+    error,
+    onGenerate,
+}) {
+    const plans = Array.isArray(advisor?.goalPlans)
+        ? advisor.goalPlans
+        : [];
+
+    const actions = Array.isArray(advisor?.priorityActions)
+        ? advisor.priorityActions
+        : [];
+
+    return (
+        <section className="goals-advisor-panel">
+
+            <div className="goals-advisor-icon">
+                <FaRobot />
+            </div>
+
+            <div className="goals-advisor-content">
+
+                <span className="goals-section-eyebrow">
+                    NEUROWALLET INTELLIGENCE
+                </span>
+
+                <h2>AI Goal Advisor</h2>
+
+                <p>
+                    Get a savings strategy based on your goals and
+                    recorded financial activity.
+                </p>
+
+                {error && (
+                    <div className="goals-advisor-error" role="alert">
+                        <FaTriangleExclamation />
+                        {error}
+                    </div>
+                )}
+
+                {advisor && (
+                    <div className="goals-advisor-result">
+
+                        <div className="goals-advisor-metrics">
+
+                            <div>
+                                <span>Recorded income</span>
+                                <strong>
+                                    {formatCurrency(
+                                        advisor.totalRecordedIncome
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Recorded expenses</span>
+                                <strong>
+                                    {formatCurrency(
+                                        advisor.totalRecordedExpense
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Net cash flow</span>
+                                <strong>
+                                    {formatCurrency(
+                                        advisor.netRecordedCashFlow
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Active goals</span>
+                                <strong>
+                                    {advisor.activeGoals ?? 0}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>Goals at risk</span>
+                                <strong>
+                                    {advisor.goalsAtRisk ?? 0}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        {advisor.overallAssessment && (
+                            <div className="goals-advisor-assessment">
+
+                                <h3>
+                                    <FaLightbulb />
+                                    Overall assessment
+                                </h3>
+
+                                <p>
+                                    {advisor.overallAssessment}
+                                </p>
+
+                            </div>
+                        )}
+
+                        {plans.length > 0 && (
+                            <div className="goals-advisor-plans">
+
+                                <h3>Individual goal analysis</h3>
+
+                                {plans.map((plan) => (
+                                    <article
+                                        key={plan.goalId}
+                                        className="goals-advisor-plan"
+                                    >
+
+                                        <div className="goals-advisor-plan-heading">
+                                            <strong>
+                                                {plan.goalName}
+                                            </strong>
+
+                                            <span className={`goals-feasibility ${getStatusClass(plan.feasibilityStatus)}`}>
+                                                {formatLabel(plan.feasibilityStatus)}
+                                            </span>
+                                        </div>
+
+                                        <div className="goals-advisor-plan-metrics">
+
+                                            <div>
+                                                <span>Progress</span>
+                                                <strong>
+                                                    {Number(
+                                                        plan.progressPercentage || 0
+                                                    ).toFixed(1)}%
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Remaining</span>
+                                                <strong>
+                                                    {formatCurrency(
+                                                        plan.remainingAmount
+                                                    )}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Monthly required</span>
+                                                <strong>
+                                                    {formatCurrency(
+                                                        plan.requiredMonthlyContribution
+                                                    )}
+                                                </strong>
+                                            </div>
+
+                                            <div>
+                                                <span>Days left</span>
+                                                <strong>
+                                                    {plan.remainingDays ?? "—"}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                        {plan.advisorRecommendation && (
+                                            <p>
+                                                {plan.advisorRecommendation}
+                                            </p>
+                                        )}
+
+                                    </article>
+                                ))}
+
+                            </div>
+                        )}
+
+                        {actions.length > 0 && (
+                            <div className="goals-advisor-actions">
+
+                                <h3>
+                                    <FaFlagCheckered />
+                                    Priority actions
+                                </h3>
+
+                                <ul>
+                                    {actions.map((action, index) => (
+                                        <li key={index}>
+                                            <FaCircleCheck />
+                                            <span>{action}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                            </div>
+                        )}
+
+                        {advisor.dataLimitations && (
+                            <div className="goals-advisor-limitations">
+                                <FaCircleInfo />
+
+                                <p>
+                                    {advisor.dataLimitations}
+                                </p>
+                            </div>
+                        )}
+
+                        {advisor.disclaimer && (
+                            <p className="goals-advisor-disclaimer">
+                                {advisor.disclaimer}
+                            </p>
+                        )}
+
+                        {advisor.generatedAt && (
+                            <small className="goals-advisor-generated">
+                                Generated: {formatDateTime(advisor.generatedAt)}
+                            </small>
+                        )}
+
+                    </div>
+                )}
+
+            </div>
+
+            <button
+                type="button"
+                className="goals-advisor-button"
+                onClick={onGenerate}
+                disabled={loading}
+            >
+                <FaLightbulb />
+
+                {loading
+                    ? "Analyzing..."
+                    : advisor
+                        ? "Refresh advice"
+                        : "Generate advice"}
+            </button>
+
+        </section>
+    );
+}
+
+// ======================================================
+// MAIN GOALS PAGE
+// ======================================================
+
 function GoalsPage() {
+
     const [goals, setGoals] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [loadError, setLoadError] = useState("");
@@ -629,50 +1435,74 @@ function GoalsPage() {
     const [contributionGoal, setContributionGoal] = useState(null);
     const [contributionSaving, setContributionSaving] = useState(false);
 
+    const [historyGoal, setHistoryGoal] = useState(null);
+
     const [advisor, setAdvisor] = useState(null);
     const [advisorLoading, setAdvisorLoading] = useState(false);
     const [advisorError, setAdvisorError] = useState("");
 
-    const PAGE_SIZE = 6;
+    const [busyGoalId, setBusyGoalId] = useState(null);
+
+    // ==================================================
+    // LOAD GOALS
+    // ==================================================
 
     const loadGoals = useCallback(async (showLoader = true) => {
-        if (showLoader) setLoading(true);
+
+        if (showLoader) {
+            setLoading(true);
+        }
 
         setLoadError("");
 
         try {
+
             const response = await goalService.getGoals({
                 page: 0,
                 size: 100,
-                sort: "createdAt,desc",
             });
 
             setGoals(getGoalsFromResponse(response));
+
         } catch (error) {
+
             console.error("Goals loading failed:", error);
+
             setLoadError(
-                getErrorMessage(error, "Unable to load your goals.")
+                getErrorMessage(
+                    error,
+                    "Unable to load your goals."
+                )
             );
+
         } finally {
+
             setLoading(false);
             setRefreshing(false);
+
         }
+
     }, []);
 
     useEffect(() => {
         loadGoals();
-
-        return () => {};
     }, [loadGoals]);
 
+    // ==================================================
+    // SUMMARY
+    // ==================================================
+
     const summary = useMemo(() => {
+
         const totalTarget = goals.reduce(
-            (sum, goal) => sum + Number(goal.targetAmount || 0),
+            (sum, goal) =>
+                sum + Number(goal.targetAmount || 0),
             0
         );
 
         const totalSaved = goals.reduce(
-            (sum, goal) => sum + Number(goal.currentAmount || 0),
+            (sum, goal) =>
+                sum + Number(goal.currentAmount || 0),
             0
         );
 
@@ -682,6 +1512,10 @@ function GoalsPage() {
 
         const completedGoals = goals.filter(
             (goal) => goal.status === "COMPLETED"
+        ).length;
+
+        const pausedGoals = goals.filter(
+            (goal) => goal.status === "PAUSED"
         ).length;
 
         const overallProgress = totalTarget > 0
@@ -694,29 +1528,53 @@ function GoalsPage() {
             totalSaved,
             activeGoals,
             completedGoals,
+            pausedGoals,
             overallProgress,
         };
+
     }, [goals]);
 
+    // ==================================================
+    // FILTERING
+    // ==================================================
+
     const filteredGoals = useMemo(() => {
+
         const query = search.trim().toLowerCase();
 
         return goals.filter((goal) => {
+
             const matchesSearch =
                 !query ||
-                String(goal.goalName || "").toLowerCase().includes(query) ||
-                String(goal.description || "").toLowerCase().includes(query);
+                String(goal.goalName || "")
+                    .toLowerCase()
+                    .includes(query) ||
+                String(goal.description || "")
+                    .toLowerCase()
+                    .includes(query);
 
             const matchesStatus =
-                statusFilter === "ALL" || goal.status === statusFilter;
+                statusFilter === "ALL" ||
+                goal.status === statusFilter;
 
             const matchesCategory =
                 categoryFilter === "ALL" ||
                 goal.category === categoryFilter;
 
-            return matchesSearch && matchesStatus && matchesCategory;
+            return (
+                matchesSearch &&
+                matchesStatus &&
+                matchesCategory
+            );
+
         });
-    }, [goals, search, statusFilter, categoryFilter]);
+
+    }, [
+        goals,
+        search,
+        statusFilter,
+        categoryFilter,
+    ]);
 
     const totalPages = Math.max(
         1,
@@ -730,14 +1588,29 @@ function GoalsPage() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [search, statusFilter, categoryFilter]);
+    }, [
+        search,
+        statusFilter,
+        categoryFilter,
+    ]);
+
+    // ==================================================
+    // REFRESH
+    // ==================================================
 
     const handleRefresh = async () => {
-        if (refreshing) return;
+
+        if (refreshing || loading) return;
 
         setRefreshing(true);
+
         await loadGoals(false);
+
     };
+
+    // ==================================================
+    // CREATE / EDIT
+    // ==================================================
 
     const openCreateModal = () => {
         setEditingGoal(null);
@@ -750,113 +1623,258 @@ function GoalsPage() {
     };
 
     const handleSaveGoal = async (formData) => {
+
+        if (formSaving) return;
+
         setFormSaving(true);
 
         try {
+
             if (editingGoal) {
+
                 await goalService.updateGoal(
                     editingGoal.goalId,
                     formData
                 );
-                toast.success("Goal updated successfully.");
+
+                toast.success(
+                    "Goal updated successfully."
+                );
+
             } else {
+
                 await goalService.createGoal(formData);
-                toast.success("Your new goal has been created.");
+
+                toast.success(
+                    "Your new goal has been created."
+                );
+
             }
 
             setFormOpen(false);
             setEditingGoal(null);
+
             await loadGoals(false);
+
         } catch (error) {
+
             toast.error(
-                getErrorMessage(error, "Unable to save this goal.")
+                getErrorMessage(
+                    error,
+                    "Unable to save this goal."
+                )
             );
+
         } finally {
+
             setFormSaving(false);
+
         }
+
     };
 
+    // ==================================================
+    // DELETE
+    // ==================================================
+
     const handleDeleteGoal = async (goal) => {
+
+        if (busyGoalId !== null) return;
+
         const confirmed = window.confirm(
             `Delete "${goal.goalName}"? Goals with contribution history may need to be cancelled instead.`
         );
 
         if (!confirmed) return;
 
+        setBusyGoalId(goal.goalId);
+
         try {
+
             await goalService.deleteGoal(goal.goalId);
-            toast.success("Goal deleted successfully.");
+
+            toast.success(
+                "Goal deleted successfully."
+            );
+
             await loadGoals(false);
+
         } catch (error) {
+
             toast.error(
                 getErrorMessage(
                     error,
                     "Unable to delete this goal. It may have contribution history."
                 )
             );
+
+        } finally {
+
+            setBusyGoalId(null);
+
         }
+
     };
 
+    // ==================================================
+    // CONTRIBUTION
+    // ==================================================
+
     const handleAddContribution = async (contributionData) => {
-        if (!contributionGoal) return;
+
+        if (!contributionGoal || contributionSaving) {
+            return;
+        }
 
         setContributionSaving(true);
 
         try {
+
             await goalService.addContribution(
                 contributionGoal.goalId,
                 contributionData
             );
 
-            toast.success("Contribution added successfully.");
-            setContributionGoal(null);
-            await loadGoals(false);
-        } catch (error) {
-            toast.error(
-                getErrorMessage(error, "Unable to add contribution.")
+            toast.success(
+                "Contribution added successfully."
             );
+
+            setContributionGoal(null);
+
+            await loadGoals(false);
+
+        } catch (error) {
+
+            toast.error(
+                getErrorMessage(
+                    error,
+                    "Unable to add contribution."
+                )
+            );
+
         } finally {
+
             setContributionSaving(false);
+
         }
+
     };
 
+    // ==================================================
+    // GOAL LIFECYCLE
+    // ==================================================
+
+    const handleStatusChange = async (goal, status) => {
+
+        if (busyGoalId !== null) return;
+
+        if (status === "CANCELLED") {
+
+            const confirmed = window.confirm(
+                `Are you sure you want to cancel "${goal.goalName}"? This action cannot be reversed.`
+            );
+
+            if (!confirmed) return;
+
+        }
+
+        setBusyGoalId(goal.goalId);
+
+        try {
+
+            await goalService.updateGoalStatus(
+                goal.goalId,
+                status
+            );
+
+            const messages = {
+                ACTIVE: "Goal resumed successfully.",
+                PAUSED: "Goal paused successfully.",
+                CANCELLED: "Goal cancelled successfully.",
+            };
+
+            toast.success(
+                messages[status] || "Goal status updated."
+            );
+
+            await loadGoals(false);
+
+        } catch (error) {
+
+            toast.error(
+                getErrorMessage(
+                    error,
+                    "Unable to update goal status."
+                )
+            );
+
+        } finally {
+
+            setBusyGoalId(null);
+
+        }
+
+    };
+
+    // ==================================================
+    // AI GOAL ADVISOR
+    // ==================================================
+
     const loadAdvisor = async () => {
+
         if (advisorLoading) return;
 
         setAdvisorLoading(true);
         setAdvisorError("");
 
         try {
-            const response = await goalService.getGoalAdvisor();
-            setAdvisor(response?.data ?? response);
+
+            const response =
+                await goalService.getGoalAdvisor();
+
+            setAdvisor(
+                response?.data ?? response
+            );
+
+            toast.success(
+                "AI Goal Advisor analysis generated."
+            );
+
         } catch (error) {
-            console.error("AI Goal Advisor failed:", error);
+
+            console.error(
+                "AI Goal Advisor failed:",
+                error
+            );
+
             setAdvisorError(
                 getErrorMessage(
                     error,
                     "The AI Goal Advisor is temporarily unavailable."
                 )
             );
+
         } finally {
+
             setAdvisorLoading(false);
+
         }
+
     };
 
-    const advisorEntries = useMemo(() => {
-        if (!advisor || typeof advisor !== "object") return [];
-
-        return Object.entries(advisor).filter(
-            ([, value]) =>
-                value !== null &&
-                value !== undefined &&
-                typeof value !== "object"
-        );
-    }, [advisor]);
+    // ==================================================
+    // RENDER
+    // ==================================================
 
     return (
         <main className="goals-page">
+
+            {/* PAGE HEADER */}
+
             <header className="goals-page-header">
+
                 <div>
+
                     <div className="goals-breadcrumb">
                         WORKSPACE <FaArrowRight /> FINANCIAL PLANNING
                     </div>
@@ -867,16 +1885,23 @@ function GoalsPage() {
                         Plan with purpose. Track your savings.
                         Make every financial milestone count.
                     </p>
+
                 </div>
 
                 <div className="goals-header-actions">
+
                     <button
                         type="button"
                         className="goals-refresh-button"
                         onClick={handleRefresh}
                         disabled={refreshing || loading}
                     >
-                        <FaRotateRight className={refreshing ? "goals-spin" : ""} />
+                        <FaRotateRight
+                            className={
+                                refreshing ? "goals-spin" : ""
+                            }
+                        />
+
                         Refresh
                     </button>
 
@@ -887,13 +1912,24 @@ function GoalsPage() {
                     >
                         <FaPlus /> Create goal
                     </button>
+
                 </div>
+
             </header>
 
+            {/* ERROR */}
+
             {loadError && (
-                <section className="goals-load-error" role="alert">
+                <section
+                    className="goals-load-error"
+                    role="alert"
+                >
+
                     <div>
-                        <strong>We couldn't load your goals.</strong>
+                        <strong>
+                            We couldn't load your goals.
+                        </strong>
+
                         <p>{loadError}</p>
                     </div>
 
@@ -904,10 +1940,14 @@ function GoalsPage() {
                     >
                         Try again
                     </button>
+
                 </section>
             )}
 
+            {/* SUMMARY CARDS */}
+
             <section className="goals-summary-grid">
+
                 <SummaryCard
                     icon={FaBullseye}
                     label="Total goals"
@@ -936,129 +1976,137 @@ function GoalsPage() {
                     icon={FaArrowTrendUp}
                     label="Overall progress"
                     value={`${summary.overallProgress.toFixed(1)}%`}
-                    helper="Saved vs target"
+                    helper={`${summary.pausedGoals} paused`}
                     color="cyan"
                 />
+
             </section>
 
+            {/* OVERALL PROGRESS */}
+
             <section className="goals-overall-panel">
+
                 <div className="goals-overall-copy">
+
                     <span className="goals-section-eyebrow">
                         YOUR SAVINGS JOURNEY
                     </span>
-                    <h2>Every contribution moves you forward.</h2>
+
+                    <h2>
+                        Every contribution moves you forward.
+                    </h2>
+
                     <p>
-                        You have saved {formatCurrency(summary.totalSaved)} of
-                        your {formatCurrency(summary.totalTarget)} combined
-                        goal target.
+                        You have saved {formatCurrency(summary.totalSaved)}
+                        {" "}of your{" "}
+                        {formatCurrency(summary.totalTarget)}
+                        {" "}combined goal target.
                     </p>
+
                 </div>
 
                 <div className="goals-overall-progress">
+
                     <div className="goals-overall-progress-heading">
                         <span>Combined progress</span>
-                        <strong>{summary.overallProgress.toFixed(1)}%</strong>
+
+                        <strong>
+                            {summary.overallProgress.toFixed(1)}%
+                        </strong>
                     </div>
 
                     <div className="goals-overall-track">
+
                         <span
                             style={{
                                 width: `${summary.overallProgress}%`,
                             }}
                         />
+
                     </div>
 
                     <div className="goals-overall-footer">
-                        <span>{formatCurrency(summary.totalSaved)} saved</span>
+
+                        <span>
+                            {formatCurrency(summary.totalSaved)} saved
+                        </span>
+
                         <span>
                             {formatCurrency(
-                                Math.max(0, summary.totalTarget - summary.totalSaved)
+                                Math.max(
+                                    0,
+                                    summary.totalTarget -
+                                    summary.totalSaved
+                                )
                             )} remaining
                         </span>
+
                     </div>
+
                 </div>
+
             </section>
 
-            <section className="goals-advisor-panel">
-                <div className="goals-advisor-icon">
-                    <FaRobot />
-                </div>
+            {/* AI GOAL ADVISOR */}
 
-                <div className="goals-advisor-content">
-                    <span className="goals-section-eyebrow">
-                        NEUROWALLET INTELLIGENCE
-                    </span>
-                    <h2>AI Goal Advisor</h2>
-                    <p>
-                        Get a savings strategy based on your goals and
-                        available financial activity.
-                    </p>
+            <GoalAdvisorPanel
+                advisor={advisor}
+                loading={advisorLoading}
+                error={advisorError}
+                onGenerate={loadAdvisor}
+            />
 
-                    {advisorError && (
-                        <p className="goals-advisor-error">{advisorError}</p>
-                    )}
-
-                    {advisorEntries.length > 0 && (
-                        <div className="goals-advisor-result">
-                            {advisorEntries.map(([key, value]) => (
-                                <div key={key}>
-                                    <span>
-                                        {key.replace(/([A-Z])/g, " $1")}
-                                    </span>
-                                    <strong>{String(value)}</strong>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <button
-                    type="button"
-                    className="goals-advisor-button"
-                    onClick={loadAdvisor}
-                    disabled={advisorLoading}
-                >
-                    <FaLightbulb />
-                    {advisorLoading
-                        ? "Analyzing..."
-                        : advisor
-                            ? "Refresh advice"
-                            : "Generate advice"}
-                </button>
-            </section>
+            {/* GOAL LIST */}
 
             <section className="goals-list-section">
+
                 <div className="goals-list-heading">
+
                     <div>
+
                         <span className="goals-section-eyebrow">
                             YOUR FINANCIAL PLAN
                         </span>
+
                         <h2>All goals</h2>
+
                         <p>
                             Manage your savings targets and monitor progress.
                         </p>
+
                     </div>
 
                     <span className="goals-count">
                         {filteredGoals.length}{" "}
                         {filteredGoals.length === 1 ? "goal" : "goals"}
                     </span>
+
                 </div>
 
+                {/* TOOLBAR */}
+
                 <div className="goals-toolbar">
+
                     <div className="goals-search">
+
                         <FaMagnifyingGlass />
+
                         <input
                             type="search"
                             placeholder="Search goals..."
                             value={search}
-                            onChange={(event) => setSearch(event.target.value)}
+                            onChange={(event) =>
+                                setSearch(event.target.value)
+                            }
                         />
+
                     </div>
 
                     <select
                         value={statusFilter}
-                        onChange={(event) => setStatusFilter(event.target.value)}
+                        onChange={(event) =>
+                            setStatusFilter(event.target.value)
+                        }
                         aria-label="Filter by status"
                     >
                         <option value="ALL">All statuses</option>
@@ -1070,10 +2118,13 @@ function GoalsPage() {
 
                     <select
                         value={categoryFilter}
-                        onChange={(event) => setCategoryFilter(event.target.value)}
+                        onChange={(event) =>
+                            setCategoryFilter(event.target.value)
+                        }
                         aria-label="Filter by category"
                     >
                         <option value="ALL">All categories</option>
+
                         {Object.entries(CATEGORY_CONFIG).map(
                             ([value, config]) => (
                                 <option key={value} value={value}>
@@ -1081,57 +2132,104 @@ function GoalsPage() {
                                 </option>
                             )
                         )}
+
                     </select>
+
                 </div>
 
+                {/* GOAL CONTENT */}
+
                 {loading ? (
-                    <div className="goals-loading-state" role="status">
+
+                    <div
+                        className="goals-loading-state"
+                        role="status"
+                    >
                         <span className="goals-loader" />
-                        <strong>Loading your financial goals...</strong>
-                        <p>Connecting securely to NeuroWallet.</p>
+
+                        <strong>
+                            Loading your financial goals...
+                        </strong>
+
+                        <p>
+                            Connecting securely to NeuroWallet.
+                        </p>
                     </div>
+
                 ) : visibleGoals.length > 0 ? (
+
                     <>
+
                         <div className="goals-grid">
+
                             {visibleGoals.map((goal) => (
+
                                 <GoalCard
                                     key={goal.goalId}
                                     goal={goal}
+                                    busy={busyGoalId === goal.goalId}
                                     onEdit={openEditModal}
                                     onDelete={handleDeleteGoal}
                                     onContribute={setContributionGoal}
+                                    onHistory={setHistoryGoal}
+                                    onStatusChange={handleStatusChange}
                                 />
+
                             ))}
+
                         </div>
 
                         {totalPages > 1 && (
+
                             <div className="goals-pagination">
+
                                 <span>
                                     Page {currentPage} of {totalPages}
                                 </span>
 
                                 <div>
+
                                     <button
                                         type="button"
-                                        onClick={() => setCurrentPage((page) => page - 1)}
+                                        onClick={() =>
+                                            setCurrentPage((page) =>
+                                                Math.max(1, page - 1)
+                                            )
+                                        }
                                         disabled={currentPage === 1}
                                     >
-                                        Previous
+                                        <FaChevronLeft /> Previous
                                     </button>
 
                                     <button
                                         type="button"
-                                        onClick={() => setCurrentPage((page) => page + 1)}
-                                        disabled={currentPage === totalPages}
+                                        onClick={() =>
+                                            setCurrentPage((page) =>
+                                                Math.min(
+                                                    totalPages,
+                                                    page + 1
+                                                )
+                                            )
+                                        }
+                                        disabled={
+                                            currentPage === totalPages
+                                        }
                                     >
-                                        Next
+                                        Next <FaChevronRight />
                                     </button>
+
                                 </div>
+
                             </div>
+
                         )}
+
                     </>
+
                 ) : (
+
                     <div className="goals-empty-state">
+
                         <div className="goals-empty-icon">
                             <FaBullseye />
                         </div>
@@ -1149,6 +2247,7 @@ function GoalsPage() {
                         </p>
 
                         {goals.length === 0 ? (
+
                             <button
                                 type="button"
                                 className="goals-primary-button"
@@ -1156,7 +2255,9 @@ function GoalsPage() {
                             >
                                 <FaPlus /> Create your first goal
                             </button>
+
                         ) : (
+
                             <button
                                 type="button"
                                 className="goals-secondary-button"
@@ -1168,10 +2269,16 @@ function GoalsPage() {
                             >
                                 Clear filters
                             </button>
+
                         )}
+
                     </div>
+
                 )}
+
             </section>
+
+            {/* CREATE / UPDATE MODAL */}
 
             <GoalFormModal
                 open={formOpen}
@@ -1186,14 +2293,26 @@ function GoalsPage() {
                 onSubmit={handleSaveGoal}
             />
 
+            {/* CONTRIBUTION MODAL */}
+
             <ContributionModal
                 goal={contributionGoal}
                 saving={contributionSaving}
                 onClose={() => {
-                    if (!contributionSaving) setContributionGoal(null);
+                    if (!contributionSaving) {
+                        setContributionGoal(null);
+                    }
                 }}
                 onSubmit={handleAddContribution}
             />
+
+            {/* CONTRIBUTION HISTORY */}
+
+            <ContributionHistoryModal
+                goal={historyGoal}
+                onClose={() => setHistoryGoal(null)}
+            />
+
         </main>
     );
 }
