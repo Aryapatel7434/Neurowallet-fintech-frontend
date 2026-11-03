@@ -23,6 +23,7 @@ import TransactionsPage from "../pages/transactions/TransactionsPage";
 import AnalyticsPage from "../pages/analytics/AnalyticsPage";
 import AIInsightsPage from "../pages/ai/AIInsightsPage";
 import GoalsPage from "../pages/goals/GoalsPage";
+import BudgetsPage from "../pages/budgets/BudgetsPage";
 
 // Other Pages
 import SettingsPage from "../pages/settings/SettingsPage";
@@ -32,20 +33,6 @@ import ScheduledTransactionsPage
 // Authentication & Layout
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
-
-// Coming Soon Page
-function ComingSoonPage({ title }) {
-    return (
-        <main className="dashboard-page-content-inner">
-            <h1>{title}</h1>
-            <p>
-                This page is not implemented yet.
-                It will be connected to the NeuroWallet backend
-                when its feature is developed.
-            </p>
-        </main>
-    );
-}
 
 // Protected Application Layout
 function ProtectedLayout({ children }) {
@@ -87,7 +74,6 @@ function AppRoutes() {
                     path="/reset-password"
                     element={<ResetPasswordPage />}
                 />
-
 
                 {/* ==============================
                     PROTECTED APPLICATION ROUTES
@@ -153,6 +139,16 @@ function AppRoutes() {
                     }
                 />
 
+                {/* Budgets Module */}
+                <Route
+                    path="/budgets"
+                    element={
+                        <ProtectedLayout>
+                            <BudgetsPage />
+                        </ProtectedLayout>
+                    }
+                />
+
                 {/* AI Insights */}
                 <Route
                     path="/ai-insights"
@@ -182,7 +178,6 @@ function AppRoutes() {
                         </ProtectedLayout>
                     }
                 />
-
 
                 {/* ==============================
                     FALLBACK ROUTE

@@ -1,3 +1,4 @@
+
 export const API_ENDPOINTS = {
     // =========================================================
     // AUTHENTICATION
@@ -45,22 +46,24 @@ export const API_ENDPOINTS = {
     MARK_ALL_NOTIFICATIONS_READ: "/notifications/read-all",
 
     // =========================================================
-// AI FINANCIAL INTELLIGENCE
-// =========================================================
+    // AI FINANCIAL INTELLIGENCE
+    // =========================================================
 
-AI_INSIGHTS: "/ai/insights",
-FINANCIAL_SCORE: "/ai/financial-score",
-BUDGET_HEALTH: "/ai/budget-health",
-GOAL_RECOMMENDATION: "/ai/goals",
+    AI_INSIGHTS: "/ai/insights",
+    FINANCIAL_SCORE: "/ai/financial-score",
 
-// Legacy single-question assistant
-AI_ASSISTANT: "/ai/assistant",
+    // Existing AI budget endpoints
+    BUDGET_HEALTH: "/ai/budget-health",
+    BUDGET_ADVISOR: "/ai/budget-advisor",
 
-// Fraud detection
-AI_FRAUD: (transactionId) =>
-    `/ai/fraud/${encodeURIComponent(transactionId)}`,
+    GOAL_RECOMMENDATION: "/ai/goals",
+
     // Legacy single-question assistant
     AI_ASSISTANT: "/ai/assistant",
+
+    // Fraud detection
+    AI_FRAUD: (transactionId) =>
+        `/ai/fraud/${encodeURIComponent(transactionId)}`,
 
     // =========================================================
     // PERSISTENT AI CONVERSATIONS
@@ -75,14 +78,38 @@ AI_FRAUD: (transactionId) =>
         `/ai/conversations/${encodeURIComponent(conversationId)}/messages`,
 
     // =========================================================
-// SCHEDULED TRANSACTIONS
-// =========================================================
+    // BUDGET MANAGEMENT - CRUD APIs
+    // =========================================================
 
-SCHEDULED_TRANSACTIONS: "/scheduled-transactions",
+    // Create budget: POST
+    BUDGETS: "/budgets",
 
-CREATE_SCHEDULED_TRANSACTION:
-    "/scheduled-transactions/schedule",
+    // Get paginated budgets: GET
+    MY_BUDGETS: "/budgets",
 
-SCHEDULED_TRANSACTION_BY_ID: (id) =>
-    `/scheduled-transactions/${encodeURIComponent(id)}`,
+    // Get budget summary: GET
+    BUDGET_SUMMARY: "/budgets/summary",
+
+    // Get active budgets: GET
+    ACTIVE_BUDGETS: "/budgets/active",
+
+    // Get, update and delete a specific budget
+    BUDGET_BY_ID: (budgetId) =>
+        `/budgets/${encodeURIComponent(budgetId)}`,
+
+    // Update budget status: PATCH
+    BUDGET_STATUS: (budgetId) =>
+        `/budgets/${encodeURIComponent(budgetId)}/status`,
+
+    // =========================================================
+    // SCHEDULED TRANSACTIONS
+    // =========================================================
+
+    SCHEDULED_TRANSACTIONS: "/scheduled-transactions",
+
+    CREATE_SCHEDULED_TRANSACTION:
+        "/scheduled-transactions/schedule",
+
+    SCHEDULED_TRANSACTION_BY_ID: (id) =>
+        `/scheduled-transactions/${encodeURIComponent(id)}`,
 };
