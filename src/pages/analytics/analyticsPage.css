@@ -1,9 +1,28 @@
+
+/* =========================================================
+   NEUROWALLET — ENTERPRISE ANALYTICS
+   Dark navy / blue fintech design
+   ========================================================= */
+
 .analytics-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
     min-height: 100%;
     padding: 32px;
     color: #e8edf7;
     background: #0b1020;
 }
+
+.analytics-page *,
+.analytics-page *::before,
+.analytics-page *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .analytics-header {
     display: flex;
@@ -11,6 +30,10 @@
     justify-content: space-between;
     gap: 24px;
     margin-bottom: 32px;
+}
+
+.analytics-header > div {
+    min-width: 0;
 }
 
 .analytics-header h1 {
@@ -33,22 +56,55 @@
     letter-spacing: 1.8px;
 }
 
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
 .analytics-refresh {
     flex-shrink: 0;
+    min-height: 42px;
     padding: 10px 16px;
     color: #e8edf7;
     background: #17213a;
     border: 1px solid #2b3957;
     border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease;
 }
 
-.analytics-refresh:hover {
+.analytics-refresh:hover:not(:disabled) {
     background: #202e4b;
+    border-color: rgba(122, 162, 255, 0.55);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
 }
+
+.analytics-refresh:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.analytics-refresh:focus-visible {
+    outline: 2px solid #7aa2ff;
+    outline-offset: 3px;
+}
+
+.analytics-refresh:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
 
 .analytics-section {
+    min-width: 0;
     margin-bottom: 28px;
 }
 
@@ -56,13 +112,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 16px;
     margin-bottom: 16px;
+}
+
+.analytics-section-heading > div {
+    min-width: 0;
 }
 
 .analytics-section-heading h2 {
     margin: 0 0 5px;
     font-size: 18px;
     font-weight: 650;
+    letter-spacing: -0.2px;
 }
 
 .analytics-section-heading p {
@@ -72,363 +134,87 @@
     line-height: 1.6;
 }
 
-.analytics-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.analytics-metric,
-.analytics-panel {
-    min-width: 0;
-    padding: 22px;
-    background: #111a2d;
-    border: 1px solid #202d45;
-    border-radius: 14px;
-}
-
-.analytics-metric-label {
-    margin: 0 0 14px;
-    color: #9ba8bf;
-    font-size: 13px;
-}
-
-.analytics-metric-value {
-    overflow-wrap: anywhere;
-    margin: 0 0 10px;
-    font-size: clamp(19px, 2vw, 26px);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.analytics-metric-description {
-    margin: 0;
-    color: #7887a2;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.analytics-panels {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.analytics-panel {
-    padding: 24px;
-}
-
-.analytics-category-list {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.analytics-category-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 10px;
-    font-size: 13px;
-}
-
-.analytics-category-top span {
-    color: #cbd5e5;
-    overflow-wrap: anywhere;
-}
-
-.analytics-category-top strong {
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-}
-
-.analytics-progress-track {
-    overflow: hidden;
-    height: 7px;
-    background: #202c43;
-    border-radius: 999px;
-}
-
-.analytics-progress-fill {
-    height: 100%;
-    background: #6c91f5;
-    border-radius: inherit;
-    transition: width 250ms ease;
-}
-
-.analytics-category-percent {
-    margin: 7px 0 0;
-    color: #8f9cb3;
-    font-size: 12px;
-    text-align: right;
-}
-
-.analytics-pattern-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.analytics-pattern-item {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 15px 0;
-    border-bottom: 1px solid #202d45;
-    font-size: 13px;
-}
-
-.analytics-pattern-item:first-child {
-    padding-top: 0;
-}
-
-.analytics-pattern-item:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-}
-
-.analytics-pattern-item span {
-    color: #9ba8bf;
-}
-
-.analytics-pattern-item strong {
-    max-width: 55%;
-    color: #e8edf7;
-    text-align: right;
-    overflow-wrap: anywhere;
-}
-
-.analytics-loading,
-.analytics-error,
-.analytics-empty {
-    padding: 20px;
-    color: #aab7cc;
-    background: #111a2d;
-    border: 1px solid #202d45;
-    border-radius: 12px;
-    line-height: 1.6;
-}
-
-.analytics-error {
-    margin-bottom: 24px;
-    border-color: #79504a;
-}
-
-.analytics-error strong {
-    color: #ffb4a8;
-}
-
-.analytics-error p {
-    margin: 8px 0 0;
-}
-
-.analytics-empty {
-    margin: 0;
-    padding: 16px;
-}
-
-.analytics-footnote {
-    margin: 24px 0 0;
-    color: #7887a2;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-@media (max-width: 1100px) {
-    .analytics-metrics-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .analytics-panels {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .analytics-page {
-        padding: 20px 14px;
-    }
-
-    .analytics-header {
-        align-items: flex-start;
-        flex-direction: column;
-        margin-bottom: 24px;
-    }
-
-    .analytics-metrics-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .analytics-metric {
-        padding: 18px;
-    }
-
-    .analytics-panel {
-        padding: 18px;
-    }
-
-    .analytics-pattern-item {
-        font-size: 12px;
-    }
-}
-
-/* ==========================================
-   NEUROWALLET — ANALYTICS LAYOUT ENHANCEMENT
-   Additive overrides: preserve existing styles
-   ========================================== */
-
-.analytics-page {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-}
-
-.analytics-page *,
-.analytics-page *::before,
-.analytics-page *::after {
-    box-sizing: border-box;
-}
-
-.analytics-header > div {
-    min-width: 0;
-}
-
-.analytics-refresh {
-    transition:
-        background-color 180ms ease,
-        border-color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease;
-}
-
-.analytics-refresh:hover {
-    border-color: rgba(122, 162, 255, 0.55);
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
-}
-
-.analytics-refresh:active {
-    transform: translateY(1px);
-}
-
-.analytics-refresh:focus-visible {
-    outline: 2px solid #7aa2ff;
-    outline-offset: 3px;
-}
-
-.analytics-metric,
-.analytics-panel {
-    min-width: 0;
-    height: 100%;
-    transition:
-        border-color 180ms ease,
-        background-color 180ms ease,
-        box-shadow 180ms ease;
-}
-
-.analytics-metric:hover,
-.analytics-panel:hover {
-    border-color: #344665;
-}
-
-.analytics-metric-value {
-    line-height: 1.3;
-    font-variant-numeric: tabular-nums;
-}
-
-.analytics-metrics-grid {
-    align-items: stretch;
-}
-
-.analytics-panels {
-    align-items: stretch;
-}
-
-.analytics-panel {
-    overflow-wrap: anywhere;
-}
-
-.analytics-category,
-.analytics-pattern-item {
-    min-width: 0;
-}
-
-.analytics-progress-fill {
-    background: linear-gradient(90deg, #557cf0, #8b9dff);
-}
-
-.analytics-loading:focus-visible,
-.analytics-error:focus-visible {
-    outline: 2px solid #7aa2ff;
-    outline-offset: 3px;
-}
-
-@media (min-width: 1400px) {
-    .analytics-page {
-        padding: 36px;
-    }
-
-    .analytics-metrics-grid {
-        gap: 20px;
-    }
-
-    .analytics-panels {
-        gap: 24px;
-    }
-}
-
-@media (max-width: 900px) {
-    .analytics-page {
-        padding: 24px;
-    }
-}
-
-@media (max-width: 600px) {
-    .analytics-page {
-        padding: 20px 14px;
-    }
-
-    .analytics-refresh {
-        min-height: 42px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .analytics-refresh,
-    .analytics-metric,
-    .analytics-panel,
-    .analytics-progress-fill {
-        transition: none;
-    }
-}
-
-/* ==========================================
-   NEUROWALLET — ANALYTICS DATE FILTERS
-   Enterprise dark-theme styling
-   ========================================== */
+/* =========================================================
+   DATE FILTERS
+   ========================================================= */
 
 .analytics-filter-controls {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding: 18px 20px;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 16px;
     background: #111a2d;
     border: 1px solid #202d45;
     border-radius: 14px;
 }
 
-.analytics-filter-controls > * {
-    min-width: 0;
+.analytics-filter-controls button {
+    min-height: 40px;
+    padding: 9px 16px;
+    color: #aab7cc;
+    background: #0b1427;
+    border: 1px solid #2b3957;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        color 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease;
 }
 
-.analytics-filter-controls select,
-.analytics-filter-controls input {
-    min-height: 40px;
+.analytics-filter-controls button:hover {
+    color: #ffffff;
+    background: #1a2944;
+    border-color: #557cf0;
+}
+
+.analytics-filter-controls button.analytics-filter-active {
+    color: #ffffff;
+    background: #294b9b;
+    border-color: #6389f5;
+    box-shadow: 0 0 0 2px rgba(99, 137, 245, 0.12);
+}
+
+.analytics-filter-controls button:focus-visible {
+    outline: 2px solid #7aa2ff;
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   CUSTOM DATE RANGE
+   ========================================================= */
+
+.analytics-custom-date {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding: 18px;
+    background: #111a2d;
+    border: 1px solid #202d45;
+    border-radius: 12px;
+}
+
+.analytics-custom-date label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 180px;
+    color: #9ba8bf;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.analytics-custom-date input {
+    width: 100%;
+    min-height: 42px;
     padding: 9px 12px;
     color: #e8edf7;
     background: #0b1427;
@@ -436,61 +222,30 @@
     border-radius: 8px;
     font: inherit;
     font-size: 13px;
+    color-scheme: dark;
     outline: none;
     transition:
         border-color 180ms ease,
-        box-shadow 180ms ease,
-        background-color 180ms ease;
+        box-shadow 180ms ease;
 }
 
-.analytics-filter-controls select {
-    min-width: 150px;
-    cursor: pointer;
+.analytics-custom-date input:hover {
+    border-color: #405578;
 }
 
-.analytics-filter-controls input {
-    color-scheme: dark;
-}
-
-.analytics-filter-controls select:focus,
-.analytics-filter-controls input:focus {
+.analytics-custom-date input:focus {
     border-color: #7aa2ff;
     box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.12);
 }
 
-.analytics-filter-controls select:hover,
-.analytics-filter-controls input:hover {
-    border-color: #405578;
-}
-
-.analytics-filter-controls select option {
-    color: #e8edf7;
-    background: #111a2d;
-}
-
-.analytics-custom-date {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.analytics-custom-date label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: #9ba8bf;
-    font-size: 12px;
-    font-weight: 600;
-}
-
 .analytics-custom-date button {
-    min-height: 40px;
-    padding: 9px 16px;
+    min-height: 42px;
+    padding: 10px 18px;
     color: #ffffff;
     background: #426fe5;
     border: 1px solid #557cf0;
     border-radius: 8px;
+    font: inherit;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -514,12 +269,16 @@
     outline-offset: 3px;
 }
 
+/* =========================================================
+   FILTER INFORMATION AND VALIDATION
+   ========================================================= */
+
 .analytics-filter-description {
-    width: 100%;
-    margin: -12px 0 20px;
-    color: #7887a2;
+    margin: 0 0 24px;
+    color: #8f9cb3;
     font-size: 12px;
     line-height: 1.6;
+    overflow-wrap: anywhere;
 }
 
 .analytics-filter-error {
@@ -533,42 +292,381 @@
     line-height: 1.6;
 }
 
-.analytics-filter-error:empty {
-    display: none;
+/* =========================================================
+   FINANCIAL METRIC CARDS
+   ========================================================= */
+
+.analytics-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 16px;
 }
 
-/* Responsive filter layout */
+.analytics-metric,
+.analytics-panel {
+    min-width: 0;
+    height: 100%;
+    padding: 22px;
+    background: #111a2d;
+    border: 1px solid #202d45;
+    border-radius: 14px;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease;
+}
 
-@media (max-width: 700px) {
+.analytics-metric:hover,
+.analytics-panel:hover {
+    border-color: #344665;
+}
+
+.analytics-metric-label {
+    margin: 0 0 14px;
+    color: #9ba8bf;
+    font-size: 13px;
+}
+
+.analytics-metric-value {
+    overflow-wrap: anywhere;
+    margin: 0 0 10px;
+    color: #e8edf7;
+    font-size: clamp(19px, 2vw, 26px);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.analytics-metric-description {
+    margin: 0;
+    color: #7887a2;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   ANALYTICS PANELS
+   ========================================================= */
+
+.analytics-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 20px;
+}
+
+.analytics-panel {
+    padding: 24px;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   CATEGORY SPENDING
+   ========================================================= */
+
+.analytics-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.analytics-category {
+    min-width: 0;
+}
+
+.analytics-category-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.analytics-category-top span {
+    min-width: 0;
+    color: #cbd5e5;
+    overflow-wrap: anywhere;
+}
+
+.analytics-category-top strong {
+    flex-shrink: 0;
+    color: #e8edf7;
+    font-variant-numeric: tabular-nums;
+}
+
+.analytics-progress-track {
+    overflow: hidden;
+    height: 7px;
+    background: #202c43;
+    border-radius: 999px;
+}
+
+.analytics-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #557cf0, #8b9dff);
+    border-radius: inherit;
+    transition: width 250ms ease;
+}
+
+.analytics-category-percent {
+    margin: 7px 0 0;
+    color: #8f9cb3;
+    font-size: 12px;
+    text-align: right;
+}
+
+/* =========================================================
+   SPENDING PATTERNS
+   ========================================================= */
+
+.analytics-pattern-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.analytics-pattern-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid #202d45;
+    font-size: 13px;
+}
+
+.analytics-pattern-item:first-child {
+    padding-top: 0;
+}
+
+.analytics-pattern-item:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.analytics-pattern-item span {
+    color: #9ba8bf;
+}
+
+.analytics-pattern-item strong {
+    max-width: 55%;
+    color: #e8edf7;
+    text-align: right;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   LOADING, ERROR AND EMPTY STATES
+   ========================================================= */
+
+.analytics-loading,
+.analytics-error,
+.analytics-empty {
+    padding: 20px;
+    color: #aab7cc;
+    background: #111a2d;
+    border: 1px solid #202d45;
+    border-radius: 12px;
+    line-height: 1.6;
+}
+
+.analytics-loading {
+    text-align: center;
+}
+
+.analytics-error {
+    margin-bottom: 24px;
+    border-color: #79504a;
+}
+
+.analytics-error strong {
+    color: #ffb4a8;
+}
+
+.analytics-error p {
+    margin: 8px 0 14px;
+}
+
+.analytics-error .analytics-refresh {
+    margin-top: 4px;
+}
+
+.analytics-empty {
+    margin: 0;
+    padding: 16px;
+    color: #8f9cb3;
+}
+
+/* =========================================================
+   DATA TRANSPARENCY
+   ========================================================= */
+
+.analytics-footnote {
+    margin: 24px 0 0;
+    padding-top: 16px;
+    color: #7887a2;
+    border-top: 1px solid #202d45;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* =========================================================
+   INTERACTION ACCESSIBILITY
+   ========================================================= */
+
+.analytics-page button:focus-visible,
+.analytics-page input:focus-visible {
+    outline: 2px solid #7aa2ff;
+    outline-offset: 3px;
+}
+
+.analytics-page button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1400px) {
+    .analytics-page {
+        padding: 36px;
+    }
+
+    .analytics-metrics-grid {
+        gap: 20px;
+    }
+
+    .analytics-panels {
+        gap: 24px;
+    }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .analytics-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .analytics-panels {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .analytics-page {
+        padding: 24px;
+    }
+
+    .analytics-filter-controls {
+        gap: 9px;
+    }
+
+    .analytics-filter-controls button {
+        flex: 1 1 auto;
+    }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+    .analytics-page {
+        padding: 20px 14px;
+    }
+
+    .analytics-header {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-bottom: 24px;
+    }
+
+    .analytics-header h1 {
+        font-size: 28px;
+    }
+
+    .analytics-refresh {
+        width: 100%;
+    }
+
+    .analytics-section {
+        margin-bottom: 24px;
+    }
+
+    .analytics-section-heading h2 {
+        font-size: 17px;
+    }
+
+    .analytics-metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .analytics-metric {
+        padding: 18px;
+    }
+
+    .analytics-panel {
+        padding: 18px;
+    }
+
     .analytics-filter-controls {
         align-items: stretch;
         flex-direction: column;
-        padding: 16px;
+        padding: 14px;
     }
 
-    .analytics-filter-controls select {
+    .analytics-filter-controls button {
         width: 100%;
+        flex: initial;
+        text-align: left;
     }
 
     .analytics-custom-date {
         align-items: stretch;
         flex-direction: column;
+        padding: 16px;
     }
 
-    .analytics-custom-date label,
+    .analytics-custom-date label {
+        min-width: 0;
+        width: 100%;
+    }
+
     .analytics-custom-date input,
     .analytics-custom-date button {
         width: 100%;
     }
 
-    .analytics-filter-description {
-        margin-top: -10px;
+    .analytics-pattern-item {
+        font-size: 12px;
+    }
+
+    .analytics-footnote {
+        font-size: 11px;
     }
 }
 
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
-    .analytics-filter-controls select,
-    .analytics-filter-controls input,
+    .analytics-refresh,
+    .analytics-metric,
+    .analytics-panel,
+    .analytics-progress-fill,
+    .analytics-filter-controls button,
+    .analytics-custom-date input,
     .analytics-custom-date button {
         transition: none;
     }

@@ -1,5 +1,9 @@
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 
 import {
     getDashboardAnalytics,
@@ -10,10 +14,6 @@ import {
 
 import "./analyticsPage.css";
 
-// ============================================================
-// FORMATTERS
-// ============================================================
-
 const formatINR = (value) =>
     new Intl.NumberFormat("en-IN", {
         style: "currency",
@@ -22,36 +22,23 @@ const formatINR = (value) =>
     }).format(Number(value ?? 0));
 
 const formatNumber = (value) =>
-    new Intl.NumberFormat("en-IN").format(Number(value ?? 0));
+    new Intl.NumberFormat("en-IN").format(
+        Number(value ?? 0)
+    );
 
-const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
+const INITIAL_DATA = {
+    dashboard: null,
+    transactions: null,
+    categories: [],
+    spending: null,
 };
-
-const getDateRange = (days) => {
-    const today = new Date();
-    const from = new Date(today);
-
-    from.setDate(today.getDate() - (days - 1));
-
-    return {
-        fromDate: formatDate(from),
-        toDate: formatDate(today),
-    };
-};
-
-// ============================================================
-// METRIC CARD
-// ============================================================
 
 function MetricCard({ label, value, description }) {
     return (
         <article className="analytics-metric">
-            <p className="analytics-metric-label">{label}</p>
+            <p className="analytics-metric-label">
+                {label}
+            </p>
 
             <h2 className="analytics-metric-value">
                 {value}
@@ -64,202 +51,193 @@ function MetricCard({ label, value, description }) {
     );
 }
 
-// ============================================================
-// ANALYTICS PAGE
-// ============================================================
-
 function AnalyticsPage() {
-    const [data, setData] = useState({
-        dashboard: null,
-        transactions: null,
-        categories: [],
-        spending: null,
-    });
+    const [data, setData] = useState(INITIAL_DATA);
 
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [errors, setErrors] = useState([]);
 
-    // Date filter state.
-    const [selectedRange, setSelectedRange] = useState("ALL");
+    const [datePreset, setDatePreset] = useState("all");
 
-    const [customFromDate, setCustomFromDate] = useState("");
-    const [customToDate, setCustomToDate] = useState("");
+    const [customFromDate, setCustomFromDate] =
+        useState("");
 
-    const [dateError, setDateError] = useState("");
+    const [customToDate, setCustomToDate] =
+        useState("");
 
-    // Applied dates are separate from the dates being edited.
-    const [appliedFilters, setAppliedFilters] = useState({
-        fromDate: "",
-        toDate: "",
-    });
+    const [appliedFilters, setAppliedFilters] =
+        useState({});
 
-    // Refresh trigger.
+    const [filterError, setFilterError] =
+        useState("");
+
     const [refreshKey, setRefreshKey] = useState(0);
 
-    // ========================================================
-    // LOAD ANALYTICS
-    // ========================================================
+    /**
+     * Generate date filters for predefined periods.
+     *
+     * Dates use the browser's local calendar date.
+     */
+    const getPresetFilters = useCallback((preset) => {
+        if (preset === "all") {
+            return {};
+        }
 
-    const loadAnalytics = useCallback(async () => {
-        setLoading(true);
-        setRefreshing(true);
-        setErrors([]);
+        const today = new Date();
 
-        const filters = {
-            ...(appliedFilters.fromDate && {
-                fromDate: appliedFilters.fromDate,
-            }),
-            ...(appliedFilters.toDate && {
-                toDate: appliedFilters.toDate,
-            }),
+        const toDate = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, "0"),
+            String(today.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        const from = new Date(today);
+
+        switch (preset) {
+            case "7":
+                from.setDate(from.getDate() - 6);
+                break;
+
+            case "30":
+                from.setDate(from.getDate() - 29);
+                break;
+
+            case "90":
+                from.setDate(from.getDate() - 89);
+                break;
+
+            default:
+                return {};
+        }
+
+        const fromDate = [
+            from.getFullYear(),
+            String(from.getMonth() + 1).padStart(2, "0"),
+            String(from.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        return {
+            fromDate,
+            toDate,
         };
+    }, []);
 
-        const requests = await Promise.allSettled([
-            // Dashboard endpoint currently returns all-time data.
-            getDashboardAnalytics(),
-
-            getTransactionAnalytics(filters),
-            getCategorySpending(filters),
-            getSpendingPattern(filters),
-        ]);
-
-        return requests;
-    }, [appliedFilters]);
-
+    /**
+     * Load all analytics using one consistent date range.
+     *
+     * Each section is handled independently so one failed
+     * endpoint does not hide the remaining analytics.
+     */
     useEffect(() => {
         let active = true;
 
-        const execute = async () => {
-            try {
-                const requests = await loadAnalytics();
+        const loadAnalytics = async () => {
+            setLoading(true);
+            setRefreshing(refreshKey > 0);
+            setErrors([]);
 
-                if (!active) {
-                    return;
-                }
+            const requests = await Promise.allSettled([
+                getDashboardAnalytics(appliedFilters),
+                getTransactionAnalytics(appliedFilters),
+                getCategorySpending(appliedFilters),
+                getSpendingPattern(appliedFilters),
+            ]);
 
-                const [
-                    dashboard,
-                    transactions,
-                    categories,
-                    spending,
-                ] = requests;
-
-                const nextData = {
-                    dashboard:
-                        dashboard.status === "fulfilled"
-                            ? dashboard.value
-                            : null,
-
-                    transactions:
-                        transactions.status === "fulfilled"
-                            ? transactions.value
-                            : null,
-
-                    categories:
-                        categories.status === "fulfilled" &&
-                        Array.isArray(categories.value)
-                            ? categories.value
-                            : [],
-
-                    spending:
-                        spending.status === "fulfilled"
-                            ? spending.value
-                            : null,
-                };
-
-                const labels = [
-                    "Dashboard summary",
-                    "Transaction analytics",
-                    "Category spending",
-                    "Spending patterns",
-                ];
-
-                const nextErrors = requests
-                    .map((result, index) => ({
-                        result,
-                        label: labels[index],
-                    }))
-                    .filter(
-                        ({ result }) =>
-                            result.status === "rejected"
-                    )
-                    .map(({ label }) => label);
-
-                setData(nextData);
-                setErrors(nextErrors);
-            } catch (error) {
-                if (active) {
-                    setErrors([
-                        error?.message ||
-                            "Unable to load analytics.",
-                    ]);
-                }
-            } finally {
-                if (active) {
-                    setLoading(false);
-                    setRefreshing(false);
-                }
+            if (!active) {
+                return;
             }
+
+            const [
+                dashboardResult,
+                transactionResult,
+                categoryResult,
+                spendingResult,
+            ] = requests;
+
+            const nextData = {
+                dashboard:
+                    dashboardResult.status === "fulfilled"
+                        ? dashboardResult.value
+                        : null,
+
+                transactions:
+                    transactionResult.status === "fulfilled"
+                        ? transactionResult.value
+                        : null,
+
+                categories:
+                    categoryResult.status === "fulfilled" &&
+                    Array.isArray(categoryResult.value)
+                        ? categoryResult.value
+                        : [],
+
+                spending:
+                    spendingResult.status === "fulfilled"
+                        ? spendingResult.value
+                        : null,
+            };
+
+            const resultLabels = [
+                "Dashboard summary",
+                "Transaction analytics",
+                "Category spending",
+                "Spending patterns",
+            ];
+
+            const failedSections = requests
+                .map((result, index) => ({
+                    result,
+                    label: resultLabels[index],
+                }))
+                .filter(
+                    ({ result }) =>
+                        result.status === "rejected"
+                )
+                .map(({ label }) => label);
+
+            setData(nextData);
+            setErrors(failedSections);
+            setLoading(false);
+            setRefreshing(false);
         };
 
-        execute();
+        loadAnalytics();
 
         return () => {
             active = false;
         };
-    }, [loadAnalytics, refreshKey]);
+    }, [appliedFilters, refreshKey]);
 
-    // ========================================================
-    // DATE FILTER HANDLERS
-    // ========================================================
+    /**
+     * Apply predefined date filters.
+     */
+    const handlePresetChange = (preset) => {
+        setDatePreset(preset);
+        setFilterError("");
 
-    const handleRangeChange = (event) => {
-        const range = event.target.value;
-
-        setSelectedRange(range);
-        setDateError("");
-
-        if (range === "ALL") {
-            setAppliedFilters({
-                fromDate: "",
-                toDate: "",
-            });
-
+        if (preset === "custom") {
             return;
         }
 
-        if (range === "CUSTOM") {
-            return;
-        }
-
-        const days = Number(range);
-
-        if (!Number.isInteger(days) || days <= 0) {
-            setDateError("Please select a valid date range.");
-            return;
-        }
-
-        const dates = getDateRange(days);
-
-        setCustomFromDate(dates.fromDate);
-        setCustomToDate(dates.toDate);
-
-        setAppliedFilters(dates);
+        setAppliedFilters(getPresetFilters(preset));
     };
 
+    /**
+     * Validate and apply a custom date range.
+     */
     const handleCustomDateApply = () => {
-        setDateError("");
+        setFilterError("");
 
         if (!customFromDate || !customToDate) {
-            setDateError(
-                "Please select both a start date and an end date."
+            setFilterError(
+                "Please select both start and end dates."
             );
             return;
         }
 
         if (customFromDate > customToDate) {
-            setDateError(
+            setFilterError(
                 "Start date cannot be after end date."
             );
             return;
@@ -269,43 +247,58 @@ function AnalyticsPage() {
             fromDate: customFromDate,
             toDate: customToDate,
         });
+
+        setDatePreset("custom");
     };
 
+    /**
+     * Refresh analytics without reloading the application.
+     */
     const handleRefresh = () => {
-        setRefreshKey((current) => current + 1);
+        setRefreshKey((previous) => previous + 1);
     };
 
-    // ========================================================
-    // DERIVED DATA
-    // ========================================================
-
+    /**
+     * Data references.
+     */
     const dashboard = data.dashboard ?? {};
     const transactions = data.transactions ?? {};
     const spending = data.spending ?? {};
 
+    /**
+     * Financial metrics.
+     *
+     * Prefer transaction analytics because it uses the same
+     * selected date range as the other analytics endpoints.
+     */
     const income =
-        transactions.totalIncome ?? dashboard.totalIncome;
+        transactions.totalIncome ??
+        dashboard.totalIncome;
 
     const expense =
-        transactions.totalExpense ?? dashboard.totalExpense;
+        transactions.totalExpense ??
+        dashboard.totalExpense;
 
     const savings =
-        transactions.savings ?? dashboard.netCashFlow;
+        transactions.savings ??
+        dashboard.netCashFlow;
 
-    const selectedDateDescription =
-        appliedFilters.fromDate && appliedFilters.toDate
-            ? `${appliedFilters.fromDate} to ${appliedFilters.toDate}`
-            : appliedFilters.fromDate
-                ? `From ${appliedFilters.fromDate}`
-                : appliedFilters.toDate
-                    ? `Until ${appliedFilters.toDate}`
-                    : "All available time";
+    const transactionCount =
+        transactions.totalTransactions ??
+        dashboard.transactionCount;
 
-    // ========================================================
-    // LOADING VIEW
-    // ========================================================
+    const formatPeriod = () => {
+        if (!appliedFilters.fromDate || !appliedFilters.toDate) {
+            return "All-time financial activity";
+        }
 
-    if (loading && !data.transactions && !data.dashboard) {
+        return `${appliedFilters.fromDate} to ${appliedFilters.toDate}`;
+    };
+
+    /**
+     * Loading state.
+     */
+    if (loading && !data.dashboard && !data.transactions) {
         return (
             <main className="analytics-page">
                 <header className="analytics-header">
@@ -317,7 +310,7 @@ function AnalyticsPage() {
                         <h1>Analytics</h1>
 
                         <p>
-                            Loading your financial data...
+                            Loading your financial analytics...
                         </p>
                     </div>
                 </header>
@@ -333,15 +326,9 @@ function AnalyticsPage() {
         );
     }
 
-    // ========================================================
-    // MAIN VIEW
-    // ========================================================
-
     return (
         <main className="analytics-page">
-
-            {/* PAGE HEADER */}
-
+            {/* Page header */}
             <header className="analytics-header">
                 <div>
                     <p className="analytics-eyebrow">
@@ -351,8 +338,8 @@ function AnalyticsPage() {
                     <h1>Analytics</h1>
 
                     <p>
-                        Understand your financial activity using
-                        your available transaction data.
+                        Understand your financial activity
+                        through intelligent financial insights.
                     </p>
                 </div>
 
@@ -361,13 +348,15 @@ function AnalyticsPage() {
                     type="button"
                     onClick={handleRefresh}
                     disabled={refreshing}
+                    aria-label="Refresh analytics data"
                 >
-                    {refreshing ? "Refreshing..." : "Refresh data"}
+                    {refreshing
+                        ? "Refreshing..."
+                        : "Refresh data"}
                 </button>
             </header>
 
-            {/* DATE FILTER */}
-
+            {/* Date filters */}
             <section
                 className="analytics-section"
                 aria-label="Analytics date filters"
@@ -377,98 +366,96 @@ function AnalyticsPage() {
                         <h2>Analytics period</h2>
 
                         <p>
-                            Filter transaction analytics by date.
+                            Select a period to analyze your
+                            financial activity.
                         </p>
                     </div>
                 </div>
 
                 <div className="analytics-filter-controls">
-                    <label htmlFor="analytics-date-range">
-                        Select period
-                    </label>
-
-                    <select
-                        id="analytics-date-range"
-                        value={selectedRange}
-                        onChange={handleRangeChange}
-                    >
-                        <option value="ALL">All Time</option>
-                        <option value="7">Last 7 Days</option>
-                        <option value="30">Last 30 Days</option>
-                        <option value="90">Last 90 Days</option>
-                        <option value="CUSTOM">Custom Range</option>
-                    </select>
+                    {[
+                        { label: "All Time", value: "all" },
+                        { label: "Last 7 Days", value: "7" },
+                        { label: "Last 30 Days", value: "30" },
+                        { label: "Last 90 Days", value: "90" },
+                        { label: "Custom Range", value: "custom" },
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            type="button"
+                            className={
+                                datePreset === option.value
+                                    ? "analytics-filter-active"
+                                    : ""
+                            }
+                            onClick={() =>
+                                handlePresetChange(option.value)
+                            }
+                            aria-pressed={
+                                datePreset === option.value
+                            }
+                        >
+                            {option.label}
+                        </button>
+                    ))}
                 </div>
 
-                {selectedRange === "CUSTOM" && (
+                {datePreset === "custom" && (
                     <div className="analytics-custom-date">
-
-                        <div>
-                            <label htmlFor="analytics-from-date">
-                                Start date
-                            </label>
+                        <label>
+                            Start date
 
                             <input
-                                id="analytics-from-date"
                                 type="date"
                                 value={customFromDate}
                                 max={customToDate || undefined}
                                 onChange={(event) =>
-                                    setCustomFromDate(event.target.value)
+                                    setCustomFromDate(
+                                        event.target.value
+                                    )
                                 }
                             />
-                        </div>
+                        </label>
 
-                        <div>
-                            <label htmlFor="analytics-to-date">
-                                End date
-                            </label>
+                        <label>
+                            End date
 
                             <input
-                                id="analytics-to-date"
                                 type="date"
                                 value={customToDate}
                                 min={customFromDate || undefined}
                                 onChange={(event) =>
-                                    setCustomToDate(event.target.value)
+                                    setCustomToDate(
+                                        event.target.value
+                                    )
                                 }
                             />
-                        </div>
+                        </label>
 
                         <button
                             type="button"
-                            className="analytics-refresh"
                             onClick={handleCustomDateApply}
                         >
-                            Apply filter
+                            Apply range
                         </button>
                     </div>
                 )}
 
-                {dateError && (
-                    <p className="analytics-filter-error" role="alert">
-                        {dateError}
+                {filterError && (
+                    <p
+                        className="analytics-filter-error"
+                        role="alert"
+                    >
+                        {filterError}
                     </p>
                 )}
 
                 <p className="analytics-filter-description">
-                    Showing transaction analytics for:{" "}
-                    <strong>{selectedDateDescription}</strong>
+                    Showing: {formatPeriod()}
                 </p>
-
-                {refreshing && (
-                    <p
-                        className="analytics-filter-description"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        Updating analytics...
-                    </p>
-                )}
             </section>
 
-            {/* PARTIAL LOAD ERRORS */}
-
+            {/* Partial API errors */}
             {errors.length > 0 && (
                 <section
                     className="analytics-error"
@@ -480,21 +467,28 @@ function AnalyticsPage() {
 
                     <p>
                         Unavailable: {errors.join(", ")}.
-                        Other successfully loaded sections remain
-                        available.
+                        Other successfully loaded sections
+                        remain available.
                     </p>
+
+                    <button
+                        type="button"
+                        className="analytics-refresh"
+                        onClick={handleRefresh}
+                    >
+                        Retry
+                    </button>
                 </section>
             )}
 
-            {/* FINANCIAL SUMMARY */}
-
+            {/* Financial summary */}
             <section className="analytics-section">
                 <div className="analytics-section-heading">
                     <div>
                         <h2>Financial summary</h2>
 
                         <p>
-                            Aggregated figures returned by your backend
+                            Financial aggregates for the selected period.
                         </p>
                     </div>
                 </div>
@@ -527,36 +521,29 @@ function AnalyticsPage() {
                                 ? "Unavailable"
                                 : formatINR(savings)
                         }
-                        description="Backend-calculated balance of income and expenses"
+                        description="Backend-calculated net savings"
                     />
 
                     <MetricCard
                         label="Transactions"
                         value={
-                            transactions.totalTransactions == null
-                                ? dashboard.transactionCount == null
-                                    ? "Unavailable"
-                                    : formatNumber(
-                                        dashboard.transactionCount
-                                    )
-                                : formatNumber(
-                                    transactions.totalTransactions
-                                )
+                            transactionCount == null
+                                ? "Unavailable"
+                                : formatNumber(transactionCount)
                         }
-                        description="Total transactions reported"
+                        description="Total reported transactions"
                     />
                 </div>
             </section>
 
-            {/* TRANSACTION PERFORMANCE */}
-
+            {/* Transaction performance */}
             <section className="analytics-section">
                 <div className="analytics-section-heading">
                     <div>
                         <h2>Transaction performance</h2>
 
                         <p>
-                            Success and failure metrics from the backend
+                            Transaction success and failure metrics.
                         </p>
                     </div>
                 </div>
@@ -568,8 +555,8 @@ function AnalyticsPage() {
                             transactions.successfulTransactions == null
                                 ? "Unavailable"
                                 : formatNumber(
-                                    transactions.successfulTransactions
-                                )
+                                      transactions.successfulTransactions
+                                  )
                         }
                         description="Successful transactions"
                     />
@@ -580,8 +567,8 @@ function AnalyticsPage() {
                             transactions.failedTransactions == null
                                 ? "Unavailable"
                                 : formatNumber(
-                                    transactions.failedTransactions
-                                )
+                                      transactions.failedTransactions
+                                  )
                         }
                         description="Failed transactions"
                     />
@@ -592,10 +579,10 @@ function AnalyticsPage() {
                             transactions.averageTransaction == null
                                 ? "Unavailable"
                                 : formatINR(
-                                    transactions.averageTransaction
-                                )
+                                      transactions.averageTransaction
+                                  )
                         }
-                        description="Backend-reported average"
+                        description="Average successful transaction"
                     />
 
                     <MetricCard
@@ -604,34 +591,31 @@ function AnalyticsPage() {
                             transactions.largestTransaction == null
                                 ? "Unavailable"
                                 : formatINR(
-                                    transactions.largestTransaction
-                                )
+                                      transactions.largestTransaction
+                                  )
                         }
-                        description="Backend-reported largest amount"
+                        description="Largest successful transaction"
                     />
                 </div>
             </section>
 
-            {/* CATEGORY AND SPENDING PANELS */}
-
+            {/* Category and spending panels */}
             <section className="analytics-panels">
-
-                {/* CATEGORY SPENDING */}
-
                 <article className="analytics-panel">
                     <div className="analytics-section-heading">
                         <div>
                             <h2>Spending by category</h2>
 
                             <p>
-                                Category distribution from your backend
+                                Category-wise spending distribution.
                             </p>
                         </div>
                     </div>
 
                     {data.categories.length === 0 ? (
                         <p className="analytics-empty">
-                            No category spending data is available.
+                            No category spending data is available
+                            for this period.
                         </p>
                     ) : (
                         <div className="analytics-category-list">
@@ -650,7 +634,9 @@ function AnalyticsPage() {
                                         key={`${item.category}-${index}`}
                                     >
                                         <div className="analytics-category-top">
-                                            <span>{item.category}</span>
+                                            <span>
+                                                {item.category}
+                                            </span>
 
                                             <strong>
                                                 {formatINR(item.amount)}
@@ -683,15 +669,13 @@ function AnalyticsPage() {
                     )}
                 </article>
 
-                {/* SPENDING PATTERNS */}
-
                 <article className="analytics-panel">
                     <div className="analytics-section-heading">
                         <div>
                             <h2>Spending patterns</h2>
 
                             <p>
-                                Behavioral metrics returned by the backend
+                                Behavioral metrics from your transactions.
                             </p>
                         </div>
                     </div>
@@ -703,7 +687,9 @@ function AnalyticsPage() {
                             <strong>
                                 {spending.totalSpending == null
                                     ? "Unavailable"
-                                    : formatINR(spending.totalSpending)}
+                                    : formatINR(
+                                          spending.totalSpending
+                                      )}
                             </strong>
                         </div>
 
@@ -713,7 +699,9 @@ function AnalyticsPage() {
                             <strong>
                                 {spending.averageSpending == null
                                     ? "Unavailable"
-                                    : formatINR(spending.averageSpending)}
+                                    : formatINR(
+                                          spending.averageSpending
+                                      )}
                             </strong>
                         </div>
 
@@ -732,8 +720,8 @@ function AnalyticsPage() {
                                 {spending.topCategoryPercentage == null
                                     ? "Unavailable"
                                     : `${Number(
-                                        spending.topCategoryPercentage
-                                    ).toFixed(1)}%`}
+                                          spending.topCategoryPercentage
+                                      ).toFixed(1)}%`}
                             </strong>
                         </div>
 
@@ -744,8 +732,8 @@ function AnalyticsPage() {
                                 {spending.activeCategories == null
                                     ? "Unavailable"
                                     : formatNumber(
-                                        spending.activeCategories
-                                    )}
+                                          spending.activeCategories
+                                      )}
                             </strong>
                         </div>
 
@@ -761,14 +749,12 @@ function AnalyticsPage() {
                 </article>
             </section>
 
-            {/* FOOTNOTE */}
-
+            {/* Data transparency */}
             <p className="analytics-footnote">
-                Transaction metrics reflect the selected date range.
-                Dashboard summary remains all-time because its API
-                currently does not support date filtering. This page
-                does not infer missing values or fabricate transaction
-                history.
+                Analytics are calculated from authenticated
+                backend transaction records using the selected
+                date range. Missing values are not estimated
+                or fabricated.
             </p>
         </main>
     );

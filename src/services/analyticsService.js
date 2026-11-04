@@ -3,13 +3,8 @@ import api from "../api/axiosConfig";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 /**
- * Builds query parameters for analytics date filtering.
- *
- * Empty dates are omitted so existing all-time API calls
- * continue working without changes.
- *
- * @param {{fromDate?: string, toDate?: string}} filters
- * @returns {Object}
+ * Builds optional date query parameters.
+ * Empty values are omitted to preserve all-time behavior.
  */
 const buildDateParams = (filters = {}) => {
     const params = {};
@@ -26,17 +21,17 @@ const buildDateParams = (filters = {}) => {
 };
 
 /**
- * Retrieves authenticated user's dashboard aggregates.
+ * Retrieves authenticated user's dashboard analytics.
  *
  * GET /dashboard/insights
- *
- * Dashboard summary remains all-time.
- *
- * @returns {Promise<Object>}
+ * Supports optional date filtering.
  */
-export const getDashboardAnalytics = async () => {
+export const getDashboardAnalytics = async (filters = {}) => {
     const response = await api.get(
-        API_ENDPOINTS.DASHBOARD_INSIGHTS
+        API_ENDPOINTS.DASHBOARD_INSIGHTS,
+        {
+            params: buildDateParams(filters),
+        }
     );
 
     return response.data;
@@ -46,11 +41,6 @@ export const getDashboardAnalytics = async () => {
  * Retrieves transaction analytics.
  *
  * GET /ai/transaction-analytics
- *
- * Supports optional date filtering.
- *
- * @param {{fromDate?: string, toDate?: string}} filters
- * @returns {Promise<Object>}
  */
 export const getTransactionAnalytics = async (filters = {}) => {
     const response = await api.get(
@@ -67,18 +57,6 @@ export const getTransactionAnalytics = async (filters = {}) => {
  * Retrieves spending distribution by category.
  *
  * GET /ai/category-spending
- *
- * Expected response:
- * [
- *   {
- *     category: string,
- *     amount: number,
- *     percentage: number
- *   }
- * ]
- *
- * @param {{fromDate?: string, toDate?: string}} filters
- * @returns {Promise<Array>}
  */
 export const getCategorySpending = async (filters = {}) => {
     const response = await api.get(
@@ -95,11 +73,6 @@ export const getCategorySpending = async (filters = {}) => {
  * Retrieves spending pattern analytics.
  *
  * GET /ai/spending-pattern
- *
- * Supports optional date filtering.
- *
- * @param {{fromDate?: string, toDate?: string}} filters
- * @returns {Promise<Object>}
  */
 export const getSpendingPattern = async (filters = {}) => {
     const response = await api.get(
@@ -117,9 +90,7 @@ export const getSpendingPattern = async (filters = {}) => {
  *
  * GET /ai/intelligence
  *
- * ApiResponse wraps the report in its `data` field.
- *
- * @returns {Promise<Object|null>}
+ * ApiResponse wraps the report in its data field.
  */
 export const getFinancialIntelligence = async () => {
     const response = await api.get("/ai/intelligence");
