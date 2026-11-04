@@ -20,17 +20,15 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (loading) return;
 
         const normalizedEmail = email.trim();
 
         if (!normalizedEmail || !password) {
-            toast.error("Please enter email and password");
-            return;
-        }
-
-        if (loading) {
+            toast.error("Please enter your email and password.");
             return;
         }
 
@@ -42,13 +40,14 @@ function LoginForm() {
                 password
             );
 
-            // Persist authentication before navigating.
+            // Store the authenticated session through AuthContext.
             login(data);
 
-            toast.success("Login successful");
+            toast.success("Login successful.");
 
-            // Return to the protected page when one was requested.
+            // Restore the protected route requested before login.
             const requestedPath = location.state?.from;
+
             const destination =
                 requestedPath?.pathname?.startsWith("/") &&
                 !requestedPath.pathname.startsWith("//") &&
@@ -62,9 +61,8 @@ function LoginForm() {
 
             navigate(destination, { replace: true });
         } catch (error) {
-            // Do not log credentials, tokens, or raw auth responses.
             toast.error(
-                error?.message || "Login failed. Please try again."
+                error?.message || "Unable to sign in. Please try again."
             );
         } finally {
             setLoading(false);
@@ -72,23 +70,36 @@ function LoginForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form
+            className="login-form"
+            onSubmit={handleSubmit}
+            aria-label="Login form"
+        >
             <div className="form-group">
-                <label className="form-label" htmlFor="login-email">
-                    Email
+                <label
+                    className="form-label"
+                    htmlFor="login-email"
+                >
+                    Email Address
                 </label>
 
                 <div className="input-wrapper">
-                    <MdEmail className="input-icon" />
+                    <MdEmail
+                        className="input-icon"
+                        aria-hidden="true"
+                    />
 
                     <input
                         id="login-email"
+                        name="email"
                         type="email"
                         className="form-control input-with-icon"
-                        placeholder="Enter Email"
+                        placeholder="Enter your email address"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(event) => setEmail(event.target.value)}
                         autoComplete="username"
+                        autoCapitalize="none"
+                        spellCheck="false"
                         required
                         disabled={loading}
                     />
@@ -96,20 +107,27 @@ function LoginForm() {
             </div>
 
             <div className="form-group">
-                <label className="form-label" htmlFor="login-password">
+                <label
+                    className="form-label"
+                    htmlFor="login-password"
+                >
                     Password
                 </label>
 
                 <div className="password-wrapper">
-                    <FaLock className="input-icon" />
+                    <FaLock
+                        className="input-icon"
+                        aria-hidden="true"
+                    />
 
                     <input
                         id="login-password"
+                        name="password"
                         type={showPassword ? "text" : "password"}
                         className="form-control"
-                        placeholder="Enter Password"
+                        placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(event) => setPassword(event.target.value)}
                         autoComplete="current-password"
                         required
                         disabled={loading}
@@ -118,7 +136,9 @@ function LoginForm() {
                     <button
                         type="button"
                         className="eye-btn"
-                        onClick={() => setShowPassword((previous) => !previous)}
+                        onClick={() =>
+                            setShowPassword((previous) => !previous)
+                        }
                         aria-label={
                             showPassword ? "Hide password" : "Show password"
                         }
@@ -131,16 +151,14 @@ function LoginForm() {
             </div>
 
             <div className="auth-options">
-                <label className="remember-me">
-                    <input
-                        type="checkbox"
-                        className="remember-checkbox"
-                        disabled={loading}
-                    />
-                    <span>Remember Me</span>
-                </label>
+                <span className="login-access-label">
+                    Secure account authentication
+                </span>
 
-                <Link to="/forgot-password" className="forgot-link">
+                <Link
+                    to="/forgot-password"
+                    className="forgot-link"
+                >
                     Forgot Password?
                 </Link>
             </div>
@@ -149,12 +167,26 @@ function LoginForm() {
                 type="submit"
                 className="login-btn"
                 disabled={loading}
+                aria-busy={loading}
             >
-                {loading ? "Signing In..." : "Login"}
+                {loading ? (
+                    <>
+                        <span
+                            className="login-spinner"
+                            aria-hidden="true"
+                        />
+                        Signing In...
+                    </>
+                ) : (
+                    "Sign In to NeuroWallet"
+                )}
             </button>
 
             <div className="auth-link">
-                New User? <Link to="/register">Create Account</Link>
+                New to NeuroWallet?{" "}
+                <Link to="/register">
+                    Create Account
+                </Link>
             </div>
         </form>
     );
