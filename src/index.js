@@ -1,3 +1,4 @@
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 
@@ -12,28 +13,24 @@ import { AuthProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root")
+    document.getElementById("root")
 );
 
 root.render(
-  <React.StrictMode>
+    <React.StrictMode>
+        <AuthProvider>
+            <App />
 
-    <AuthProvider>
-
-      <App />
-
-      <ToastContainer
-        position="top-right"
-        autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="dark"
-      />
-
-    </AuthProvider>
-
-  </React.StrictMode>
+            <ToastContainer
+                position="top-right"
+                autoClose={2500}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                draggable
+                theme="dark"
+            />
+        </AuthProvider>
+    </React.StrictMode>
 );
