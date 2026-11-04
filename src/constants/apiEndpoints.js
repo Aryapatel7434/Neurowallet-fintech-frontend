@@ -66,6 +66,14 @@ export const API_ENDPOINTS = {
         `/ai/fraud/${encodeURIComponent(transactionId)}`,
 
     // =========================================================
+    // ANALYTICS
+    // =========================================================
+
+    TRANSACTION_ANALYTICS: "/ai/transaction-analytics",
+    CATEGORY_SPENDING: "/ai/category-spending",
+    SPENDING_PATTERN: "/ai/spending-pattern",
+
+    // =========================================================
     // PERSISTENT AI CONVERSATIONS
     // =========================================================
 
