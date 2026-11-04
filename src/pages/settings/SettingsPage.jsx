@@ -16,6 +16,7 @@ import {
     FaExchangeAlt,
     FaDownload,
     FaDatabase,
+    FaKey,
 } from "react-icons/fa";
 
 import api from "../../api/axiosConfig";
@@ -82,6 +83,18 @@ function SettingsPage() {
     // Account data export state
     // --------------------------------------------------
     const [exportingData, setExportingData] = useState(false);
+
+    // --------------------------------------------------
+    // Change password state
+    // --------------------------------------------------
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const [changingPassword, setChangingPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState("");
 
     // --------------------------------------------------
     // Load authenticated user's profile
@@ -454,6 +467,79 @@ function SettingsPage() {
             toast.error(message);
         } finally {
             setExportingData(false);
+        }
+    };
+
+    // --------------------------------------------------
+    // Change authenticated user's password
+    // --------------------------------------------------
+    const handleChangePassword = async (event) => {
+        event.preventDefault();
+        setPasswordError("");
+
+        const { currentPassword, newPassword, confirmPassword } =
+            passwordForm;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            setPasswordError("Please complete all password fields.");
+            return;
+        }
+
+        if (newPassword.length < 8 || newPassword.length > 72) {
+            setPasswordError(
+                "New password must contain between 8 and 72 characters."
+            );
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setPasswordError("New password and confirmation do not match.");
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            setPasswordError(
+                "New password must be different from your current password."
+            );
+            return;
+        }
+
+        setChangingPassword(true);
+
+        try {
+            await api.post("/users/me/change-password", {
+                currentPassword,
+                newPassword,
+            });
+
+            setPasswordForm({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: "",
+            });
+
+            toast.success("Your password has been changed successfully.");
+        } catch (err) {
+            console.error(
+                "Unable to change password:",
+                err.response?.status || err.message
+            );
+
+            const status = err.response?.status;
+
+            const message =
+                status === 400
+                    ? err.response?.data?.message ||
+                      err.response?.data?.detail ||
+                      "Please check your current password and new password."
+                    : status === 401 || status === 403
+                      ? "Your session may have expired. Please log in again."
+                      : "Unable to change your password. Please try again.";
+
+            setPasswordError(message);
+            toast.error(message);
+        } finally {
+            setChangingPassword(false);
         }
     };
 
@@ -866,6 +952,130 @@ function SettingsPage() {
                                 </div>
                             </form>
                         )}
+                    </div>
+
+                    {/* Security Settings - Change Password */}
+                    <div className="settings-form-card settings-security-card">
+                        <div className="settings-card-heading">
+                            <div className="settings-heading-icon">
+                                <FaKey />
+                            </div>
+
+                            <div>
+                                <h2>Security Settings</h2>
+                                <p>
+                                    Update your account password to help protect
+                                    your financial information.
+                                </p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleChangePassword}>
+                            <div className="settings-field">
+                                <label htmlFor="current-password">
+                                    Current Password
+                                </label>
+
+                                <input
+                                    id="current-password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    value={passwordForm.currentPassword}
+                                    onChange={(event) =>
+                                        setPasswordForm((previous) => ({
+                                            ...previous,
+                                            currentPassword: event.target.value,
+                                        }))
+                                    }
+                                    disabled={changingPassword}
+                                    required
+                                />
+                            </div>
+
+                            <div className="settings-field">
+                                <label htmlFor="new-password">
+                                    New Password
+                                </label>
+
+                                <input
+                                    id="new-password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    minLength={8}
+                                    maxLength={72}
+                                    value={passwordForm.newPassword}
+                                    onChange={(event) =>
+                                        setPasswordForm((previous) => ({
+                                            ...previous,
+                                            newPassword: event.target.value,
+                                        }))
+                                    }
+                                    disabled={changingPassword}
+                                    required
+                                />
+
+                                <small>
+                                    Use between 8 and 72 characters.
+                                </small>
+                            </div>
+
+                            <div className="settings-field">
+                                <label htmlFor="confirm-password">
+                                    Confirm New Password
+                                </label>
+
+                                <input
+                                    id="confirm-password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    minLength={8}
+                                    maxLength={72}
+                                    value={passwordForm.confirmPassword}
+                                    onChange={(event) =>
+                                        setPasswordForm((previous) => ({
+                                            ...previous,
+                                            confirmPassword: event.target.value,
+                                        }))
+                                    }
+                                    disabled={changingPassword}
+                                    required
+                                />
+                            </div>
+
+                            {passwordError && (
+                                <div
+                                    className="settings-inline-error"
+                                    role="alert"
+                                >
+                                    <p>{passwordError}</p>
+                                </div>
+                            )}
+
+                            <div className="settings-form-footer">
+                                <p>
+                                    Your current password is required to
+                                    authorize this change.
+                                </p>
+
+                                <button
+                                    type="submit"
+                                    className="settings-primary-btn"
+                                    disabled={changingPassword}
+                                >
+                                    {changingPassword ? (
+                                        <>
+                                            <span className="settings-button-spinner" />
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaShieldAlt />
+                                            Update Password
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
                     {/* Notification Preferences */}
