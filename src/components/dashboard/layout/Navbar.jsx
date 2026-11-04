@@ -1,3 +1,4 @@
+
 import {
     useCallback,
     useContext,
@@ -266,14 +267,17 @@ function Navbar() {
         setProfileOpen((current) => !current);
     };
 
-    const handleLogout = () => {
+    // Secure asynchronous logout.
+    const handleLogout = async () => {
         setProfileOpen(false);
 
-        if (typeof logout === "function") {
-            logout();
+        try {
+            if (typeof logout === "function") {
+                await logout();
+            }
+        } finally {
+            navigate("/", { replace: true });
         }
-
-        navigate("/", { replace: true });
     };
 
     const handleWalletNavigation = () => {

@@ -1,6 +1,15 @@
 
-import { useCallback, useContext, useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import {
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
+
+import {
+    NavLink,
+    useNavigate,
+} from "react-router-dom";
 
 import {
     FaGaugeHigh,
@@ -14,13 +23,16 @@ import {
     FaBell,
     FaGear,
     FaRightFromBracket,
-    FaCrown,
 } from "react-icons/fa6";
 
 import { AuthContext } from "../../../context/AuthContext";
 import { getUnreadNotifications } from "../../../services/notificationService";
 
 import "../../../styles/sidebar.css";
+
+/* ============================================================
+   UNREAD NOTIFICATION COUNT
+============================================================ */
 
 const getUnreadCount = (response) => {
     if (Array.isArray(response)) return response.length;
@@ -31,15 +43,24 @@ const getUnreadCount = (response) => {
     return 0;
 };
 
+/* ============================================================
+   SIDEBAR COMPONENT
+============================================================ */
+
 function Sidebar() {
     const navigate = useNavigate();
     const { logout } = useContext(AuthContext);
 
     const [unreadCount, setUnreadCount] = useState(0);
 
+    /* ========================================================
+       LOAD UNREAD NOTIFICATIONS
+    ======================================================== */
+
     const loadUnreadCount = useCallback(async () => {
         try {
             const response = await getUnreadNotifications();
+
             setUnreadCount(getUnreadCount(response));
         } catch (error) {
             console.error(
@@ -48,6 +69,10 @@ function Sidebar() {
             );
         }
     }, []);
+
+    /* ========================================================
+       NOTIFICATION SYNCHRONIZATION
+    ======================================================== */
 
     useEffect(() => {
         loadUnreadCount();
@@ -65,7 +90,10 @@ function Sidebar() {
             handleNotificationUpdate
         );
 
-        window.addEventListener("focus", handleWindowFocus);
+        window.addEventListener(
+            "focus",
+            handleWindowFocus
+        );
 
         const intervalId = window.setInterval(
             loadUnreadCount,
@@ -78,11 +106,18 @@ function Sidebar() {
                 handleNotificationUpdate
             );
 
-            window.removeEventListener("focus", handleWindowFocus);
+            window.removeEventListener(
+                "focus",
+                handleWindowFocus
+            );
 
             window.clearInterval(intervalId);
         };
     }, [loadUnreadCount]);
+
+    /* ========================================================
+       SIDEBAR NAVIGATION ITEMS
+    ======================================================== */
 
     const menuItems = [
         {
@@ -139,6 +174,10 @@ function Sidebar() {
         },
     ];
 
+    /* ========================================================
+       SECURE LOGOUT
+    ======================================================== */
+
     const handleLogout = async () => {
         try {
             await logout();
@@ -147,8 +186,14 @@ function Sidebar() {
         }
     };
 
+    /* ========================================================
+       RENDER
+    ======================================================== */
+
     return (
         <aside className="sidebar nw-sidebar">
+
+            {/* BRAND */}
             <div className="sidebar-brand nw-sidebar-brand">
                 <div
                     className="sidebar-logo nw-sidebar-logo"
@@ -163,15 +208,18 @@ function Sidebar() {
                 </div>
             </div>
 
+            {/* SECTION LABEL */}
             <div className="sidebar-section-label">
                 WORKSPACE
             </div>
 
+            {/* NAVIGATION */}
             <nav
                 className="nw-sidebar-nav"
                 aria-label="Main navigation"
             >
                 <ul className="sidebar-menu">
+
                     {menuItems.map((item) => {
                         const Icon = item.icon;
 
@@ -191,7 +239,9 @@ function Sidebar() {
                                     to={item.path}
                                     end={item.end}
                                     className={({ isActive }) =>
-                                        `nw-sidebar-link${isActive ? " active" : ""}`
+                                        `nw-sidebar-link${
+                                            isActive ? " active" : ""
+                                        }`
                                     }
                                 >
                                     <Icon
@@ -228,6 +278,7 @@ function Sidebar() {
                         );
                     })}
 
+                    {/* LOGOUT */}
                     <li className="sidebar-logout-item">
                         <button
                             type="button"
@@ -244,38 +295,13 @@ function Sidebar() {
                             </span>
                         </button>
                     </li>
+
                 </ul>
             </nav>
 
+            {/* FLEXIBLE SIDEBAR SPACE */}
             <div className="nw-sidebar-spacer" />
 
-            <section
-                className="nw-sidebar-plan"
-                aria-label="Premium plan"
-            >
-                <div className="nw-sidebar-plan-heading">
-                    <span className="nw-sidebar-crown">
-                        <FaCrown />
-                    </span>
-
-                    <div>
-                        <strong>Pro Plan</strong>
-                        <span>Premium workspace</span>
-                    </div>
-                </div>
-
-                <p>
-                    Unlock advanced AI insights and higher limits.
-                </p>
-
-                <button
-                    type="button"
-                    className="nw-sidebar-upgrade"
-                    onClick={() => navigate("/settings")}
-                >
-                    Upgrade Now
-                </button>
-            </section>
         </aside>
     );
 }

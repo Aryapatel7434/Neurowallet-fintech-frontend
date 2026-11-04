@@ -158,6 +158,7 @@ const normalizeApiError = (error) => {
 
 /* ============================================================
    REFRESH ACCESS TOKEN
+
    Used by the response interceptor after a 401 response.
 ============================================================ */
 
@@ -227,6 +228,7 @@ const getRefreshAccessToken = async () => {
 
 /* ============================================================
    RESTORE SESSION
+
    Used by AuthContext during application initialization.
    Returns authentication data after backend validation.
 ============================================================ */
@@ -307,6 +309,27 @@ export const restoreSession = async () => {
     };
 };
 
+/* ============================================================
+   LOGOUT SESSION
+
+   Revokes the refresh token on the backend.
+   Uses the separate client to avoid automatic refresh logic.
+============================================================ */
+
+export const logoutSession = async () => {
+    const refreshToken = localStorage.getItem(
+        STORAGE_KEYS.REFRESH_TOKEN
+    );
+
+    if (!refreshToken) {
+        return;
+    }
+
+    await refreshClient.post(
+        API_ENDPOINTS.LOGOUT,
+        { refreshToken }
+    );
+};
 
 /* ============================================================
    REQUEST INTERCEPTOR

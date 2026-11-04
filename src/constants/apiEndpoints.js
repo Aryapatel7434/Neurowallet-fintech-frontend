@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
 
     LOGIN: "/auth/login",
     REFRESH: "/auth/refresh",
+    LOGOUT: "/auth/logout",
     REGISTER: "/users/register",
     FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD: "/auth/reset-password",
@@ -52,16 +53,13 @@ export const API_ENDPOINTS = {
     AI_INSIGHTS: "/ai/insights",
     FINANCIAL_SCORE: "/ai/financial-score",
 
-    // Existing AI budget endpoints
     BUDGET_HEALTH: "/ai/budget-health",
     BUDGET_ADVISOR: "/ai/budget-advisor",
 
     GOAL_RECOMMENDATION: "/ai/goals",
 
-    // Legacy single-question assistant
     AI_ASSISTANT: "/ai/assistant",
 
-    // Fraud detection
     AI_FRAUD: (transactionId) =>
         `/ai/fraud/${encodeURIComponent(transactionId)}`,
 
@@ -86,26 +84,17 @@ export const API_ENDPOINTS = {
         `/ai/conversations/${encodeURIComponent(conversationId)}/messages`,
 
     // =========================================================
-    // BUDGET MANAGEMENT - CRUD APIs
+    // BUDGET MANAGEMENT
     // =========================================================
 
-    // Create budget: POST
     BUDGETS: "/budgets",
-
-    // Get paginated budgets: GET
     MY_BUDGETS: "/budgets",
-
-    // Get budget summary: GET
     BUDGET_SUMMARY: "/budgets/summary",
-
-    // Get active budgets: GET
     ACTIVE_BUDGETS: "/budgets/active",
 
-    // Get, update and delete a specific budget
     BUDGET_BY_ID: (budgetId) =>
         `/budgets/${encodeURIComponent(budgetId)}`,
 
-    // Update budget status: PATCH
     BUDGET_STATUS: (budgetId) =>
         `/budgets/${encodeURIComponent(budgetId)}/status`,
 

@@ -9,9 +9,16 @@ import {
 
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getInitials } from "../utils/userUtils";
-import { restoreSession } from "../api/axiosConfig";
+import {
+    restoreSession,
+    logoutSession,
+} from "../api/axiosConfig";
 
 export const AuthContext = createContext(null);
+
+/* ============================================================
+   CLEAR STORED AUTHENTICATION
+============================================================ */
 
 const clearStoredAuthentication = () => {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
@@ -19,6 +26,10 @@ const clearStoredAuthentication = () => {
     localStorage.removeItem(STORAGE_KEYS.EMAIL);
     localStorage.removeItem(STORAGE_KEYS.USER);
 };
+
+/* ============================================================
+   BUILD USER DATA
+============================================================ */
 
 const buildUserData = (data) => {
     if (
@@ -42,6 +53,10 @@ const buildUserData = (data) => {
     };
 };
 
+/* ============================================================
+   TEMPORARY SESSION ERROR DETECTION
+============================================================ */
+
 const isTemporarySessionError = (error) => {
     const status = error?.response?.status;
 
@@ -54,11 +69,19 @@ const isTemporarySessionError = (error) => {
     return status >= 500;
 };
 
+/* ============================================================
+   AUTH PROVIDER
+============================================================ */
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isInitializing, setIsInitializing] = useState(true);
     const [sessionRestoreError, setSessionRestoreError] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
+
+    /* ========================================================
+       INITIALIZE SESSION
+    ======================================================== */
 
     const initializeSession = useCallback(async () => {
         setIsInitializing(true);
@@ -101,12 +124,13 @@ export const AuthProvider = ({ children }) => {
             );
 
             setUser(userData);
+
         } catch (error) {
             if (isTemporarySessionError(error)) {
-                // Preserve stored credentials so the user can retry.
+                // Preserve credentials so the user can retry.
                 setSessionRestoreError(true);
             } else {
-                // A definitive authentication/client error requires login.
+                // Definitive authentication failure.
                 clearStoredAuthentication();
                 setUser(null);
             }
@@ -118,69 +142,89 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         initializeSession();
     }, [initializeSession, retryCount]);
-    
+
+    /* ========================================================
+       CROSS-TAB AUTHENTICATION SYNCHRONIZATION
+    ======================================================== */
+
     useEffect(() => {
-    const handleStorageChange = (event) => {
-        const authKeys = [
-            STORAGE_KEYS.ACCESS_TOKEN,
-            STORAGE_KEYS.REFRESH_TOKEN,
-            STORAGE_KEYS.EMAIL,
-            STORAGE_KEYS.USER,
-        ];
+        const handleStorageChange = (event) => {
+            const authKeys = [
+                STORAGE_KEYS.ACCESS_TOKEN,
+                STORAGE_KEYS.REFRESH_TOKEN,
+                STORAGE_KEYS.EMAIL,
+                STORAGE_KEYS.USER,
+            ];
 
-        // Ignore unrelated localStorage changes.
-        if (
-            event.key !== null &&
-            !authKeys.includes(event.key)
-        ) {
-            return;
-        }
+            // Ignore unrelated localStorage changes.
+            if (
+                event.key !== null &&
+                !authKeys.includes(event.key)
+            ) {
+                return;
+            }
 
-        // localStorage.clear() also triggers this event.
-        if (event.key === null || !localStorage.getItem(
-            STORAGE_KEYS.ACCESS_TOKEN
-        )) {
-            setUser(null);
-            setSessionRestoreError(false);
-            return;
-        }
+            // localStorage.clear() also triggers this event.
+            if (
+                event.key === null ||
+                !localStorage.getItem(
+                    STORAGE_KEYS.ACCESS_TOKEN
+                )
+            ) {
+                setUser(null);
+                setSessionRestoreError(false);
+                return;
+            }
 
-        // Synchronize login or updated user data across tabs.
-        const storedUser = localStorage.getItem(
-            STORAGE_KEYS.USER
-        );
-
-        if (!storedUser) {
-            return;
-        }
-
-        try {
-            const userData = buildUserData(
-                JSON.parse(storedUser)
+            // Synchronize login or updated user data.
+            const storedUser = localStorage.getItem(
+                STORAGE_KEYS.USER
             );
 
-            if (userData) {
-                setUser(userData);
-            } else {
+            if (!storedUser) {
+                return;
+            }
+
+            try {
+                const userData = buildUserData(
+                    JSON.parse(storedUser)
+                );
+
+                if (userData) {
+                    setUser(userData);
+                } else {
+                    setUser(null);
+                }
+
+            } catch {
                 setUser(null);
             }
-        } catch {
-            setUser(null);
-        }
-    };
+        };
 
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-        window.removeEventListener(
+        window.addEventListener(
             "storage",
             handleStorageChange
         );
-    };
-}, []);
+
+        return () => {
+            window.removeEventListener(
+                "storage",
+                handleStorageChange
+            );
+        };
+    }, []);
+
+    /* ========================================================
+       RETRY SESSION RESTORATION
+    ======================================================== */
+
     const retrySessionRestore = useCallback(() => {
         setRetryCount((count) => count + 1);
     }, []);
+
+    /* ========================================================
+       LOGIN
+    ======================================================== */
 
     const login = useCallback((data) => {
         if (
@@ -234,6 +278,7 @@ export const AuthProvider = ({ children }) => {
                 STORAGE_KEYS.USER,
                 JSON.stringify(userData)
             );
+
         } catch (error) {
             clearStoredAuthentication();
             throw error;
@@ -243,15 +288,46 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
     }, []);
 
-    const logout = useCallback(() => {
+    /* ========================================================
+       LOGOUT
+
+       1. Start backend refresh-token revocation.
+       2. Clear local authentication immediately.
+       3. Clear React authentication state.
+       4. Handle backend failures without retaining local login.
+    ======================================================== */
+
+    const logout = useCallback(async () => {
+        // Start the request before removing the stored refresh token.
+        const backendLogoutPromise = logoutSession();
+
+        // Immediately clear local authentication.
         clearStoredAuthentication();
+
         setUser(null);
         setSessionRestoreError(false);
+
+        try {
+            await backendLogoutPromise;
+        } catch (error) {
+            // Local logout remains effective if backend is unavailable.
+            console.error(
+                "Backend logout revocation failed:",
+                error?.message || error
+            );
+        }
     }, []);
+
+    /* ========================================================
+       ROLE MANAGEMENT
+    ======================================================== */
 
     const hasRole = useCallback(
         (requiredRole) =>
-            Boolean(user?.role && user.role === requiredRole),
+            Boolean(
+                user?.role &&
+                user.role === requiredRole
+            ),
         [user]
     );
 
@@ -265,9 +341,18 @@ export const AuthProvider = ({ children }) => {
         [user]
     );
 
+    /* ========================================================
+       AUTHENTICATION STATUS
+    ======================================================== */
+
     const isAuthenticated = Boolean(
-        user && localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+        user &&
+        localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
     );
+
+    /* ========================================================
+       AUTH CONTEXT VALUE
+    ======================================================== */
 
     const value = useMemo(
         () => ({
