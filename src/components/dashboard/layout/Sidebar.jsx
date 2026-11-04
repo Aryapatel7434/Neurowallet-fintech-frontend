@@ -1,5 +1,5 @@
 
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
@@ -18,10 +18,71 @@ import {
 } from "react-icons/fa6";
 
 import { AuthContext } from "../../../context/AuthContext";
+import { getUnreadNotifications } from "../../../services/notificationService";
+
 import "../../../styles/sidebar.css";
+
+const getUnreadCount = (response) => {
+    if (Array.isArray(response)) return response.length;
+    if (Array.isArray(response?.content)) return response.content.length;
+    if (Array.isArray(response?.items)) return response.items.length;
+    if (Array.isArray(response?.data)) return response.data.length;
+
+    return 0;
+};
+
 function Sidebar() {
     const navigate = useNavigate();
     const { logout } = useContext(AuthContext);
+
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    const loadUnreadCount = useCallback(async () => {
+        try {
+            const response = await getUnreadNotifications();
+            setUnreadCount(getUnreadCount(response));
+        } catch (error) {
+            console.error(
+                "Failed to load sidebar notification count:",
+                error
+            );
+        }
+    }, []);
+
+    useEffect(() => {
+        loadUnreadCount();
+
+        const handleNotificationUpdate = () => {
+            loadUnreadCount();
+        };
+
+        const handleWindowFocus = () => {
+            loadUnreadCount();
+        };
+
+        window.addEventListener(
+            "neurowallet:notifications-updated",
+            handleNotificationUpdate
+        );
+
+        window.addEventListener("focus", handleWindowFocus);
+
+        const intervalId = window.setInterval(
+            loadUnreadCount,
+            30000
+        );
+
+        return () => {
+            window.removeEventListener(
+                "neurowallet:notifications-updated",
+                handleNotificationUpdate
+            );
+
+            window.removeEventListener("focus", handleWindowFocus);
+
+            window.clearInterval(intervalId);
+        };
+    }, [loadUnreadCount]);
 
     const menuItems = [
         {
@@ -70,7 +131,6 @@ function Sidebar() {
             label: "Notifications",
             path: "/notifications",
             icon: FaBell,
-            badge: "3",
         },
         {
             label: "Settings",
@@ -90,7 +150,10 @@ function Sidebar() {
     return (
         <aside className="sidebar nw-sidebar">
             <div className="sidebar-brand nw-sidebar-brand">
-                <div className="sidebar-logo nw-sidebar-logo" aria-hidden="true">
+                <div
+                    className="sidebar-logo nw-sidebar-logo"
+                    aria-hidden="true"
+                >
                     <span>NW</span>
                 </div>
 
@@ -104,10 +167,23 @@ function Sidebar() {
                 WORKSPACE
             </div>
 
-            <nav className="nw-sidebar-nav" aria-label="Main navigation">
+            <nav
+                className="nw-sidebar-nav"
+                aria-label="Main navigation"
+            >
                 <ul className="sidebar-menu">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
+
+                        const badgeValue =
+                            item.path === "/notifications"
+                                ? unreadCount
+                                : item.badge;
+
+                        const showBadge =
+                            item.path === "/notifications"
+                                ? unreadCount > 0
+                                : Boolean(item.badge);
 
                         return (
                             <li key={item.path}>
@@ -127,15 +203,24 @@ function Sidebar() {
                                         {item.label}
                                     </span>
 
-                                    {item.badge && (
+                                    {showBadge && (
                                         <span
                                             className={`nw-sidebar-badge ${
                                                 item.badge === "NEW"
                                                     ? "new"
                                                     : "count"
                                             }`}
+                                            aria-label={
+                                                item.path === "/notifications"
+                                                    ? `${unreadCount} unread notifications`
+                                                    : item.badge
+                                            }
                                         >
-                                            {item.badge}
+                                            {item.path === "/notifications"
+                                                ? unreadCount > 99
+                                                    ? "99+"
+                                                    : badgeValue
+                                                : badgeValue}
                                         </span>
                                     )}
                                 </NavLink>
@@ -153,6 +238,7 @@ function Sidebar() {
                                 className="sidebar-menu-icon"
                                 aria-hidden="true"
                             />
+
                             <span className="nw-sidebar-link-label">
                                 Logout
                             </span>
@@ -163,7 +249,10 @@ function Sidebar() {
 
             <div className="nw-sidebar-spacer" />
 
-            <section className="nw-sidebar-plan" aria-label="Premium plan">
+            <section
+                className="nw-sidebar-plan"
+                aria-label="Premium plan"
+            >
                 <div className="nw-sidebar-plan-heading">
                     <span className="nw-sidebar-crown">
                         <FaCrown />
