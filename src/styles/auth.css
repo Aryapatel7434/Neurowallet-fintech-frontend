@@ -833,4 +833,46 @@
         padding-top: 13px;
     }
 }
+/* =====================================================
+   AUTH INPUT VISIBILITY — NORMAL, FOCUS & AUTOFILL
+===================================================== */
+
+.auth-container .form-control,
+.auth-container .form-control:focus {
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    caret-color: #c4b5fd;
+}
+
+.auth-container .form-control::placeholder {
+    color: #94a3b8 !important;
+    -webkit-text-fill-color: #94a3b8 !important;
+    opacity: 1;
+}
+
+/* Chrome / Edge browser autofill */
+.auth-container .form-control:-webkit-autofill,
+.auth-container .form-control:-webkit-autofill:hover,
+.auth-container .form-control:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f8fafc !important;
+    caret-color: #f8fafc;
+    -webkit-box-shadow: 0 0 0 1000px #151d35 inset !important;
+    box-shadow: 0 0 0 1000px #151d35 inset !important;
+    border: 1px solid rgba(139, 92, 246, 0.55);
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+.auth-container .form-control:disabled {
+    -webkit-text-fill-color: #cbd5e1 !important;
+}
+.reset-success-message {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 10px;
+    background: rgba(52, 211, 153, 0.08);
+    color: #a7f3d0;
+    font-size: 13px;
+    line-height: 1.6;
+}
 
