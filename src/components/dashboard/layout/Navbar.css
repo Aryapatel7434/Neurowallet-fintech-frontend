@@ -715,27 +715,48 @@
    TABLET
 ========================================================= */
 
+/* =========================================================
+   TABLET — 481px to 760px
+========================================================= */
+
 @media (max-width: 760px) {
     .dashboard-navbar.nw-navbar {
-        flex-wrap: wrap;
-        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
 
+        width: 100%;
+        min-width: 0;
         min-height: 0;
+
         padding: 12px;
     }
 
+    /* Search occupies its own row */
     .dashboard-navbar.nw-navbar .navbar-left {
-        flex: 1 1 100%;
+        flex: 1 1 auto;
 
         width: 100%;
         max-width: none;
+        min-width: 0;
     }
 
+    .dashboard-navbar.nw-navbar .nw-navbar-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Navbar actions can wrap safely */
     .dashboard-navbar.nw-navbar .navbar-right {
-        flex: 1 1 100%;
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        align-items: center;
         justify-content: space-between;
 
         width: 100%;
+        min-width: 0;
         gap: 8px;
     }
 
@@ -746,67 +767,142 @@
 }
 
 /* =========================================================
-   MOBILE
+   MOBILE — 480px and below
 ========================================================= */
 
 @media (max-width: 480px) {
     .dashboard-navbar.nw-navbar {
+        gap: 10px;
         padding: 10px;
     }
 
-    .dashboard-navbar.nw-navbar .nw-session-status {
-        min-height: 34px;
-        padding-inline: 8px;
-        font-size: 10px;
+    /* Search */
+    .dashboard-navbar.nw-navbar .nw-navbar-search {
+        height: 40px;
+        padding-inline: 10px;
+        gap: 8px;
+    }
+
+    .dashboard-navbar.nw-navbar .search-box {
+        font-size: 12px;
+    }
+
+    .dashboard-navbar.nw-navbar .search-box::placeholder {
+        font-size: 11px;
+    }
+
+    /* Actions */
+    .dashboard-navbar.nw-navbar .navbar-right {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    /* Reporting filter gets its own row */
+    .dashboard-navbar.nw-navbar .nw-period-control {
+        flex: 1 1 100%;
+        width: 100%;
     }
 
     .dashboard-navbar.nw-navbar .dashboard-filter {
-        width: 105px;
+        width: 100%;
         min-width: 0;
-        height: 36px;
+        height: 38px;
+
+        padding-inline: 10px;
+        font-size: 11px;
+    }
+
+    /* Compact session status */
+    .dashboard-navbar.nw-navbar .nw-session-status {
+        flex: 0 1 auto;
+        min-width: 0;
+        min-height: 34px;
+
         padding-inline: 7px;
-        font-size: 11px;
+        gap: 5px;
+
+        font-size: 10px;
     }
 
+    .dashboard-navbar.nw-navbar .nw-session-dot {
+        font-size: 7px;
+    }
+
+    /* Notifications */
     .dashboard-navbar.nw-navbar .notification-btn {
-        flex-basis: 34px;
+        flex: 0 0 34px;
         width: 34px;
         height: 34px;
-        font-size: 16px;
+
+        font-size: 15px;
     }
 
-    .dashboard-navbar.nw-navbar .profile-avatar {
-        flex-basis: 34px;
-        width: 34px;
-        height: 34px;
-        font-size: 11px;
+    /* Profile */
+    .dashboard-navbar.nw-navbar .nw-profile-wrapper {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 145px;
     }
 
     .dashboard-navbar.nw-navbar .profile-card {
-        gap: 6px;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    .dashboard-navbar.nw-navbar .profile-avatar {
+        flex: 0 0 32px;
+        width: 32px;
+        height: 32px;
+
+        font-size: 10px;
+    }
+
+    .dashboard-navbar.nw-navbar .profile-info {
+        min-width: 0;
     }
 
     .dashboard-navbar.nw-navbar .profile-name {
-        max-width: 85px;
-        font-size: 11px;
+        max-width: 72px;
+        font-size: 10px;
     }
 
     .dashboard-navbar.nw-navbar .profile-arrow {
         font-size: 9px;
     }
+
+    /* Keep dropdown inside the viewport */
+    .dashboard-navbar.nw-navbar .nw-profile-menu {
+        right: 0;
+        width: 235px;
+        max-width: calc(100vw - 20px);
+    }
 }
 
 /* =========================================================
-   REDUCED MOTION
+   EXTRA SMALL MOBILE — 360px and below
 ========================================================= */
 
-@media (prefers-reduced-motion: reduce) {
-    .dashboard-navbar.nw-navbar *,
-    .dashboard-navbar.nw-navbar *::before,
-    .dashboard-navbar.nw-navbar *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+@media (max-width: 360px) {
+    .dashboard-navbar.nw-navbar {
+        padding: 8px;
+    }
+
+    .dashboard-navbar.nw-navbar .nw-session-status {
+        padding-inline: 5px;
+        font-size: 9px;
+    }
+
+    .dashboard-navbar.nw-navbar .profile-name {
+        max-width: 58px;
+    }
+
+    .dashboard-navbar.nw-navbar .nw-profile-wrapper {
+        max-width: 125px;
     }
 }

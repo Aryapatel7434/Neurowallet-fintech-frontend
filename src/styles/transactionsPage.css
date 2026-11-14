@@ -761,3 +761,141 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* =========================================================
+   NEUROWALLET — TRANSACTIONS RESPONSIVE REFINEMENTS
+   Add below the existing responsive and accessibility rules.
+   ========================================================= */
+
+.transactions-layout,
+.transactions-page,
+.transactions-panel {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.transactions-summary-card,
+.transactions-toolbar > *,
+.transactions-advanced-filters > * {
+    min-width: 0;
+}
+
+.transactions-table-wrapper {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.transactions-page-table th,
+.transactions-page-table td {
+    white-space: nowrap;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .transactions-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .transactions-summary-card:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .transactions-heading {
+        flex-wrap: wrap;
+    }
+
+    .transactions-toolbar select,
+    .transactions-search,
+    .transactions-date-filter input,
+    .transactions-sort-filter select {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .transactions-advanced-filters {
+        gap: 14px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .transactions-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .transactions-summary-card:last-child {
+        grid-column: auto;
+    }
+
+    .transactions-heading,
+    .transactions-heading > div {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .transactions-refresh {
+        width: 100%;
+    }
+
+    .transactions-panel {
+        border-radius: 11px;
+    }
+
+    .transactions-toolbar,
+    .transactions-advanced-filters {
+        padding: 12px;
+    }
+
+    .transactions-date-filter,
+    .transactions-sort-filter {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .transactions-date-filter label,
+    .transactions-sort-filter label {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .transactions-pagination {
+        padding: 14px 12px;
+    }
+
+    .transactions-pagination > div {
+        flex-wrap: wrap;
+    }
+
+    .transactions-pagination button {
+        min-height: 38px;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+    .transactions-page {
+        padding: 9px;
+    }
+
+    .transactions-heading h1 {
+        font-size: 20px;
+    }
+
+    .transactions-summary-card {
+        padding: 15px;
+    }
+
+    .transactions-summary-card strong {
+        font-size: 22px;
+    }
+
+    .transactions-pagination > div {
+        gap: 6px;
+    }
+
+    .transactions-pagination > div span {
+        font-size: 10px;
+    }
+}

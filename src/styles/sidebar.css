@@ -425,41 +425,136 @@
 
 /* ---------- Tablet and mobile ---------- */
 
+
+/* ---------- Tablet and mobile ---------- */
+
 @media (max-width: 760px) {
-  .nw-sidebar {
-    flex-basis: 76px;
-    width: 76px;
-    min-width: 76px;
-    padding: 14px 8px;
-  }
+    .nw-sidebar {
+        position: relative;
+        top: auto;
 
-  .nw-sidebar .nw-sidebar-brand {
-    justify-content: center;
-    margin-bottom: 24px;
-    padding: 0;
-  }
+        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        min-height: 0;
 
-  .nw-sidebar .sidebar-brand-copy,
-  .nw-sidebar .sidebar-section-label,
-  .nw-sidebar .nw-sidebar-link-label,
-  .nw-sidebar .nw-sidebar-badge,
-  .nw-sidebar .nw-sidebar-plan,
-  .nw-sidebar .nw-sidebar-spacer {
-    display: none;
-  }
+        padding: 10px 12px 8px;
 
-  .nw-sidebar .nw-sidebar-link {
-    justify-content: center;
-    gap: 0;
-    padding: 0;
-  }
+        overflow: hidden;
 
-  .nw-sidebar .sidebar-menu-icon {
-    flex-basis: 20px;
-    width: 20px;
-    height: 20px;
-  }
+        border-right: none;
+        border-bottom: 1px solid #19334d;
+    }
+
+    /* Keep the existing NeuroWallet branding */
+    .nw-sidebar .nw-sidebar-brand {
+        justify-content: flex-start;
+        margin: 0 0 10px;
+        padding: 0 2px;
+    }
+
+    .nw-sidebar .nw-sidebar-logo {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .nw-sidebar .sidebar-brand-copy {
+        display: flex;
+    }
+
+    .nw-sidebar .sidebar-brand-copy h2 {
+        font-size: 15px;
+    }
+
+    .nw-sidebar .sidebar-brand-copy > span {
+        display: none;
+    }
+
+    /* Hide only the desktop workspace label */
+    .nw-sidebar .sidebar-section-label {
+        display: none;
+    }
+
+    /* Horizontally scrollable mobile navigation */
+    .nw-sidebar .nw-sidebar-nav {
+        width: 100%;
+        min-width: 0;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nw-sidebar .nw-sidebar-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nw-sidebar .sidebar-menu {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: max-content;
+        min-width: 100%;
+        gap: 6px;
+    }
+
+    .nw-sidebar .sidebar-menu > li {
+        flex: 0 0 auto;
+        width: auto;
+    }
+
+    /* Preserve existing navigation labels and icons */
+    .nw-sidebar .nw-sidebar-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: auto;
+        min-width: max-content;
+        min-height: 42px;
+
+        padding: 0 11px;
+        gap: 8px;
+    }
+
+    .nw-sidebar .nw-sidebar-link-label {
+        display: inline;
+
+        flex: 0 0 auto;
+        min-width: 0;
+
+        overflow: visible;
+        text-overflow: clip;
+        white-space: nowrap;
+    }
+
+    .nw-sidebar .nw-sidebar-badge {
+        display: inline-flex;
+    }
+
+    .nw-sidebar .sidebar-logout-item {
+        margin-top: 0;
+    }
+
+    .nw-sidebar .nw-sidebar-spacer {
+        display: none;
+    }
 }
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .nw-sidebar .nw-sidebar-link,
+    .nw-sidebar .nw-sidebar-upgrade {
+        transition: none;
+    }
+}
+
 
 /* ---------- Reduced motion ---------- */
 
@@ -469,3 +564,129 @@
     transition: none;
   }
 }
+
+/* =========================================================
+   NEUROWALLET — FINAL MOBILE NAVIGATION FIX
+   Replace the vertical icon rail with a horizontal nav bar.
+   ========================================================= */
+
+@media (max-width: 760px) {
+    .dashboard-layout > .nw-sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        min-height: 0;
+
+        padding: 10px 12px;
+
+        overflow: hidden;
+
+        border-right: 0;
+        border-bottom: 1px solid #19334d;
+    }
+
+    .nw-sidebar .nw-sidebar-brand {
+        display: flex;
+        justify-content: flex-start;
+        margin: 0 0 10px;
+        padding: 0 4px;
+    }
+
+    .nw-sidebar .sidebar-brand-copy {
+        display: flex;
+    }
+
+    .nw-sidebar .sidebar-section-label,
+    .nw-sidebar .nw-sidebar-plan,
+    .nw-sidebar .nw-sidebar-spacer {
+        display: none;
+    }
+
+    .nw-sidebar .nw-sidebar-nav {
+        width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nw-sidebar .sidebar-menu {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: max-content;
+        min-width: 100%;
+        gap: 7px;
+    }
+
+    .nw-sidebar .sidebar-menu > li {
+        flex: 0 0 auto;
+        width: auto;
+    }
+
+    .nw-sidebar .nw-sidebar-link {
+        display: inline-flex;
+        justify-content: flex-start;
+        gap: 8px;
+
+        width: auto;
+        min-width: 0;
+        min-height: 40px;
+
+        padding: 0 11px;
+        white-space: nowrap;
+    }
+
+    .nw-sidebar .nw-sidebar-link-label {
+        display: inline;
+        flex: 0 0 auto;
+        overflow: visible;
+        text-overflow: clip;
+        white-space: nowrap;
+        font-size: 11px;
+    }
+
+    .nw-sidebar .sidebar-menu-icon {
+        flex: 0 0 16px;
+        width: 16px;
+        height: 16px;
+        font-size: 15px;
+    }
+
+    .nw-sidebar .nw-sidebar-badge {
+        display: inline-flex;
+    }
+
+    .nw-sidebar .sidebar-logout-item {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .dashboard-layout > .nw-sidebar {
+        padding: 8px;
+    }
+
+    .nw-sidebar .sidebar-brand-copy h2 {
+        font-size: 16px;
+    }
+
+    .nw-sidebar .nw-sidebar-link {
+        min-height: 38px;
+        padding-inline: 9px;
+    }
+
+    .nw-sidebar .nw-sidebar-link-label {
+        font-size: 10px;
+    }
+}
+

@@ -76,3 +76,40 @@
 
   font-size: 16px;
 }
+
+/* Mobile transaction details modal */
+.transaction-modal {
+    width: min(500px, calc(100vw - 24px));
+    max-width: 100%;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.modal-overlay {
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .transaction-modal {
+        padding: 19px;
+        border-radius: 14px;
+    }
+
+    .modal-header {
+        gap: 10px;
+        margin-bottom: 17px;
+    }
+
+    .modal-header h2 {
+        min-width: 0;
+        font-size: 17px;
+    }
+
+    .modal-body p {
+        overflow-wrap: anywhere;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}

@@ -2193,3 +2193,217 @@
         width: 100%;
     }
 }
+
+/* =========================================================
+   NEUROWALLET — SCHEDULED PAYMENTS MOBILE REFINEMENTS
+   ========================================================= */
+
+.nw-scheduled-page,
+.nw-scheduled-page * {
+    box-sizing: border-box;
+}
+
+.nw-scheduled-container,
+.nw-scheduled-panel,
+.nw-scheduled-stats,
+.nw-scheduled-header,
+.nw-scheduled-toolbar {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.nw-scheduled-heading-copy {
+    min-width: 0;
+}
+
+.nw-scheduled-heading-copy p {
+    overflow-wrap: anywhere;
+}
+
+.nw-scheduled-stat-card {
+    min-width: 0;
+}
+
+.nw-scheduled-stat-card > strong {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.nw-scheduled-table-wrap {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nw-scheduled-table th,
+.nw-scheduled-table td {
+    white-space: nowrap;
+}
+
+/* Tablet */
+@media (max-width: 760px) {
+    .nw-scheduled-header-actions {
+        flex-wrap: wrap;
+    }
+
+    .nw-scheduled-header-actions button {
+        min-width: 0;
+    }
+
+    .nw-scheduled-toolbar {
+        width: 100%;
+    }
+
+    .nw-scheduled-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .nw-scheduled-status-filter {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .nw-scheduled-status-filter select {
+        min-width: 0;
+    }
+
+    .nw-scheduled-pagination > span {
+        line-height: 1.6;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .nw-scheduled-container {
+        padding: 12px;
+    }
+
+    .nw-scheduled-header {
+        gap: 15px;
+    }
+
+    .nw-scheduled-header-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .nw-scheduled-header-actions button {
+        width: 100%;
+    }
+
+    .nw-scheduled-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .nw-scheduled-stat-card {
+        padding: 12px;
+    }
+
+    .nw-scheduled-stat-card > strong {
+        font-size: clamp(17px, 5vw, 23px);
+    }
+
+    .nw-scheduled-stat-top {
+        align-items: flex-start;
+    }
+
+    .nw-scheduled-stat-caption {
+        max-width: 65%;
+    }
+
+    .nw-scheduled-panel-heading {
+        width: 100%;
+    }
+
+    .nw-scheduled-total {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .nw-scheduled-toolbar {
+        padding: 13px;
+    }
+
+    .nw-scheduled-status-filter {
+        flex-wrap: wrap;
+    }
+
+    .nw-scheduled-status-filter select {
+        width: 100%;
+    }
+
+    .nw-scheduled-pagination {
+        gap: 12px;
+        padding: 13px;
+    }
+
+    .nw-scheduled-pagination-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .nw-scheduled-pagination-actions button {
+        min-height: 38px;
+    }
+
+    .nw-scheduled-modal-backdrop {
+        align-items: center;
+        padding: 10px;
+    }
+
+    .nw-scheduled-modal {
+        width: 100%;
+        max-height: 90dvh;
+        overflow-y: auto;
+    }
+
+    .nw-scheduled-detail-row {
+        gap: 10px;
+    }
+
+    .nw-scheduled-detail-row > strong {
+        max-width: 60%;
+        overflow-wrap: anywhere;
+    }
+
+    .nw-scheduled-footnote {
+        align-items: flex-start;
+        line-height: 1.6;
+    }
+}
+
+/* Extra-small phones */
+@media (max-width: 360px) {
+    .nw-scheduled-container {
+        padding: 9px;
+    }
+
+    .nw-scheduled-stats {
+        gap: 7px;
+    }
+
+    .nw-scheduled-stat-card {
+        padding: 10px;
+    }
+
+    .nw-scheduled-stat-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .nw-scheduled-stat-label {
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .nw-scheduled-pagination-actions {
+        justify-content: space-between;
+    }
+
+    .nw-scheduled-pagination-actions button {
+        padding: 0 8px;
+        font-size: 9px;
+    }
+}
