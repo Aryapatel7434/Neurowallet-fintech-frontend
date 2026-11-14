@@ -167,14 +167,14 @@ const getDashboardDateRange = (period) => {
                 toDate,
             };
 
-        case "All Time":
+      case "All Time":
+    // Fall through to the default date range.
 
-        default:
-
-            return {
-                fromDate: null,
-                toDate: null,
-            };
+default:
+    return {
+        fromDate: null,
+        toDate: null,
+    };
     }
 };
 

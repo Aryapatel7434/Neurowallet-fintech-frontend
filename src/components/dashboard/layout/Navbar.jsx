@@ -17,9 +17,7 @@ import {
     FaWallet,
     FaXmark,
 } from "react-icons/fa6";
-
 import {
-    useLocation,
     useNavigate,
 } from "react-router-dom";
 
@@ -100,7 +98,6 @@ function Navbar() {
     } = useContext(AuthContext);
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [search, setSearch] = useState("");
     const [period, setPeriod] = useState("Today");

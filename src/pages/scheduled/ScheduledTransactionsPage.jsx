@@ -147,8 +147,10 @@ function ScheduledTransactionsPage() {
 
     const [cancellingId, setCancellingId] = useState(null);
     const [transactionToCancel, setTransactionToCancel] = useState(null);
-
-    const transactions = pageData?.content || [];
+const transactions = useMemo(
+    () => pageData?.content || [],
+    [pageData]
+);
     const totalPages = pageData?.totalPages || 0;
     const totalElements = pageData?.totalElements || 0;
 

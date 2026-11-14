@@ -213,7 +213,6 @@ function TransactionsPage() {
         toDate,
         sortBy,
         direction,
-        refreshKey,
         dateRangeError,
     ]);
 
@@ -224,7 +223,7 @@ function TransactionsPage() {
         return () => {
             requestIdRef.current += 1;
         };
-    }, [loadTransactions]);
+    }, [loadTransactions, refreshKey]);
 
     // API response data
     const transactions = useMemo(

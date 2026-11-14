@@ -30,7 +30,6 @@ import {
     FaXmark,
     FaLightbulb,
     FaCircleCheck,
-    FaClock,
     FaPause,
     FaPlay,
     FaBan,
@@ -120,27 +119,6 @@ const formatCurrency = (value) => {
         minimumFractionDigits: 0,
     }).format(Number.isFinite(amount) ? amount : 0);
 };
-
-const formatDate = (value) => {
-    if (!value) return "Date unavailable";
-
-    const date = new Date(
-        /^\d{4}-\d{2}-\d{2}$/.test(value)
-            ? `${value}T00:00:00`
-            : value
-    );
-
-    if (Number.isNaN(date.getTime())) {
-        return "Date unavailable";
-    }
-
-    return new Intl.DateTimeFormat("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    }).format(date);
-};
-
 const formatDateTime = (value) => {
     if (!value) return "Date unavailable";
 
@@ -307,9 +285,8 @@ function GoalCard({
 
     const progress = getProgress(goal);
 
-    const completed = goal.status === "COMPLETED";
-    const active = goal.status === "ACTIVE";
-    const paused = goal.status === "PAUSED";
+  const completed = goal.status === "COMPLETED";
+const active = goal.status === "ACTIVE";
 
     const remaining = Math.max(
         0,

@@ -8,8 +8,6 @@ import {
   FaReceipt,
   FaChevronLeft,
   FaChevronRight,
-  FaArrowUpWideShort,
-  FaArrowDownShortWide,
 } from "react-icons/fa6";
 
 const PAGE_SIZE = 8;

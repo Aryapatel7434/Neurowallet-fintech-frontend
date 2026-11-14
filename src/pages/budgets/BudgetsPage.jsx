@@ -7,7 +7,6 @@ import React, {
 } from "react";
 
 import {
-    FaWallet,
     FaArrowTrendUp,
     FaArrowTrendDown,
     FaPiggyBank,
@@ -26,7 +25,6 @@ import {
     FaPause,
     FaPlay,
     FaXmark,
-    FaCalendarDays,
     FaCoins,
 } from "react-icons/fa6";
 
@@ -1012,12 +1010,6 @@ function BudgetsPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingBudget, setEditingBudget] = useState(null);
 
-    const [loadErrors, setLoadErrors] = useState({
-        health: null,
-        advisor: null,
-        summary: null,
-        budgets: null,
-    });
 
     const loadBudgetData = useCallback(async (isRefresh = false) => {
         if (isRefresh) {
@@ -1038,7 +1030,7 @@ function BudgetsPage() {
                 budgets: extractBudgetList(result.budgets),
             });
 
-            setLoadErrors(result.errors || {});
+
 
             if (
                 !result.health &&
@@ -1055,12 +1047,7 @@ function BudgetsPage() {
         } catch (error) {
             console.error("Budget dashboard error:", error);
 
-            setLoadErrors({
-                health: error,
-                advisor: error,
-                summary: error,
-                budgets: error,
-            });
+
 
             toast.error(
                 getErrorMessage(
