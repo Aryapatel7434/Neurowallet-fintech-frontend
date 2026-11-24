@@ -1,5 +1,5 @@
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -19,6 +19,47 @@ function LoginForm() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    // Wake up the Render backend when the login page opens.
+    useEffect(() => {
+        const apiBaseUrl = process.env.REACT_APP_API_URL;
+
+        if (!apiBaseUrl) {
+            console.warn("Backend API URL is not configured.");
+            return;
+        }
+
+        const controller = new AbortController();
+
+        try {
+            const healthUrl = new URL(apiBaseUrl);
+
+            // API base URL ends with /api.
+            // Actuator health endpoint is at the server root.
+            healthUrl.pathname =
+                healthUrl.pathname
+                    .replace(/\/api\/?$/, "")
+                    .replace(/\/$/, "") + "/actuator/health";
+
+            healthUrl.search = "";
+            healthUrl.hash = "";
+
+            fetch(healthUrl.toString(), {
+                method: "GET",
+                cache: "no-store",
+                signal: controller.signal,
+            }).catch(() => {
+                // Warm-up is best-effort and must never block login.
+            });
+        } catch (error) {
+            console.warn(
+                "Backend warm-up could not start:",
+                error
+            );
+        }
+
+        return () => controller.abort();
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();

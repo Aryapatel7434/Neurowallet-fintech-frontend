@@ -13,14 +13,16 @@ export const loginUser = async (
     password
 ) => {
 
-    const response =
-        await api.post(
-            API_ENDPOINTS.LOGIN,
-            {
-                email,
-                password,
-            }
-        );
+   const response = await api.post(
+    API_ENDPOINTS.LOGIN,
+    {
+        email,
+        password,
+    },
+    {
+        timeout: 75000,
+    }
+);
 
     return response.data;
 };
