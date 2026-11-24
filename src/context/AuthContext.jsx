@@ -1,4 +1,3 @@
-
 import {
     createContext,
     useCallback,
@@ -9,6 +8,7 @@ import {
 
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { getInitials } from "../utils/userUtils";
+
 import {
     restoreSession,
     logoutSession,
@@ -60,13 +60,13 @@ const buildUserData = (data) => {
 const isTemporarySessionError = (error) => {
     const status = error?.response?.status;
 
-    // No response usually means a network failure or timeout.
+    // No response usually means network failure or timeout.
     if (!error?.response) {
         return true;
     }
 
-    // Server-side failures may be temporary.
-    return status >= 500;
+    // Server failures and rate limiting may be temporary.
+    return status >= 500 || status === 429;
 };
 
 /* ============================================================
@@ -127,7 +127,7 @@ export const AuthProvider = ({ children }) => {
 
         } catch (error) {
             if (isTemporarySessionError(error)) {
-                // Preserve credentials so the user can retry.
+                // Preserve credentials for a later retry.
                 setSessionRestoreError(true);
             } else {
                 // Definitive authentication failure.
@@ -298,7 +298,7 @@ export const AuthProvider = ({ children }) => {
     ======================================================== */
 
     const logout = useCallback(async () => {
-        // Start the request before removing the stored refresh token.
+        // Start the request before removing the refresh token.
         const backendLogoutPromise = logoutSession();
 
         // Immediately clear local authentication.

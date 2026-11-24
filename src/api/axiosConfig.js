@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 import { STORAGE_KEYS } from "../constants/storageKeys";
@@ -13,7 +12,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 15000,
+    timeout: 90000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -22,13 +21,13 @@ const axiosInstance = axios.create({
 /* ============================================================
    REFRESH TOKEN CLIENT
 
-   Separate client prevents startup restoration from triggering
-   the main client's automatic redirect interceptor.
+   Separate client prevents refresh requests from triggering
+   the main Axios response interceptor.
 ============================================================ */
 
 const refreshClient = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 10000,
+    timeout: 90000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -36,6 +35,8 @@ const refreshClient = axios.create({
 
 /* ============================================================
    SHARED REFRESH PROMISE
+
+   Startup restoration and 401 recovery share one request.
 ============================================================ */
 
 let refreshPromise = null;
@@ -64,6 +65,22 @@ const redirectToLogin = () => {
 };
 
 /* ============================================================
+   TEMPORARY REFRESH ERROR DETECTION
+============================================================ */
+
+const isTemporaryRefreshError = (error) => {
+    const status = error?.response?.status;
+
+    // Network errors and timeouts are temporary.
+    if (!error?.response) {
+        return true;
+    }
+
+    // Server errors and rate limits may be temporary.
+    return status >= 500 || status === 429;
+};
+
+/* ============================================================
    API ERROR NORMALIZATION
 ============================================================ */
 
@@ -71,6 +88,7 @@ const normalizeApiError = (error) => {
     /*
      * Network / timeout / unavailable backend
      */
+
     if (!error.response) {
         const isTimeout =
             error.code === "ECONNABORTED" ||
@@ -157,80 +175,96 @@ const normalizeApiError = (error) => {
 };
 
 /* ============================================================
+   SHARED REFRESH SESSION REQUEST
+
+   Both restoreSession() and the response interceptor use this
+   function to avoid duplicate refresh requests.
+============================================================ */
+
+const requestRefreshSession = () => {
+    if (refreshPromise) {
+        return refreshPromise;
+    }
+
+    const refreshToken = localStorage.getItem(
+        STORAGE_KEYS.REFRESH_TOKEN
+    );
+
+    if (!refreshToken) {
+        return Promise.reject(
+            new Error("Refresh token is unavailable.")
+        );
+    }
+
+    refreshPromise = refreshClient
+        .post(
+            API_ENDPOINTS.REFRESH,
+            { refreshToken }
+        )
+        .then((response) => {
+            const data = response?.data;
+
+            if (
+                !data ||
+                typeof data.accessToken !== "string" ||
+                !data.accessToken
+            ) {
+                throw new Error(
+                    "Refresh response did not contain an access token."
+                );
+            }
+
+            // Store the new access token.
+            localStorage.setItem(
+                STORAGE_KEYS.ACCESS_TOKEN,
+                data.accessToken
+            );
+
+            // Support refresh-token rotation.
+            if (
+                typeof data.refreshToken === "string" &&
+                data.refreshToken
+            ) {
+                localStorage.setItem(
+                    STORAGE_KEYS.REFRESH_TOKEN,
+                    data.refreshToken
+                );
+            }
+
+            return data;
+        })
+        .finally(() => {
+            // Allow a future retry after success or failure.
+            refreshPromise = null;
+        });
+
+    return refreshPromise;
+};
+
+/* ============================================================
    REFRESH ACCESS TOKEN
 
    Used by the response interceptor after a 401 response.
 ============================================================ */
 
 const refreshAccessToken = async () => {
-    const refreshToken = localStorage.getItem(
-        STORAGE_KEYS.REFRESH_TOKEN
-    );
+    const data = await requestRefreshSession();
 
-    if (!refreshToken) {
-        throw new Error("Refresh token is unavailable.");
-    }
-
-    const response = await refreshClient.post(
-        API_ENDPOINTS.REFRESH,
-        { refreshToken }
-    );
-
-    const accessToken = response?.data?.accessToken;
-
-    if (
-        typeof accessToken !== "string" ||
-        !accessToken
-    ) {
-        throw new Error(
-            "Refresh response did not contain an access token."
-        );
-    }
-
-    localStorage.setItem(
-        STORAGE_KEYS.ACCESS_TOKEN,
-        accessToken
-    );
-
-    /*
-     * Support refresh-token rotation when provided by the backend.
-     */
-    if (
-        typeof response?.data?.refreshToken === "string" &&
-        response.data.refreshToken
-    ) {
-        localStorage.setItem(
-            STORAGE_KEYS.REFRESH_TOKEN,
-            response.data.refreshToken
-        );
-    }
-
-    return accessToken;
+    return data.accessToken;
 };
 
 /* ============================================================
-   GET / CREATE SHARED REFRESH PROMISE
+   GET SHARED REFRESH ACCESS TOKEN
 ============================================================ */
 
 const getRefreshAccessToken = async () => {
-    if (refreshPromise) {
-        return refreshPromise;
-    }
-
-    refreshPromise = refreshAccessToken();
-
-    try {
-        return await refreshPromise;
-    } finally {
-        refreshPromise = null;
-    }
+    return refreshAccessToken();
 };
 
 /* ============================================================
    RESTORE SESSION
 
    Used by AuthContext during application initialization.
-   Returns authentication data after backend validation.
 ============================================================ */
 
 export const restoreSession = async () => {
@@ -242,21 +276,13 @@ export const restoreSession = async () => {
         return null;
     }
 
-    const response = await refreshClient.post(
-        API_ENDPOINTS.REFRESH,
-        { refreshToken }
-    );
-
-    const data = response?.data;
+    const data = await requestRefreshSession();
 
     if (
-        !data ||
-        typeof data.accessToken !== "string" ||
-        !data.accessToken ||
         typeof data.email !== "string" ||
-        !data.email ||
+        !data.email.trim() ||
         typeof data.name !== "string" ||
-        !data.name ||
+        !data.name.trim() ||
         typeof data.role !== "string" ||
         !data.role.trim()
     ) {
@@ -266,8 +292,8 @@ export const restoreSession = async () => {
     }
 
     const userData = {
-        name: data.name,
-        email: data.email,
+        name: data.name.trim(),
+        email: data.email.trim(),
         initials: data.name
             .trim()
             .split(/\s+/)
@@ -277,21 +303,6 @@ export const restoreSession = async () => {
             .join(""),
         role: data.role.trim(),
     };
-
-    localStorage.setItem(
-        STORAGE_KEYS.ACCESS_TOKEN,
-        data.accessToken
-    );
-
-    if (
-        typeof data.refreshToken === "string" &&
-        data.refreshToken
-    ) {
-        localStorage.setItem(
-            STORAGE_KEYS.REFRESH_TOKEN,
-            data.refreshToken
-        );
-    }
 
     localStorage.setItem(
         STORAGE_KEYS.EMAIL,
@@ -305,7 +316,7 @@ export const restoreSession = async () => {
 
     return {
         ...data,
-        role: userData.role,
+        ...userData,
     };
 };
 
@@ -313,7 +324,6 @@ export const restoreSession = async () => {
    LOGOUT SESSION
 
    Revokes the refresh token on the backend.
-   Uses the separate client to avoid automatic refresh logic.
 ============================================================ */
 
 export const logoutSession = async () => {
@@ -363,8 +373,9 @@ axiosInstance.interceptors.response.use(
         const status = error.response?.status;
 
         /*
-         * Normalize non-401 errors centrally.
+         * Normalize errors that are not 401 responses.
          */
+
         if (!originalRequest || status !== 401) {
             return Promise.reject(normalizeApiError(error));
         }
@@ -374,24 +385,30 @@ axiosInstance.interceptors.response.use(
         /*
          * Login failures must not trigger token refresh.
          */
+
         if (requestUrl.includes(API_ENDPOINTS.LOGIN)) {
             return Promise.reject(normalizeApiError(error));
         }
 
         /*
-         * A failed refresh request means the existing
-         * authentication can no longer be refreshed.
+         * A refresh endpoint 401 means the refresh token
+         * was rejected. The separate refresh client normally
+         * handles this path without this interceptor.
          */
+
         if (requestUrl.includes(API_ENDPOINTS.REFRESH)) {
             redirectToLogin();
+
             return Promise.reject(normalizeApiError(error));
         }
 
         /*
          * Prevent infinite retry loops.
          */
+
         if (originalRequest._retry) {
             redirectToLogin();
+
             return Promise.reject(normalizeApiError(error));
         }
 
@@ -408,21 +425,30 @@ axiosInstance.interceptors.response.use(
                 `Bearer ${newAccessToken}`;
 
             return axiosInstance(originalRequest);
+
         } catch (refreshError) {
+            /*
+             * Do not destroy a session when Render is asleep,
+             * starting, unavailable, or timing out.
+             */
+
+            if (isTemporaryRefreshError(refreshError)) {
+                return Promise.reject(
+                    normalizeApiError(refreshError)
+                );
+            }
+
+            /*
+             * A definitive refresh failure means the session
+             * cannot be renewed.
+             */
+
             redirectToLogin();
 
             return Promise.reject(
                 refreshError instanceof ApiError
                     ? refreshError
-                    : new ApiError({
-                        message:
-                            "Your session has expired. Please log in again.",
-                        status: 401,
-                        code: "SESSION_EXPIRED",
-                        data: null,
-                        isNetworkError: false,
-                        originalError: refreshError,
-                    })
+                    : normalizeApiError(refreshError)
             );
         }
     }
