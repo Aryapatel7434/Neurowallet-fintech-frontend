@@ -9,6 +9,11 @@ import { MdEmail } from "react-icons/md";
 import { AuthContext } from "../../context/AuthContext";
 import { loginUser } from "../../services/authService";
 
+const MAX_HEALTH_ATTEMPTS = 5;
+const HEALTH_TIMEOUT = 20000;
+
+const RETRY_DELAYS = [2000, 4000, 6000, 8000];
+
 function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -20,46 +25,139 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // Wake up the Render backend when the login page opens.
+    const [connectionStatus, setConnectionStatus] = useState("checking");
+
     useEffect(() => {
         const apiBaseUrl = process.env.REACT_APP_API_URL;
 
         if (!apiBaseUrl) {
             console.warn("Backend API URL is not configured.");
+            setConnectionStatus("unavailable");
             return;
         }
 
-        const controller = new AbortController();
+        let cancelled = false;
+        let activeController = null;
+        let retryTimer = null;
 
-        try {
-            const healthUrl = new URL(apiBaseUrl);
-
-            // API base URL ends with /api.
-            // Actuator health endpoint is at the server root.
-            healthUrl.pathname =
-                healthUrl.pathname
-                    .replace(/\/api\/?$/, "")
-                    .replace(/\/$/, "") + "/actuator/health";
-
-            healthUrl.search = "";
-            healthUrl.hash = "";
-
-            fetch(healthUrl.toString(), {
-                method: "GET",
-                cache: "no-store",
-                signal: controller.signal,
-            }).catch(() => {
-                // Warm-up is best-effort and must never block login.
+        const sleep = (delay) =>
+            new Promise((resolve) => {
+                retryTimer = setTimeout(resolve, delay);
             });
-        } catch (error) {
-            console.warn(
-                "Backend warm-up could not start:",
-                error
-            );
-        }
 
-        return () => controller.abort();
+        const checkBackendHealth = async () => {
+            let healthUrl;
+
+            try {
+                healthUrl = new URL(apiBaseUrl);
+
+                healthUrl.pathname =
+                    healthUrl.pathname
+                        .replace(/\/api\/?$/, "")
+                        .replace(/\/$/, "") + "/actuator/health";
+
+                healthUrl.search = "";
+                healthUrl.hash = "";
+            } catch (error) {
+                console.error("Invalid backend API URL:", error);
+
+                if (!cancelled) {
+                    setConnectionStatus("unavailable");
+                }
+
+                return;
+            }
+
+            for (
+                let attempt = 0;
+                attempt < MAX_HEALTH_ATTEMPTS;
+                attempt++
+            ) {
+                if (cancelled) return;
+
+                setConnectionStatus(
+                    attempt === 0 ? "checking" : "waking"
+                );
+
+               const controller = new AbortController();
+activeController = controller;
+
+let timeoutTimer;
+
+try {
+    timeoutTimer = setTimeout(() => {
+        controller.abort();
+    }, HEALTH_TIMEOUT);
+
+    const response = await fetch(
+        healthUrl.toString(),
+        {
+            method: "GET",
+            cache: "no-store",
+            signal: controller.signal,
+        }
+    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Health check returned HTTP ${response.status}`
+                        );
+                    }
+
+                    const health = await response.json();
+
+                    if (health?.status !== "UP") {
+                        throw new Error("Backend is not healthy.");
+                    }
+
+                    if (!cancelled) {
+                        setConnectionStatus("online");
+                    }
+
+                    return;
+
+                } catch (error) {
+                    if (cancelled) return;
+
+                    console.warn(
+                        `Backend health attempt ${attempt + 1} failed.`,
+                        error
+                    );
+
+                } finally {
+                    clearTimeout(timeoutTimer);
+                    activeController = null;
+                }
+
+                if (attempt < MAX_HEALTH_ATTEMPTS - 1) {
+                    await sleep(RETRY_DELAYS[attempt]);
+                }
+            }
+
+            if (!cancelled) {
+                setConnectionStatus("unavailable");
+            }
+        };
+
+        checkBackendHealth();
+
+        return () => {
+            cancelled = true;
+
+            activeController?.abort();
+
+            if (retryTimer) {
+                clearTimeout(retryTimer);
+            }
+        };
     }, []);
+
+    const connectionMessages = {
+        checking: "Connecting to NeuroWallet services...",
+        waking: "Waking up secure backend services...",
+        online: "Secure connection established",
+        unavailable: "Services are taking longer than expected. You can still sign in.",
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -81,12 +179,10 @@ function LoginForm() {
                 password
             );
 
-            // Store the authenticated session through AuthContext.
             login(data);
 
             toast.success("Login successful.");
 
-            // Restore the protected route requested before login.
             const requestedPath = location.state?.from;
 
             const destination =
@@ -101,10 +197,12 @@ function LoginForm() {
                     : { pathname: "/dashboard" };
 
             navigate(destination, { replace: true });
+
         } catch (error) {
             toast.error(
                 error?.message || "Unable to sign in. Please try again."
             );
+
         } finally {
             setLoading(false);
         }
@@ -116,6 +214,21 @@ function LoginForm() {
             onSubmit={handleSubmit}
             aria-label="Login form"
         >
+            <div
+                className={`login-connection-status ${connectionStatus}`}
+                role="status"
+                aria-live="polite"
+            >
+                <span
+                    className="login-connection-dot"
+                    aria-hidden="true"
+                />
+
+                <span>
+                    {connectionMessages[connectionStatus]}
+                </span>
+            </div>
+
             <div className="form-group">
                 <label
                     className="form-label"
